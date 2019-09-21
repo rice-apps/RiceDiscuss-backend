@@ -4,7 +4,12 @@
   "description": "MERN stack backend for the RiceDiscuss project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint ./",
+    "test": "jest -i --verbose --coverage --runInBand",
+    "start": "node index.js",
+    "dboff": "killall mongod",
+    "watch": "nodemon index.js",
+    "dbon": "mkdir -p ./db && mongod --dbpath ./db"
   },
   "repository": {
     "type": "git",
@@ -29,13 +34,5 @@
   "devDependencies": {
     "eslint": "^6.4.0",
     "jest": "^24.9.0"
-  },
-  "scripts": {
-    "lint": "eslint ./",
-    "test": "jest -i --verbose --coverage --runInBand",
-    "start": "node index.js",
-    "dboff": "killall mongod",
-    "watch": "nodemon index.js",
-    "dbon": "mkdir -p ./db && mongod --dbpath ./db"
   }
 }
