@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon --exec babel-node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,5 +17,14 @@
   "bugs": {
     "url": "https://github.com/rice-apps/RiceDiscuss-backend/issues"
   },
-  "homepage": "https://github.com/rice-apps/RiceDiscuss-backend#readme"
+  "homepage": "https://github.com/rice-apps/RiceDiscuss-backend#readme",
+  "devDependencies": {
+    "@babel/core": "^7.6.2",
+    "@babel/node": "^7.6.2",
+    "@babel/preset-env": "^7.6.2",
+    "nodemon": "^1.19.3"
+  },
+  "dependencies": {
+    "mongodb": "^3.3.2"
+  }
 }
