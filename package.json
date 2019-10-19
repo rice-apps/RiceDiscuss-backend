@@ -1,15 +1,20 @@
 {
   "name": "RiceDiscuss-backend",
   "version": "1.0.0",
-  "description": "MERN stack backend for the RiceDiscuss project",
+  "description": "",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "lint": "eslint ./",
     "test": "jest -i --verbose --coverage --runInBand",
     "start": "node index.js",
     "dboff": "killall mongod",
     "watch": "nodemon index.js",
     "dbon": "mkdir -p ./db && mongod --dbpath ./db"
+=======
+    "start": "nodemon --exec babel-node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+>>>>>>> 7f429a985bf9b51bc68cae1cbaaedcc487064b5b
   },
   "repository": {
     "type": "git",
@@ -22,17 +27,18 @@
     "url": "https://github.com/rice-apps/RiceDiscuss-backend/issues"
   },
   "homepage": "https://github.com/rice-apps/RiceDiscuss-backend#readme",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "dotenv": "^8.1.0",
-    "express": "^4.17.1",
-    "http-errors": "^1.7.3",
-    "mongoose": "^5.7.1",
-    "superagent": "^5.1.0"
-  },
   "devDependencies": {
+<<<<<<< HEAD
     "eslint": "^6.4.0",
     "jest": "^24.9.0"
+=======
+    "@babel/core": "^7.6.2",
+    "@babel/node": "^7.6.2",
+    "@babel/preset-env": "^7.6.2",
+    "nodemon": "^1.19.3"
+  },
+  "dependencies": {
+    "mongodb": "^3.3.2"
+>>>>>>> 7f429a985bf9b51bc68cae1cbaaedcc487064b5b
   }
 }
