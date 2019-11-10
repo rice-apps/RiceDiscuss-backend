@@ -24,7 +24,7 @@ router.get('/', function (req, res) {
 		// This should be the URL that we redirect the user back to after successful CAS authentication
 		var serviceURL = 'http://localhost:3000/auth'; // Using local host for testing purposes
 
-		var url = ${casValidateURL}?ticket=${ticket}?service=?{serviceURL};
+		var url = `${casValidateURL}?ticket=${ticket}?service=?${serviceURL}`;
 
 		request(url, function (err, respose, body) {
 
@@ -60,7 +60,7 @@ router.get('/', function (req, res) {
 						if (!user) {
 							// Create a new user
 							User.create({
-								netID: authSuccess.user;
+								netID: authSuccess.user,
 								date_joined: Math.round((Date.getTime() / 1000))
 							}, function (err, newUser) {
 								if (err) return res.status(500).send();
