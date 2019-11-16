@@ -1,8 +1,17 @@
-const commentSchema = `
+import gql from 'apollo-server-express';
+
+const CommentGQLSchema = gql`
     type Comment {
         _id: ID!,
         creator: User!,
-        post_id: 
-
+        post_id: Post!,
+        parent_id: Comment,
+        date_created: Date!,
+        body: String!,
+        votes: Votes!,
+        children: [Comment!],
+        depth: Int!
     }
 `;
+
+export default CommentGQLSchema;
