@@ -1,7 +1,7 @@
 const express = require('express');
 //const schema = require('./schema');
 import {ApolloServer, gql} from 'apollo-server-express';
-const resolvers = require('./schema/resolvers');
+const resolvers = require('./graphql/resolvers/resolvers');
 
 var app = express();
 
@@ -20,7 +20,7 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 
-var Models = require('./model/models.js');
+var Models = require('./model');
 
 
 app.post('/insertData', (req, res)=>{
