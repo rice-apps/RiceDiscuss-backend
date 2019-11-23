@@ -6,6 +6,6 @@ export const typedef = gql`
         username: String!,
         netID: String!,
         password: String!,
-        date_joined: Date!,
+        date_joined: String!,
     }
 `;
