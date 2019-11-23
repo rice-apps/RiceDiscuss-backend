@@ -1,6 +1,6 @@
 import gql from 'apollo-server-express';
 
-const Query = gql`
+const QueryGQLSchema = gql`
     type Query {
         post(_id: ID): Post
         user(_id: ID): User
@@ -8,4 +8,4 @@ const Query = gql`
     }
 `;
 
-export default Query;
+export default QueryGQLSchema;

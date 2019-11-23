@@ -1,28 +1,15 @@
-import ApolloServer from 'apollo-server-express';
+import { makeExecutableSchema } from 'apollo-server-express';
+
+import QueryGQLSchema from './Query.js';
+import UserGQLSchema from './User.js';
+import PostGQLSchema from './Post.js';
+import CommentGQLSchema from './Comment.js'
+
 const resolvers = require('../resolvers/resolvers');
 
-const typeDefs = gql`
-type Place {
-    id: String!
-    listing_url: String!
-    name: String!
-}
-
-type Query {
-    places: [Place!]!
-}
-
-
-type User {
-    id: ID!
-    username: String!
-}
-`;
-const schema = new ApolloServer({
-	typeDefs,
-	resolvers,
-	playground: {
-		endpoint: '/graphql',
-	}
+const schema = new makeExecutableSchema({
+	typeDefs: [QueryGQLSchema, UserGQLSchema, PostGQLSchema, CommentGQLSchema],
+	resolvers: resolvers,
 });
+
 export default schema;
