@@ -10,11 +10,8 @@ const Mutation = gql`
         downvotePost(_id: ID): Post
         
         createComment(body: String, post_id: ID, parent_id: ID): Comment
-        updateComment(body: String, post_id: ID): Comment
-        deleteComment(post_id: ID): Comment
-
-        user(_id: ID): User
-        comment(_id: ID): Comment
+        updateComment(_id: ID, body: String): Comment
+        deleteComment(_id: ID): Comment
     }
 `;
 
