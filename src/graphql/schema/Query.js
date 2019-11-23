@@ -2,7 +2,9 @@ import gql from 'apollo-server-express';
 
 const Query = gql`
     type Query {
-        
+        post(_id: ID): Post
+        user(_id: ID): User
+        comment(_id: ID): Comment
     }
 `;
 
