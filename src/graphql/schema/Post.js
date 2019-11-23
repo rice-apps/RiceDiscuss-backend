@@ -7,8 +7,8 @@ const PostGQLSchema = gql`
         title: String!,
         body: String!,
         date_created: String!,
-        upvotes: [User!],
-        downvotes: [User!],
+        upvotes: [ID],
+        downvotes: [ID],
         tags: [String!],
         
     }
