@@ -8,7 +8,8 @@ const CommentGQLSchema = gql`
         parent_id: Comment,
         date_created: Date!,
         body: String!,
-        votes: Votes!,
+        upvotes: [User!],
+        downvotes: [User!],
         children: [Comment!],
         depth: Int!
     }
