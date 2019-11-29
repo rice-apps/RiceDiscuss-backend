@@ -11,3 +11,5 @@ const PostResolver = {
         
     }
 }
+
+export default PostResolver;
