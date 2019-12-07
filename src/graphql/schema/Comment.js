@@ -3,13 +3,13 @@ import gql from 'apollo-server-express';
 const CommentGQLSchema = gql`
     type Comment {
         _id: ID!,
-        creator: User!,
+        creator: Post!,
         post_id: Post!,
         parent_id: Comment,
         date_created: Date!,
         body: String!,
-        upvotes: [ID],
-        downvotes: [ID],
+        upvotes: [User],
+        downvotes: [User],
         children: [Comment!],
         depth: Int!
     }

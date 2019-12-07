@@ -3,12 +3,12 @@ import gql from 'apollo-server-express';
 const PostGQLSchema = gql`
     type Post {
         _id: ID!,
-        creator: User!,
+        creator: String!,
         title: String!,
         body: String!,
         date_created: String!,
-        upvotes: [ID],
-        downvotes: [ID],
+        upvotes: [String],
+        downvotes: [String],
         tags: [String!],
         
     }
