@@ -1,15 +1,12 @@
-import { makeExecutableSchema } from 'apollo-server-express';
-
 import QueryGQLSchema from './Query.js';
 import UserGQLSchema from './User.js';
 import PostGQLSchema from './Post.js';
-import CommentGQLSchema from './Comment.js'
+import CommentGQLSchema from './Comment.js';
 
-const resolvers = require('../resolvers/resolvers');
+import Mutation from './Mutation.js';
 
-const schema = new makeExecutableSchema({
-	typeDefs: [QueryGQLSchema, UserGQLSchema, PostGQLSchema, CommentGQLSchema],
-	resolvers: resolvers,
-});
+import { merge } from 'lodash';
 
-export default schema;
+const typeDefs = merge(QueryGQLSchema, [UserGQLSchema, PostGQLSchema, CommentGQLSchema, Mutation]);
+
+export default typeDefs;

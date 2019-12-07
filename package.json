@@ -22,6 +22,7 @@
     "@babel/core": "^7.6.2",
     "@babel/node": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
+    "lodash": "^4.17.15",
     "nodemon": "^1.19.3"
   },
   "dependencies": {
