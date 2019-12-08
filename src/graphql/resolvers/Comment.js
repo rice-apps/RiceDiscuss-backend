@@ -1,5 +1,4 @@
 import Models from '../../model';
-import { Model } from 'mongoose';
 
 const CommentResolver = {
     Comment: {
