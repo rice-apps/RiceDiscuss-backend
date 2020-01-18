@@ -2,32 +2,32 @@ import Models from '../../model';
 
 const CommentResolver = {
     Comment: {
-        _id: async ({ _id }) => {
-            return Models.Comment.findById(_id).select("_id");
+        id: async ({ id }) => {
+            return Models.Comment.findById(id).select("id");
         },
-        creator: async ({ _id }) => {
-            return Models.Comment.findById(_id).select("creator");
+        creator: async ({ id }) => {
+            return Models.Comment.findById(id).select("creator");
         },
-        post_id: async ({ _id }) => {
-            return Models.Comment.findById(_id).select("post_id");
+        postid: async ({ id }) => {
+            return Models.Comment.findById(id).select("postid");
         },
-        date_created: async ({ _id }) => {
-            return Models.Comment.findById(_id).select("date_created");
+        date_created: async ({ id }) => {
+            return Models.Comment.findById(id).select("date_created");
         },
-        body: async ({ _id }) => {
-            return Models.Comment.findById(_id).select("body");
+        body: async ({ id }) => {
+            return Models.Comment.findById(id).select("body");
         },
-        upvotes: async ({ _id }) => {
-            return Models.Comment.findById(_id).select("upvotes");
+        upvotes: async ({ id }) => {
+            return Models.Comment.findById(id).select("upvotes");
         },
-        downvotes: async ({ _id }) => {
-            return Models.Comment.findById(_id).select("downvotes");
+        downvotes: async ({ id }) => {
+            return Models.Comment.findById(id).select("downvotes");
         },
-        children: async ({ _id }) => {
-            return Models.Comment.findById(_id).select("children");
+        children: async ({ id }) => {
+            return Models.Comment.findById(id).select("children");
         },
-        depth: async ({ _id }) => {
-            return Models.Comment.findById(_id).select("depth");
+        depth: async ({ id }) => {
+            return Models.Comment.findById(id).select("depth");
         }
     }
 }
