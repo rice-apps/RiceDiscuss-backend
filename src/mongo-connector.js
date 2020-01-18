@@ -7,7 +7,7 @@ const dbName = "sample_airbnb";
 // 2
 module.exports = async () => {
   return await MongoClient.connect(uri, function(err, client) {
-  	console.log('hi');
+  	console.log('hi friend');
   	return {Listings: client.db(dbName).collection('listingsAndReviews')};
   });
 }
