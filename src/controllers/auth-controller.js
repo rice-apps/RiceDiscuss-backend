@@ -1,8 +1,8 @@
-var express = require('express');
+import express from 'express';
 var router = express.Router();
-var bodyParser = require('body-parser');
-var jwt = require('jsonwebtoken');
-var request = require('request');
+import bodyParser from 'body-parser';
+import jwt from 'jsonwebtoken';
+import request from 'request';
 var xmlParser = require('xml2js').parseString;
 var stripPrefix = require('xml2js').processors.stripPrefix;
 
