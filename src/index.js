@@ -12,7 +12,7 @@ var app = express();
 
 async function connectMongo() {
 //Set up default mongoose connection
-var mongoDB = 'mongodb+srv://davidcyyi:123@shryans-mr8uh.mongodb.net/admin?retryWrites=true&w=majority/ricediscuss';
+var mongoDB = 'mongodb+srv://davidcyyi:123@shryans-mr8uh.mongodb.net/ricediscuss?retryWrites=true&w=majority';
 mongoose.connect(mongoDB, { useNewUrlParser: true });
 
 //Get the default connection

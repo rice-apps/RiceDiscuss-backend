@@ -2,8 +2,8 @@ import Models from '../../model';
 
 const PostResolver = {
     Post: {
-        _id: async ({ id }) => {
-            return Models.Post.findById(id).select('id');
+        id: async ({ id }) => {
+            return Models.Post.findById(id).select('_id');
         },
         creator: async ({ id }) => {
             return Models.Post.findById(id).select('creator');

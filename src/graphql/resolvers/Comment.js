@@ -2,14 +2,14 @@ import Models from '../../model';
 
 const CommentResolver = {
     Comment: {
-        _id: async ({ id }) => {
-            return Models.Comment.findById(id).select("id");
+        id: async ({ id }) => {
+            return Models.Comment.findById(id).select("_id");
         },
         creator: async ({ id }) => {
             return Models.Comment.findById(id).select("creator");
         },
         postid: async ({ id }) => {
-            return Models.Comment.findById(id).select("postid");
+            return Models.Comment.findById(id).select("post_id");
         },
         date_created: async ({ id }) => {
             return Models.Comment.findById(id).select("date_created");

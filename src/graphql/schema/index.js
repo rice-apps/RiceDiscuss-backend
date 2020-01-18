@@ -13,7 +13,7 @@ import { merge } from 'lodash';
 //const typeDefs = merge([UserGQLSchema, PostGQLSchema, CommentGQLSchema, Mutation], QueryGQLSchema);
 const typeDefs =  gql`
     type Post {
-        _id: ID!,
+        id: ID!,
         creator: String!,
         title: String!,
         body: String!,
@@ -21,18 +21,20 @@ const typeDefs =  gql`
         upvotes: [String],
         downvotes: [String],
         tags: [String!],
-        
+        start: String,
+        end: String,
+        place: String,
     }
 
     type User {
-        _id: ID!,
+        id: ID!,
         netID: String!,
         token: String!,
         date_joined: String!
     }
 
     type Comment {
-        _id: ID!,
+        id: ID!,
         creator: Post!,
         post_id: Post!,
         parent_id: Comment,

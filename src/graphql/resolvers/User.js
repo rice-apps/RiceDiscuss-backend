@@ -3,8 +3,8 @@ import Models from '../../model';
 const UserResolver = {
     User: {
         // This doesn't actual work yet, but I don't know how to get the ID for the post without using the ID as an identifier
-        _id: async ({ id }) => {
-            return Models.User.findById(id).select('id');
+        id: async ({ id }) => {
+            return Models.User.findById(id).select('_id');
         },
         netID: async ({ id }) => {
             return Models.User.findById(id).select('netID');
