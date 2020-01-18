@@ -1,12 +1,12 @@
-const { ApolloServer, gql } = require('apollo-server');
 
-const UserGQLSchema = gql`
+import { gql } from 'apollo-server-express';
+
+export const typedef = gql`
     type User {
         _id: ID!,
+        username: String!,
         netID: String!,
-        token: String!,
-        date_joined: Date!
+        password: String!,
+        date_joined: String!,
     }
 `;
-
-export default UserGQLSchema;
