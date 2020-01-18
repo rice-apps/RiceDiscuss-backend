@@ -1,4 +1,5 @@
-import gql from 'apollo-server-express';
+const { ApolloServer, gql } = require('apollo-server');
+
 
 const PostGQLSchema = gql`
     type Post {

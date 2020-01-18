@@ -7,6 +7,6 @@ import Mutation from './Mutation.js';
 
 import { merge } from 'lodash';
 
-const typeDefs = merge(QueryGQLSchema, [UserGQLSchema, PostGQLSchema, CommentGQLSchema, Mutation]);
+const typeDefs = merge([UserGQLSchema, PostGQLSchema, CommentGQLSchema, Mutation], QueryGQLSchema);
 
 export default typeDefs;

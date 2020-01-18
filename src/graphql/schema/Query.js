@@ -1,13 +1,14 @@
-import gql from 'apollo-server-express';
+const { ApolloServer, gql } = require('apollo-server');
+
 
 const QueryGQLSchema = gql`
     type Query {
         posts: [Post]
-        post(_id: ID): Post
+        post(id: ID): Post
         users: [User]
-        user(_id: ID): User
+        user(id: ID): User
         comments: [Comment]
-        comment(_id: ID): Comment
+        comment(id: ID): Comment
     }
 `;
 

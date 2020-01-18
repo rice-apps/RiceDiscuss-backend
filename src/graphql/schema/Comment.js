@@ -1,4 +1,4 @@
-import gql from 'apollo-server-express';
+const { ApolloServer, gql } = require('apollo-server');
 
 const CommentGQLSchema = gql`
     type Comment {

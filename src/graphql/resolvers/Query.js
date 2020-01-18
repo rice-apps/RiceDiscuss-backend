@@ -5,20 +5,20 @@ const QueryResolver = {
         posts: async () => {
             return Models.Post.find();
         },
-        post: async (_, {_id}) => {
-            return Models.Post.findByID(_id);
+        post: async (_, {id}) => {
+            return Models.Post.findByID(id);
         },
         users: async () => {
             return Models.User.find();
         },
-        user: async (_, {_id}) => {
-            return Models.User.findByID(_id);
+        user: async (_, {id}) => {
+            return Models.User.findByID(id);
         },
         comments: async () => {
             return Models.Comment.find();
         },
-        comment: async (_, {_id}) => {
-            return Models.Comment.findByID(_id);
+        comment: async (_, {id}) => {
+            return Models.Comment.findByID(id);
         }
     }
 }
