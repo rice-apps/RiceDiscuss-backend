@@ -2,38 +2,38 @@ import Models from '../../model';
 
 const PostResolver = {
     Post: {
-        _id: async ({ _id }) => {
-            return Models.Post.findById(_id).select('_id');
+        _id: async ({ id }) => {
+            return Models.Post.findById(id).select('id');
         },
-        creator: async ({ _id }) => {
-            return Models.Post.findById(_id).select('creator');
+        creator: async ({ id }) => {
+            return Models.Post.findById(id).select('creator');
         },
-        title: async ({ _id }) => {
-            return Models.Post.findById(_id).select('title');
+        title: async ({ id }) => {
+            return Models.Post.findById(id).select('title');
         },
-        body: async ({ _id }) => {
-            return Models.Post.findById(_id).select('body');
+        body: async ({ id }) => {
+            return Models.Post.findById(id).select('body');
         },
-        date_created: async ({ _id }) => {
-            return Models.Post.findById(_id).select('date_created');
+        date_created: async ({ id }) => {
+            return Models.Post.findById(id).select('date_created');
         },
-        upvotes: async ({ _id }) => {
-            return Models.Post.findById(_id).select('upvotes');
+        upvotes: async ({ id }) => {
+            return Models.Post.findById(id).select('upvotes');
         },
-        downvotes: async({ _id }) => {
-            return Models.Post.findById(_id).select('downvotes');
+        downvotes: async({ id }) => {
+            return Models.Post.findById(id).select('downvotes');
         },
-        tags: async ({ _id }) => {
-            return Models.Post.findById(_id).select('tags');
+        tags: async ({ id }) => {
+            return Models.Post.findById(id).select('tags');
         },
-        start: async ({ _id }) => {
-            return Models.Post.findById(_id).select('start');
+        start: async ({ id }) => {
+            return Models.Post.findById(id).select('start');
         },
-        end: async ({ _id }) => {
-            return Models.Post.findById(_id).select('end');
+        end: async ({ id }) => {
+            return Models.Post.findById(id).select('end');
         },
-        place: async ({ _id }) => {
-            return Models.Post.findById(_id).select('place');
+        place: async ({ id }) => {
+            return Models.Post.findById(id).select('place');
         }
         
     }

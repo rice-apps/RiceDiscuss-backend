@@ -2,7 +2,7 @@ import Models from '../../model';
 
 const CommentResolver = {
     Comment: {
-        id: async ({ id }) => {
+        _id: async ({ id }) => {
             return Models.Comment.findById(id).select("id");
         },
         creator: async ({ id }) => {

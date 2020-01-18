@@ -6,6 +6,6 @@ import MutationResolver from './Mutation.js';
 
 import { merge } from 'lodash';
 
-const resolvers = merge(QueryResolver.Query, [PostResolver.Post, UserResolver.User, CommentResolver.Comment, MutationResolver.Mutation]);
+const resolvers = merge([PostResolver.Post, UserResolver.User, CommentResolver.Comment, MutationResolver.Mutation], QueryResolver.Query);
 
 export default resolvers;
