@@ -35,7 +35,7 @@ const typeDefs =  gql`
 
     type Comment {
         id: ID!,
-        creator: Post!,
+        creator: User!,
         post_id: Post!,
         parent_id: Comment,
         date_created: String!,

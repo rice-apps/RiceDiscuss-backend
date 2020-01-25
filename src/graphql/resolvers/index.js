@@ -9,7 +9,7 @@ import { merge } from 'lodash';
 // const resolvers = merge(PostResolver.Post, UserResolver.User, CommentResolver.Comment, MutationResolver.Mutation, QueryResolver.Query);
 import Models from '../../model';
 
-async function upvote(username, post){
+async function upvote(username, post) {
     if (post.creator === username || post.upvotes.contains(username)) return post;
             
     var index = post.downvotes.indexOf(username);
@@ -37,89 +37,55 @@ async function downvote(username, post) {
     return post;
 }
 
+async function preparePost (id, param){
+    var res = await Models.Post.findById(id).select(param);
+    return res[param];
+}
+
+async function prepareComment (id, param){
+    var res = await Models.Comment.findById(id).select(param);
+    return res[param];
+}
+
+async function prepareUser (id, param) {
+    var res = await Models.User.findById(id).select(param);
+    return res[param];
+}
+
 
 const resolvers = {
 	Post: {
-        id: async ({ id }) => {
-            return Models.Post.findById(id).select('_id');
-        },
-        creator: async ({ id }) => {
-            return Models.Post.findById(id).select('creator');
-        },
-        title: async ({ id }) => {
-            return Models.Post.findById(id).select("title").toString();
-        },
-        body: async ({ id }) => {
-            return Models.Post.findById(id).select('body');
-        },
-        date_created: async ({ id }) => {
-            return Models.Post.findById(id).select('date_created');
-        },
-        upvotes: async ({ id }) => {
-            return Models.Post.findById(id).select('upvotes');
-        },
-        downvotes: async({ id }) => {
-            return Models.Post.findById(id).select('downvotes');
-        },
-        tags: async ({ id }) => {
-            return Models.Post.findById(id).select('tags');
-        },
-        start: async ({ id }) => {
-            return Models.Post.findById(id).select('start');
-        },
-        end: async ({ id }) => {
-            return Models.Post.findById(id).select('end');
-        },
-        place: async ({ id }) => {
-            return Models.Post.findById(id).select('place');
-        }
-        
+        id: async ({ id }) => await preparePost(id, "_id"),
+        creator: async ({ id }) => await preparePost(id, "creator"),
+        title: async ({ id }) => await  preparePost(id, "title"),
+        body: async ({ id }) => await  preparePost(id, "body"),
+        date_created: async ({ id }) => await  preparePost(id, "date_created"),
+        upvotes: async ({ id }) => await  preparePost(id, "upvotes"),
+        downvotes: async({ id }) => await preparePost(id, "downvotes"),
+        tags: async ({ id }) => await preparePost(id, "tags"),
+        start: async ({ id }) => await preparePost(id, "start"),
+        end: async ({ id }) => await preparePost(id, "end"),
+        place: async ({ id }) => await preparePost(id, "place")        
     },
 
     User: {
         // This doesn't actual work yet, but I don't know how to get the ID for the post without using the ID as an identifier
-        id: async ({ id }) => {
-            return Models.User.findById(id).select('_id');
-        },
-        netID: async ({ id }) => {
-            return Models.User.findById(id).select('netID');
-        },
-        token: async ({ id }) => {
-            return Models.User.findById(id).select('token');
-        },
-        date_joined: async ({ id }) => {
-            return Models.User.findById(id).select('date_joined');
-        }
+        id: async ({ id }) => await prepareUser(id, "_id"),
+        netID: async ({ id }) => await prepareUser(id, "netID"),
+        token: async ({ id }) => await prepareUser(id, "token"),
+        date_joined: async ({ id }) => await prepareUser(id, "date_joined")
     },
 
     Comment: {
-        id: async ({ id }) => {
-            return Models.Comment.findById(id).select("_id");
-        },
-        creator: async ({ id }) => {
-            return Models.Comment.findById(id).select("creator");
-        },
-        post_id: async ({ id }) => {
-            return Models.Comment.findById(id).select("post_id");
-        },
-        date_created: async ({ id }) => {
-            return Models.Comment.findById(id).select("date_created");
-        },
-        body: async ({ id }) => {
-            return Models.Comment.findById(id).select("body");
-        },
-        upvotes: async ({ id }) => {
-            return Models.Comment.findById(id).select("upvotes");
-        },
-        downvotes: async ({ id }) => {
-            return Models.Comment.findById(id).select("downvotes");
-        },
-        children: async ({ id }) => {
-            return Models.Comment.findById(id).select("children");
-        },
-        depth: async ({ id }) => {
-            return Models.Comment.findById(id).select("depth");
-        }
+        id: async ({ id }) => await prepareComment(id, "_id"),
+        creator: async ({ id }) => await prepareComment(id, "creator"),
+        post_id: async ({ id }) => await prepareComment(id, "post_id"),
+        date_created: async ({ id }) => await prepareComment(id, "date_created"),
+        body: async ({ id }) => await prepareComment(id, "body"),
+        upvotes: async ({ id }) => await prepareComment(id, "upvotes"),
+        downvotes: async ({ id }) => await prepareComment(id, "downvotes"),
+        children: async ({ id }) => await prepareComment(id, "children"),
+        depth: async ({ id }) => await prepareComment(id, "depth")
     },
 
     Mutation: {
