@@ -6,6 +6,7 @@ import typeDefs from './graphql/schema';
 import resolvers from './graphql/resolvers';
 
 import jwt from 'jsonwebtoken';
+import idp from './controllers/auth-controller';
 
 //import connectMongo from './mongo-connector.js';
 
@@ -46,6 +47,7 @@ const start = async () => {
   // 3
   const mongo = await connectMongo();
   var app = express();
+
   const schema = new ApolloServer({
     typeDefs,
     resolvers,
@@ -64,9 +66,29 @@ const start = async () => {
     }
   });
 
+
+
+  /*
+  ***********
+  Middleware
+  ***********
+  */
   schema.applyMiddleware({ app, path: '/graphql'});
 
+  /*
+  ***********
+  Endpoints
+  ***********
+  */
+  idp(app);
+
   const PORT = 3001;
+
+  /*
+  ***********
+  Server
+  ***********
+  */
   app.listen(PORT, () => {
     console.log(`Apollo Server on http://localhost:${PORT}/graphql.`)
   });

@@ -1,6 +1,3 @@
-import express from 'express';
-var router = express.Router();
-import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
 import request from 'request';
 var xmlParser = require('xml2js').parseString;
@@ -10,12 +7,10 @@ var config = require('../config');
 
 var User = require('../model/schema/User');
 
-router.use(bodyParser.json());
-
 /* Routing for the homepage. Front end sends a get request to the backend and here is the 
  * handling for that get request.
  */
-router.get('/', function (req, res) {
+function oAuth(req, res) {
 	var ticket = req.query.ticket;
 	//console.log("HERE", req.query);
 
@@ -107,4 +102,8 @@ router.get('/', function (req, res) {
 	} else {
 		return res.status(400);
 	}
-});
+}
+
+module.exports = (app) => {
+	app.use('/login', oAuth)
+}

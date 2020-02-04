@@ -3,7 +3,7 @@ const { ApolloServer, gql } = require('apollo-server');
 const CommentGQLSchema = gql`
     type Comment {
         _id: ID!,
-        creator: Post!,
+        creator: String!,
         post_id: Post!,
         parent_id: Comment,
         date_created: Date!,
