@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import typeDefs from './graphql/schema';
 import resolvers from './graphql/resolvers';
 
+import jwt from 'jsonwebtoken';
 import idp from './controllers/auth-controller';
 
 //import connectMongo from './mongo-connector.js';
@@ -52,6 +53,19 @@ const start = async () => {
   const schema = new ApolloServer({
     typeDefs,
     resolvers,
+    context: ({req, res}) => {
+      const token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+      if (token) {
+        try {
+          user = jwt.verify(token, config.secret);
+        } catch (err) {
+          user = null;
+        }
+      }
+
+      return { user };
+    }
   });
 
 
