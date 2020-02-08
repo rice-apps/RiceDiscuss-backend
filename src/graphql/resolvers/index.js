@@ -8,6 +8,7 @@ import { merge } from 'lodash';
 
 // const resolvers = merge(PostResolver.Post, UserResolver.User, CommentResolver.Comment, MutationResolver.Mutation, QueryResolver.Query);
 import Models from '../../model';
+import mongoose from 'mongoose';
 
 async function upvote(username, post) {
     if (post.creator === username || post.upvotes.contains(username)) return post;
@@ -52,6 +53,12 @@ async function prepareUser (id, param) {
     return res[param];
 }
 
+function handleError (err) {
+    console.log("\n\n---------BEGIN ERROR MESSAGE---------");
+    console.log("@@@ TIME: " + Date() + " @@@\n");
+    console.log(err);
+    console.log("\n--------END ERROR MESSAGE------------\n\n\n");
+}
 
 const resolvers = {
 	Post: {
@@ -63,6 +70,7 @@ const resolvers = {
         upvotes: async ({ id }) => await  preparePost(id, "upvotes"),
         downvotes: async({ id }) => await preparePost(id, "downvotes"),
         tags: async ({ id }) => await preparePost(id, "tags"),
+        postType: async ({ id }) => await preparePost(id, "postType"),
         start: async ({ id }) => await preparePost(id, "start"),
         end: async ({ id }) => await preparePost(id, "end"),
         place: async ({ id }) => await preparePost(id, "place")        
@@ -95,12 +103,20 @@ const resolvers = {
             if (title && title !== "") post.title = title;
             await post.save();
         },
-        createPost: async (body, title, type, userID) => {
-            const typeT = type && type !== "" ? type : "discussion"; //default to discussion
-            const post = new Models.Post({creator: userID, title: title, type: typeT, body: body});
+        createPost: async (body, title, postType, userID) => {
+            const typeT = postType && postType !== "" ? postType : "discussion"; //default to discussion
+            const post = new Models.Post({
+                _id: new mongoose.Types.ObjectId(),
+                creator: `${title.userID}`,
+                title: `${title.title}`,
+                body: `${title.body}`,
+                postType: `${title.postType}`
+            });
             
             await post.save(function (err) {
-              if (err) return handleError(err);
+              if (err) {
+                  return handleError(err);
+              }
             });
 
             return post;

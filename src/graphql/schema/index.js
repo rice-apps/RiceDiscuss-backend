@@ -21,6 +21,7 @@ const typeDefs =  gql`
         upvotes: [String],
         downvotes: [String],
         tags: [String!],
+        postType: String!,
         start: String,
         end: String,
         place: String,
@@ -49,7 +50,7 @@ const typeDefs =  gql`
 
     type Mutation {
         updatePost(id: ID, body: String, title: String): Post
-        createPost(body: String, title: String, type: String, username: String): Post
+        createPost(body: String, title: String, postType: String, userID: String): Post
         deletePost(id: ID): Post
         upvotePost(id: ID, username: String): Post
         downvotePost(id: ID, username: String): Post

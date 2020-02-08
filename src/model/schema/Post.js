@@ -13,7 +13,7 @@ var PostSchema = new Schema({
 	upvotes: [{type: String, required: true}],
 	downvotes: [{type: String, required: true}],
 	tags: [ { type: String } ],
-	type: { type: String, required: true, default: "discussion", 
+	postType: { type: String, required: true, default: "discussion", 
 			enum:["discussion", "job", "event"] },
 	start: { type: Date, default: null },
 	end: { type: Date, default: null },
