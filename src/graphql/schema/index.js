@@ -37,8 +37,8 @@ const typeDefs =  gql`
     type Comment {
         id: ID!,
         creator: String!,
-        post_id: Post!,
-        parent_id: Comment,
+        post_id: ID,
+        parent_id: ID,
         date_created: String!,
         body: String!,
         upvotes: [User],
@@ -55,7 +55,7 @@ const typeDefs =  gql`
         upvotePost(id: ID, username: String): Post
         downvotePost(id: ID, username: String): Post
         
-        createComment(body: String, post_id: ID, parent_id: ID, username: String): Comment
+        createComment(body: String, post_id: String, parent_id: String, username: String): Comment
         upvoteComment(id: ID, username: String): Post
         downvoteComment(id: ID, username: String): Post
         updateComment(id: ID, body: String): Comment

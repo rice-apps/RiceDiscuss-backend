@@ -38,13 +38,15 @@ async function downvote(username, post) {
     return post;
 }
 
-async function preparePost (id, param){
+async function preparePost (id, param) {
     var res = await Models.Post.findById(id).select(param);
+    var res = await Models.Post.find();
+    console.log(res);
     return res[param];
 }
 
 async function prepareComment (id, param){
-    var res = await Models.Comment.findById(id).select(param);
+    var res = await Models.Comment.findById(id);
     return res[param];
 }
 
@@ -66,7 +68,7 @@ const resolvers = {
         creator: async ({ id }) => await preparePost(id, "creator"),
         title: async ({ id }) => await  preparePost(id, "title"),
         body: async ({ id }) => await  preparePost(id, "body"),
-        date_created: async ({ id }) => await  preparePost(id, "date_created"),
+        date_created: async ({ id }) => await preparePost(id, "date_created"),
         upvotes: async ({ id }) => await  preparePost(id, "upvotes"),
         downvotes: async({ id }) => await preparePost(id, "downvotes"),
         tags: async ({ id }) => await preparePost(id, "tags"),
@@ -141,15 +143,16 @@ const resolvers = {
         createComment:  async (body, postid, parentid, username) => {
             var parent;
             let depth = 0;
-            if (parentid) {
+            if (postid.parentid) {
                 parent = await Models.Comment.findById(parentid);
                 if (parent.depth >= 3) {
                     return;//someway to return failure
                 }
                 depth = parent.depth + 1;
             }
-            const comment = new Models.Comment({postid: postid, 
-                creator: username, parentid: parentid, body: body, depth: depth});
+            
+            const comment = new Models.Comment({_id: mongoose.Types.ObjectId(), post_id: mongoose.Types.ObjectId(postid.post_id), 
+                creator: `${postid.username}`, parent_id: null, body: `${postid.body}`, depth: depth});
             await comment.save(function (err) {
                 if (err) return handleError(err);
             })
