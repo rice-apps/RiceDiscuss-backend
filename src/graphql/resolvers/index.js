@@ -40,13 +40,11 @@ async function downvote(username, post) {
 
 async function preparePost (id, param) {
     var res = await Models.Post.findById(id).select(param);
-    var res = await Models.Post.find();
-    console.log(res);
     return res[param];
 }
 
 async function prepareComment (id, param){
-    var res = await Models.Comment.findById(id);
+    var res = await Models.Comment.findById(id).select(param);
     return res[param];
 }
 
@@ -99,20 +97,20 @@ const resolvers = {
     },
 
     Mutation: {
-        updatePost: async (id, body, title) => {
+        updatePost: async (_, { id, body, title }, __, ___) => {
             const post = await Models.Post.findByID(id);
             if (body && body !== "") post.body = body;
             if (title && title !== "") post.title = title;
             await post.save();
         },
-        createPost: async (body, title, postType, userID) => {
+        createPost: async (_, { body, title, postType, userID }, __, ___) => {
             const typeT = postType && postType !== "" ? postType : "discussion"; //default to discussion
             const post = new Models.Post({
                 _id: new mongoose.Types.ObjectId(),
-                creator: `${title.userID}`,
-                title: `${title.title}`,
-                body: `${title.body}`,
-                postType: `${title.postType}`
+                creator: userID,
+                title: title,
+                body: body,
+                postType: typeT
             });
             
             await post.save(function (err) {
@@ -123,27 +121,27 @@ const resolvers = {
 
             return post;
         },
-        deletePost: async (id) => {
+        deletePost: async (_, { id }, __, ___) => {
             const post = await Models.Post.findById(id);
             post.body = "[removed]";
             post.creator = "[removed]";
             return post;
         },
-        upvotePost:  async (id, username) => {
+        upvotePost:  async (_, { id, username }, __, ___) => {
             const post = await Models.Post.findById(id);
             //check if userID already in upvotes/downvotes/author
             return upvote(username, post);
         },
-        downvotePost:  async (id, username) => {
+        downvotePost:  async (_, { id, username }, __, ___) => {
             const post = await Models.Post.findById(id);
             //check if userID already in upvotes/downvotes/author
             return downvote(username, post);
         },
 
-        createComment:  async (body, postid, parentid, username) => {
+        createComment:  async (_, { body, postid, parentid, username }, __, ___) => {
             var parent;
             let depth = 0;
-            if (postid.parentid) {
+            if (parentid) {
                 parent = await Models.Comment.findById(parentid);
                 if (parent.depth >= 3) {
                     return;//someway to return failure
@@ -151,14 +149,14 @@ const resolvers = {
                 depth = parent.depth + 1;
             }
             
-            const comment = new Models.Comment({_id: mongoose.Types.ObjectId(), post_id: mongoose.Types.ObjectId(postid.post_id), 
-                creator: `${postid.username}`, parent_id: null, body: `${postid.body}`, depth: depth});
+            const comment = new Models.Comment({_id: mongoose.Types.ObjectId(), post_id: mongoose.Types.ObjectId(postid), 
+                creator: username, parent_id: parentid, body: body, depth: depth});
             await comment.save(function (err) {
                 if (err) return handleError(err);
             })
             return comment;
         },
-        updateComment: async (id, body) => {
+        updateComment: async (_, { id, body }, __, ___) => {
             const comment = await Models.Comment.findById(id);
             if (body && body !== "") comment.body = body;
             await comment.save();
