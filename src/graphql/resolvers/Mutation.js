@@ -30,23 +30,26 @@ async function downvote(username, post) {
 
 const MutationResolver = {
     Mutation: {
-        updatePost: async (id, body, title) => {
+        async updatePost (id, body, title) {
             const post = await Models.Post.findByID(id);
             if (body && body !== "") post.body = body;
             if (title && title !== "") post.title = title;
             await post.save();
         },
-        createPost: async (body, title, type, userID) => {
-            const typeT = type && type !== "" ? type : "discussion"; //default to discussion
-            const post = new Models.Post({creator: userID, title: title, type: typeT, body: body});
+        async createPost (root, {body, title, type, userID}) {
+            if (type && type !== "")
+                type = "discussion";
+            const post = new Models.Post({creator: userID, title: title, postType: type, body: body});
             
-            await post.save(function (err) {
-              if (err) return handleError(err);
-            });
+            return await post.save();
 
-            return post;
+            // return post;
+
+            //await Models.Post.create({creator: userID, title: title, postType: type, body: body});
+
+            //return await Models.Post.findById("5e5ac6960bd326de24b71b45");
         },
-        deletePost: async (id) => {
+        async deletePost (id) {
             const post = await Models.Post.findById(id);
             post.body = "[removed]";
             post.creator = "[removed]";
@@ -66,6 +69,7 @@ const MutationResolver = {
         createComment:  async (body, postid, parentid, username) => {
             var parent;
             let depth = 0;
+            console.log("hi");
             if (parentid) {
                 parent = await Models.Comment.findByID(parentid);
                 if (parent.depth >= 3) {
@@ -78,6 +82,7 @@ const MutationResolver = {
             await comment.save(function (err) {
                 if (err) return handleError(err);
             })
+            console.log(comment);
             return comment;
         },
         updateComment: async (id, body) => {

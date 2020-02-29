@@ -11,8 +11,10 @@ const PostGQLSchema = gql`
         upvotes: [String],
         downvotes: [String],
         tags: [String!],
-        
+        postType: String!,
+        start: String,
+        end: String,
+        place: String
     }
 `;
-
 export default PostGQLSchema;
