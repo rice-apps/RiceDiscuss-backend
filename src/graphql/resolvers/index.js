@@ -12,14 +12,14 @@ import mongoose from 'mongoose';
 
 async function upvote(username, post) {
     if (post.creator === username || post.upvotes.contains(username)) return post;
-            
+
     var index = post.downvotes.indexOf(username);
     if (index) {
         post.downvotes.splice(index, 1);
     }
     post.upvotes.append(username);
     await post.save(function (err) {
-      if (err) return handleError(err);
+        if (err) return handleError(err);
     });
     return post;
 }
@@ -33,27 +33,27 @@ async function downvote(username, post) {
     }
     post.downvotes.append(username);
     await post.save(function (err) {
-      if (err) return handleError(err);
+        if (err) return handleError(err);
     });
     return post;
 }
 
-async function preparePost (id, param) {
+async function preparePost(id, param) {
     var res = await Models.Post.findById(id).select(param);
     return res[param];
 }
 
-async function prepareComment (id, param){
+async function prepareComment(id, param) {
     var res = await Models.Comment.findById(id).select(param);
     return res[param];
 }
 
-async function prepareUser (id, param) {
+async function prepareUser(id, param) {
     var res = await Models.User.findById(id).select(param);
     return res[param];
 }
 
-function handleError (err) {
+function handleError(err) {
     console.log("\n\n---------BEGIN ERROR MESSAGE---------");
     console.log("@@@ TIME: " + Date() + " @@@\n");
     console.log(err);
@@ -61,19 +61,19 @@ function handleError (err) {
 }
 
 const resolvers = {
-	Post: {
+    Post: {
         id: async ({ id }) => await preparePost(id, "_id"),
         creator: async ({ id }) => await preparePost(id, "creator"),
-        title: async ({ id }) => await  preparePost(id, "title"),
-        body: async ({ id }) => await  preparePost(id, "body"),
+        title: async ({ id }) => await preparePost(id, "title"),
+        body: async ({ id }) => await preparePost(id, "body"),
         date_created: async ({ id }) => await preparePost(id, "date_created"),
-        upvotes: async ({ id }) => await  preparePost(id, "upvotes"),
-        downvotes: async({ id }) => await preparePost(id, "downvotes"),
+        upvotes: async ({ id }) => await preparePost(id, "upvotes"),
+        downvotes: async ({ id }) => await preparePost(id, "downvotes"),
         tags: async ({ id }) => await preparePost(id, "tags"),
         postType: async ({ id }) => await preparePost(id, "postType"),
         start: async ({ id }) => await preparePost(id, "start"),
         end: async ({ id }) => await preparePost(id, "end"),
-        place: async ({ id }) => await preparePost(id, "place")        
+        place: async ({ id }) => await preparePost(id, "place")
     },
 
     User: {
@@ -112,11 +112,11 @@ const resolvers = {
                 body: body,
                 postType: typeT
             });
-            
+
             await post.save(function (err) {
-              if (err) {
-                  return handleError(err);
-              }
+                if (err) {
+                    return handleError(err);
+                }
             });
 
             return post;
@@ -127,18 +127,18 @@ const resolvers = {
             post.creator = "[removed]";
             return post;
         },
-        upvotePost:  async (_, { id, username }, __, ___) => {
+        upvotePost: async (_, { id, username }, __, ___) => {
             const post = await Models.Post.findById(id);
             //check if userID already in upvotes/downvotes/author
             return upvote(username, post);
         },
-        downvotePost:  async (_, { id, username }, __, ___) => {
+        downvotePost: async (_, { id, username }, __, ___) => {
             const post = await Models.Post.findById(id);
             //check if userID already in upvotes/downvotes/author
             return downvote(username, post);
         },
 
-        createComment:  async (_, { body, postid, parentid, username }, __, ___) => {
+        createComment: async (_, { body, postid, parentid, username }, __, ___) => {
             var parent;
             let depth = 0;
             if (parentid) {
@@ -148,9 +148,11 @@ const resolvers = {
                 }
                 depth = parent.depth + 1;
             }
-            
-            const comment = new Models.Comment({_id: mongoose.Types.ObjectId(), post_id: mongoose.Types.ObjectId(postid), 
-                creator: username, parent_id: parentid, body: body, depth: depth});
+
+            const comment = new Models.Comment({
+                _id: mongoose.Types.ObjectId(), post_id: mongoose.Types.ObjectId(postid),
+                creator: username, parent_id: parentid, body: body, depth: depth
+            });
             await comment.save(function (err) {
                 if (err) return handleError(err);
             })
@@ -172,12 +174,12 @@ const resolvers = {
             return comment;
         },
 
-        upvoteComment:  async (id, username) => {
+        upvoteComment: async (id, username) => {
             const comment = await Models.Comment.findById(id);
             //check if userID already in upvotes/downvotes/author
             return upvote(username, comment);
         },
-        downvoteComment:  async (id, username) => {
+        downvoteComment: async (id, username) => {
             const comment = await Models.Comment.findById(id);
             //check if userID already in upvotes/downvotes/author
             return downvote(username, comment);
@@ -186,22 +188,25 @@ const resolvers = {
 
     Query: {
         posts: async () => {
-            return Models.Post.find();
+            return await Models.Post.find();
         },
-        post: async (_, {id}) => {
-            return Models.Post.findById(id);
+        postByID: async (_, { id }) => {
+            return await Models.Post.findById(id);
+        },
+        postByUser: async (_, { userID }) => {
+            return await Models.Post.find({ creator: userID });
         },
         users: async () => {
-            return Models.User.find();
+            return await Models.User.find();
         },
-        user: async (_, {id}) => {
-            return Models.User.findById(id);
+        user: async (_, { id }) => {
+            return await Models.User.findById(id);
         },
         comments: async () => {
-            return Models.Comment.find();
+            return await Models.Comment.find();
         },
-        comment: async (_, {id}) => {
-            return Models.Comment.findById(id);
+        comment: async (_, { id }) => {
+            return await Models.Comment.findById(id);
         }
     }
 

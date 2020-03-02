@@ -7,8 +7,17 @@ import resolvers from './graphql/resolvers';
 
 import jwt from 'jsonwebtoken';
 import idp from './controllers/auth-controller';
+import config from './config';
+
+import request from 'request';
 
 //import connectMongo from './mongo-connector.js';
+
+request("https://idp.rice.edu/idp/profile/cas/login?service=http://localhost:3000", function(err, response, body) {
+  console.log(err);
+  console.log(response);
+  console.log(body);
+});
 
 var app = express();
 
@@ -51,6 +60,21 @@ const start = async () => {
   const schema = new ApolloServer({
     typeDefs,
     resolvers,
+    context: ({ req, res }) => {
+      const token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+      if (token) {
+        try {
+          var decoded = jwt.verify(token, config.secret);
+        } catch (err) {
+          return { success: false, message: "token authentication failed", user: null };
+        }
+
+        return { success: true, message: "Authentication successful", user: decoded.user };
+      }
+
+      return { success: false, message: "No token provided", user: null };
+    },
   });
 
 

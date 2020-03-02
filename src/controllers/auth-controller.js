@@ -14,20 +14,20 @@ function oAuth(req, res) {
 	var ticket = req.query.ticket;
 	//console.log("HERE", req.query);
 
-	if (ticket){
+	if (ticket) {
 		var casValidateURL = 'https://idp.rice.edu/idp/profile/cas/serviceValidate';
 		// This should be the URL that we redirect the user back to after successful CAS authentication
 		var serviceURL = 'http://localhost:3000/auth'; // Using local host for testing purposes
 
 		var url = `${casValidateURL}?ticket=${ticket}?service=?${serviceURL}`;
 
-		request(url, function (err, respose, body) {
+		request(url, function (err, response, body) {
 
 			if (err) return res.status(500);
 
 			/* Parsing the XML body returned from CAS authentication
 			 */
-			xmlParser(body, {tagNameProcessors: [stripPredix], explicitArray: false}, function (err, result) {
+			xmlParser(body, { tagNameProcessors: [stripPredix], explicitArray: false }, function (err, result) {
 
 				if (err) return res.status(500);
 
@@ -39,7 +39,7 @@ function oAuth(req, res) {
 				if (authSuccess) {
 					//console.log('authentication succeeded!');
 
-					var token = jwt.sign({data: authSuccess});
+					var token = jwt.sign({ data: authSuccess });
 
 					var newUserCheck = null;
 
@@ -47,7 +47,7 @@ function oAuth(req, res) {
 					authSuccess.user = authSuccess.user.toLowerCase();
 
 					// Try to find the user in our database
-					User.findOne({username: authSuccess.user}, function (err, user) {
+					User.findOne({ username: authSuccess.user }, function (err, user) {
 						if (err) return res.status(500).send('Internal Error');
 						var userID = null;
 						//console.log('user: ', user);
@@ -84,7 +84,7 @@ function oAuth(req, res) {
 								success: true,
 								message: 'CAS authentication successful',
 								isNewUser: newUserCheck,
-								user : {
+								user: {
 									_id: userID,
 									token: token
 								}
@@ -93,7 +93,7 @@ function oAuth(req, res) {
 						}
 					});
 				} else if (serviceResponse.authenticationFailure) {
-					return res.status(401).json({success: false, message: 'CAS authentication failed'});
+					return res.status(401).json({ success: false, message: 'CAS authentication failed' });
 				} else {
 					return res.status(500).send();
 				}
