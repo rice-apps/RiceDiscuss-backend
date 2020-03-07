@@ -39,7 +39,7 @@ function oAuth(req, res) {
 				if (authSuccess) {
 					//console.log('authentication succeeded!');
 
-					var token = jwt.sign({ data: authSuccess });
+					var token = jwt.sign({ data: authSuccess }, config.secret);
 
 					var newUserCheck = null;
 
