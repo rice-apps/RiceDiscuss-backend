@@ -7,13 +7,15 @@ import assert from 'assert';
 const uri = "mongodb+srv://davidcyyi:123@shryans-mr8uh.mongodb.net/admin?retryWrites=true&w=majority/sample_airbnb";
 const port = 3001;
 const dbName = "sample_airbnb";
+const secret = "xuqzysyam5t92e97qqrf5mgx5jqjaq6s";
 
 //var collection;
 
 //const url = 'mongodb://localhost:27017/graphqldb';
 module.exports = async () => {
 	const db = await client.connect(uri);
-	return {db: db.collection('listingsAndReviews')};
+	return { db: db.collection('listingsAndReviews'), 
+			 secret: secret };
 }
 // client.connect(uri, function(err, client) {
 //     assert.equal(null, err);
@@ -31,7 +33,7 @@ module.exports = async () => {
 // function iterateFunc(doc) {
 //     console.log(JSON.stringify(doc.name, null, 4));
 // }
- 
+
 // function errorFunc(error) {
 // 	console.log(error);
 // }

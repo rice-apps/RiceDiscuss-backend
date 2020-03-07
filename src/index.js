@@ -13,12 +13,6 @@ import request from 'request';
 
 //import connectMongo from './mongo-connector.js';
 
-request("https://idp.rice.edu/idp/profile/cas/login?service=http://localhost:3000", function(err, response, body) {
-  console.log(err);
-  console.log(response);
-  console.log(body);
-});
-
 var app = express();
 
 
@@ -70,7 +64,7 @@ const start = async () => {
           return { success: false, message: "token authentication failed", user: null };
         }
 
-        return { success: true, message: "Authentication successful", user: decoded.user };
+        return { success: true, message: "Authentication successful", user: decoded.data.user };
       }
 
       return { success: false, message: "No token provided", user: null };

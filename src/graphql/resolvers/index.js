@@ -80,7 +80,6 @@ const resolvers = {
         // This doesn't actual work yet, but I don't know how to get the ID for the post without using the ID as an identifier
         id: async ({ id }) => await prepareUser(id, "_id"),
         netID: async ({ id }) => await prepareUser(id, "netID"),
-        token: async ({ id }) => await prepareUser(id, "token"),
         date_joined: async ({ id }) => await prepareUser(id, "date_joined")
     },
 
@@ -103,7 +102,10 @@ const resolvers = {
             if (title && title !== "") post.title = title;
             await post.save();
         },
-        createPost: async (_, { body, title, postType, userID }, __, ___) => {
+        createPost: async (_, { body, title, postType, userID }, context, ___) => {
+            if (context.user.toLowerCase() !== userID) {
+                return handleError("username doesn't match");
+            }
             const typeT = postType && postType !== "" ? postType : "discussion"; //default to discussion
             const post = new Models.Post({
                 _id: new mongoose.Types.ObjectId(),
@@ -201,6 +203,9 @@ const resolvers = {
         },
         user: async (_, { id }) => {
             return await Models.User.findById(id);
+        },
+        userByNetID: async (_, { netID }) => {
+            return await Models.User.find({ netID: netID });
         },
         comments: async () => {
             return await Models.Comment.find();

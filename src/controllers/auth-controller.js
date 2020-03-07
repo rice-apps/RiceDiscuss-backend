@@ -34,7 +34,7 @@ function oAuth(req, res) {
 				// global variable?
 				serviceResponse = result.serviceResponse;
 
-				var authSucess = serviceResponse.authenticationSuccess;
+				var authSuccess = serviceResponse.authenticationSuccess;
 				//console.log('authSuccess: ', authSuccess);
 				if (authSuccess) {
 					//console.log('authentication succeeded!');

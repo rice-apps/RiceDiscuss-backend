@@ -30,7 +30,7 @@ const typeDefs =  gql`
     type User {
         id: ID!,
         netID: String!,
-        token: String!,
+        username: String!,
         date_joined: String!
     }
 
@@ -69,6 +69,7 @@ const typeDefs =  gql`
         postByUser(userID: String): [Post]
         users: [User]
         user(id: ID): User
+        userByNetID(netID: String): [User]
         comments: [Comment]
         comment(id: ID): Comment
     }

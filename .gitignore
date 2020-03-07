@@ -8,6 +8,7 @@ npm-debug.log
 .env
 .passport.js
 .DS_Store
+config.js
 
 build/
 dist/
