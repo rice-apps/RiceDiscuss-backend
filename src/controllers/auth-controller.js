@@ -13,6 +13,8 @@ var User = require('../model/schema/User');
 function oAuth(req, res) {
 	var ticket = req.query.ticket;
 	//console.log("HERE", req.query);
+	console.log(ticket);
+	console.log("hi")
 
 	if (ticket) {
 		var casValidateURL = 'https://idp.rice.edu/idp/profile/cas/serviceValidate';
