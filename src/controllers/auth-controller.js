@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import request from 'request';
 var xmlParser = require('xml2js').parseString;
-var stripPrefix = require('xml2js').processors.stripPrefix;
+const stripPrefix = require('xml2js').processors.stripPrefix;
 
 var config = require('../config');
 
@@ -11,17 +11,16 @@ var User = require('../model/schema/User');
  * handling for that get request.
  */
 function oAuth(req, res) {
-	var ticket = req.query.ticket;
-	//console.log("HERE", req.query);
+	var ticket = req.body.ticket;
 	console.log(ticket);
-	console.log("hi")
 
 	if (ticket) {
 		var casValidateURL = 'https://idp.rice.edu/idp/profile/cas/serviceValidate';
 		// This should be the URL that we redirect the user back to after successful CAS authentication
-		var serviceURL = 'http://localhost:3000/auth'; // Using local host for testing purposes
+		var serviceURL = 'http://localhost:3000'; // Using local host for testing purposes
 
-		var url = `${casValidateURL}?ticket=${ticket}?service=?${serviceURL}`;
+		var url = `${casValidateURL}?ticket=${ticket}&service=${serviceURL}`;
+		var serviceResponse;
 
 		request(url, function (err, response, body) {
 
@@ -29,7 +28,7 @@ function oAuth(req, res) {
 
 			/* Parsing the XML body returned from CAS authentication
 			 */
-			xmlParser(body, { tagNameProcessors: [stripPredix], explicitArray: false }, function (err, result) {
+			xmlParser(body, { tagNameProcessors: [stripPrefix], explicitArray: false }, function (err, result) {
 
 				if (err) return res.status(500);
 
@@ -39,7 +38,7 @@ function oAuth(req, res) {
 				var authSuccess = serviceResponse.authenticationSuccess;
 				//console.log('authSuccess: ', authSuccess);
 				if (authSuccess) {
-					//console.log('authentication succeeded!');
+					console.log('authentication succeeded!');
 
 					var token = jwt.sign({ data: authSuccess }, config.secret);
 
