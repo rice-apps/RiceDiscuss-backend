@@ -23,7 +23,7 @@ var app = express();
 async function connectMongo() {
   //Set up default mongoose connection
   var mongoDB = 'mongodb+srv://davidcyyi:123@shryans-mr8uh.mongodb.net/ricediscuss?retryWrites=true&w=majority';
-  mongoose.connect(mongoDB, { useNewUrlParser: true });
+  mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 
   //Get the default connection
   var db = mongoose.connection;
@@ -89,8 +89,8 @@ const start = async () => {
         callback(null, true)
       } else {
         callback(new Error('Not allowed by CORS'))
-        }
-      },
+      }
+    },
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
     credentials: true,
   };
