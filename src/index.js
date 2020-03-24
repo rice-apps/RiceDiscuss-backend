@@ -1,17 +1,21 @@
 import { ApolloServer } from 'apollo-server-express';
-import express from 'express';
 import mongoose from 'mongoose';
 
 import typeDefs from './graphql/schema';
 import resolvers from './graphql/resolvers';
 
 import jwt from 'jsonwebtoken';
-import idp from './controllers/auth-controller';
 import config from './config';
 
 import request from 'request';
 
 //import connectMongo from './mongo-connector.js';
+const express = require('express');
+
+const idp = require('./controllers/auth-controller');
+
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
 var app = express();
 
@@ -19,7 +23,7 @@ var app = express();
 async function connectMongo() {
   //Set up default mongoose connection
   var mongoDB = 'mongodb+srv://davidcyyi:123@shryans-mr8uh.mongodb.net/ricediscuss?retryWrites=true&w=majority';
-  mongoose.connect(mongoDB, { useNewUrlParser: true });
+  mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 
   //Get the default connection
   var db = mongoose.connection;
@@ -78,7 +82,22 @@ const start = async () => {
   Middleware
   ***********
   */
+  const whitelist = ['http://localhost:3000', 'http://localhost:3001'];
+  const corsOptions = {
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    credentials: true,
+  };
+
+  app.use(cors(corsOptions));
   schema.applyMiddleware({ app, path: '/graphql' });
+  app.use(bodyParser.json());
 
   /*
   ***********
@@ -86,6 +105,12 @@ const start = async () => {
   ***********
   */
   idp(app);
+
+  app.use('/hi', (req, res) => {
+    console.log(req.body);
+    console.log("in hi endpoint");
+    res.send("hello");
+  })
 
   const PORT = 3001;
 
