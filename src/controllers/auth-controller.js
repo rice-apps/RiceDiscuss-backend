@@ -14,7 +14,7 @@ function oAuth(req, res) {
 	var ticket = req.query.ticket;
 	//console.log("HERE", req.query);
 	console.log(ticket);
-	console.log("hi")
+	console.log("hi");
 
 	if (ticket) {
 		var casValidateURL = 'https://idp.rice.edu/idp/profile/cas/serviceValidate';
@@ -29,7 +29,7 @@ function oAuth(req, res) {
 
 			/* Parsing the XML body returned from CAS authentication
 			 */
-			xmlParser(body, { tagNameProcessors: [stripPredix], explicitArray: false }, function (err, result) {
+			xmlParser(body, { tagNameProcessors: [stripPrefix], explicitArray: false }, function (err, result) {
 
 				if (err) return res.status(500);
 
