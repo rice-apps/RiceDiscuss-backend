@@ -1,5 +1,7 @@
 import { ApolloServer } from 'apollo-server-express';
 import mongoose from 'mongoose';
+import cors from "cors";
+import bodyParser from 'body-parser';
 
 import typeDefs from './graphql/schema';
 import resolvers from './graphql/resolvers';
@@ -82,13 +84,16 @@ const start = async () => {
   Middleware
   ***********
   */
+
   const whitelist = ['http://localhost:3000', 'http://localhost:3001'];
+
   const corsOptions = {
     origin: function (origin, callback) {
       if (whitelist.indexOf(origin) !== -1) {
         callback(null, true)
       } else {
         callback(new Error('Not allowed by CORS'))
+
       }
     },
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
@@ -96,6 +101,7 @@ const start = async () => {
   };
 
   app.use(cors(corsOptions));
+
   schema.applyMiddleware({ app, path: '/graphql' });
   app.use(bodyParser.json());
 
@@ -113,6 +119,9 @@ const start = async () => {
   })
 
   const PORT = 3001;
+
+
+  schema.applyMiddleware({ app, path: '/graphql'});
 
   /*
   ***********
