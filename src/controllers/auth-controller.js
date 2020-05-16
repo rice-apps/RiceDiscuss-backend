@@ -2,19 +2,18 @@ import jwt from 'jsonwebtoken';
 import request from 'request';
 var xmlParser = require('xml2js').parseString;
 const stripPrefix = require('xml2js').processors.stripPrefix;
-
 var config = require('../config');
-
-var User = require('../model/schema/User');
+import Models from '../model';
+import mongoose from 'mongoose';
 
 /* Routing for the homepage. Front end sends a get request to the backend and here is the 
  * handling for that get request.
  */
 function oAuth(req, res) {
-	var ticket = req.body.ticket;
+	var ticket = req.params.ticket;
+	var d = new Date();
 
 	console.log(ticket);
-	console.log("HERE", req.body.ticket);
 
 	if (ticket) {
 		var casValidateURL = 'https://idp.rice.edu/idp/profile/cas/serviceValidate';
@@ -28,132 +27,73 @@ function oAuth(req, res) {
 
 			if (err) return res.status(500);
 
-			/* Parsing the XML body returned from CAS authentication
-			 */
+			/* Parsing the XML body returned from CAS authentication */
 			xmlParser(body, { tagNameProcessors: [stripPrefix], explicitArray: false }, function (err, result) {
 
-				if (err) return res.status(500);
+				if (err) 
+					return res.status(500);
 
-				// global variable?
 				serviceResponse = result.serviceResponse;
-
 				var authSuccess = serviceResponse.authenticationSuccess;
-				//console.log('authSuccess: ', authSuccess);
+
 				if (authSuccess) {
-					console.log('authentication succeeded!');
 
-					var token = jwt.sign({ data: authSuccess }, config.secret);
-
+					var token = jwt.sign({ data: authSuccess }, "config.secret");
 					var newUserCheck = null;
 
 					// Make netID lowercase to help avoid duplicate accounts
 					authSuccess.user = authSuccess.user.toLowerCase();
 
 					// Try to find the user in our database
-					User.findOne({ username: authSuccess.user }, function (err, user) {
-						if (err) return res.status(500).send('Internal Error');
+					Models.User.findOne({ username: authSuccess.user }, function (err, user) {
+						if (err)
+						{
+							console.log("Line 60");
+							return res.status(500).send('Internal Error');
+						}
 						var userID = null;
-						//console.log('user: ', user);
 
 						if (!user) {
 							// Create a new user
-							User.create({
+							Models.User.create({
+								_id: mongoose.Types.ObjectId(),
 								netID: authSuccess.user,
-								date_joined: Math.round((Date.getTime() / 1000))
+								username: authSuccess.user,
+								date_joined: Math.round((d.getTime() / 1000))
 							}, function (err, newUser) {
-								if (err) return res.status(500).send();
-
+								if (err)
+								{
+									console.log("Line 74");
+									console.log(err);
+									console.log(newUser);
+									return res.status(500).send();
+								}
+									
 								newUserCheck = true;
 								userID = newUser._id;
-
-								res.json({
-									success: true,
-									message: 'CAS authentication successful',
-									isNewUser: newUserCheck,
-									user: {
-										_id: userID,
-										token: token
-									}
-								});
-								return res.status(200);
 							});
 
 						} else {
 							// Existing user -- just need to send token to front end
 							newUserCheck = false;
 							userID = user._id;
-
-							res.json({
-								success: true,
-								message: 'CAS authentication successful',
-								isNewUser: newUserCheck,
-								user: {
-									_id: userID,
-									token: token
-								}
-							});
-							return res.status(200);
 						}
+
+						res.json({
+							success: true,
+							message: 'CAS authentication successful',
+							isNewUser: newUserCheck,
+							user: {
+								_id: userID,
+								token: token
+							}
+						});
+						return res.status(200);
 					});
-
-					// return res.status(200);
-					// var token = jwt.sign({data: authSuccess});
-
-					// var newUserCheck = null;
-
-					// // Make netID lowercase to help avoid duplicate accounts
-					// authSuccess.user = authSuccess.user.toLowerCase();
-
-					// // Try to find the user in our database
-					// User.findOne({username: authSuccess.user}, function (err, user) {
-					// 	if (err) return res.status(500).send('Internal Error');
-					// 	var userID = null;
-					// 	//console.log('user: ', user);
-
-					// 	if (!user) {
-					// 		// Create a new user
-					// 		User.create({
-					// 			netID: authSuccess.user,
-					// 			date_joined: Math.round((Date.getTime() / 1000))
-					// 		}, function (err, newUser) {
-					// 			if (err) return res.status(500).send();
-
-					// 			newUserCheck = true;
-					// 			userID = newUser._id;
-
-					// 			res.json({
-					// 				success: true,
-					// 				message: 'CAS authentication successful',
-					// 				isNewUser: newUserCheck,
-					// 				user: {
-					// 					_id: userID,
-					// 					token: token
-					// 				}
-					// 			});
-					// 			return res.status(200);
-					// 		});
-
-					// 	} else {
-					// 		// Existing user -- just need to send token to front end
-					// 		newUserCheck = false;
-					// 		userID = user._id;
-
-					// 		res.json({
-					// 			success: true,
-					// 			message: 'CAS authentication successful',
-					// 			isNewUser: newUserCheck,
-					// 			user : {
-					// 				_id: userID,
-					// 				token: token
-					// 			}
-					// 		});
-					// 		return res.status(200);
-					// 	}
-					// });
-
 				} else if (serviceResponse.authenticationFailure) {
 					return res.status(401).json({ success: false, message: 'CAS authentication failed' });
 				} else {
+					console.log("Line 113");
 					return res.status(500).send();
 				}
 			})

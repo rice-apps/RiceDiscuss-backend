@@ -3,7 +3,6 @@ import PostResolver from './Post.js';
 import UserResolver from './User.js';
 import CommentResolver from './Comment.js';
 import MutationResolver from './Mutation.js';
-
 import { merge } from 'lodash';
 
 // const resolvers = merge(PostResolver.Post, UserResolver.User, CommentResolver.Comment, MutationResolver.Mutation, QueryResolver.Query);
@@ -21,7 +20,7 @@ async function upvote(username, post) {
     await post.save(function (err) {
         if (err) return handleError(err);
     });
-    return post;
+    return await post.save({ j: true });
 }
 
 async function downvote(username, post) {
@@ -32,10 +31,8 @@ async function downvote(username, post) {
         post.upvotes.splice(index, 1);
     }
     post.downvotes.append(username);
-    await post.save(function (err) {
-        if (err) return handleError(err);
-    });
-    return post;
+    
+    return await post.save({ j: true });
 }
 
 async function preparePost(id, param) {
@@ -100,34 +97,30 @@ const resolvers = {
             const post = await Models.Post.findByID(id);
             if (body && body !== "") post.body = body;
             if (title && title !== "") post.title = title;
-            await post.save();
+            return await post.save({ j: true });
         },
         createPost: async (_, { body, title, postType, userID }, context, ___) => {
-            if (context.user.toLowerCase() !== userID) {
-                return handleError("username doesn't match");
-            }
+            // if (context.user.toLowerCase() !== userID) {
+            //     return handleError("username doesn't match");
+            // }
             const typeT = postType && postType !== "" ? postType : "discussion"; //default to discussion
+            const i = mongoose.Types.ObjectId();
             const post = new Models.Post({
-                _id: new mongoose.Types.ObjectId(),
+                _id: i,
                 creator: userID,
                 title: title,
                 body: body,
                 postType: typeT
             });
 
-            await post.save(function (err) {
-                if (err) {
-                    return handleError(err);
-                }
-            });
-
-            return post;
+            return await post.save({ j: true });
         },
         deletePost: async (_, { id }, __, ___) => {
-            const post = await Models.Post.findById(id);
-            post.body = "[removed]";
-            post.creator = "[removed]";
-            return post;
+            const post = await Models.Post.findByIdAndDelete(id);
+            // TODO: Delete the corresponding comments
+            // post.body = "[removed]";
+            // post.creator = "[removed]";
+            return await post;
         },
         upvotePost: async (_, { id, username }, __, ___) => {
             const post = await Models.Post.findById(id);
@@ -155,25 +148,18 @@ const resolvers = {
                 _id: mongoose.Types.ObjectId(), post_id: mongoose.Types.ObjectId(postid),
                 creator: username, parent_id: parentid, body: body, depth: depth
             });
-            await comment.save(function (err) {
-                if (err) return handleError(err);
-            })
-            return comment;
+            
+            return await comment.save({ j: true });
         },
         updateComment: async (_, { id, body }, __, ___) => {
             const comment = await Models.Comment.findById(id);
             if (body && body !== "") comment.body = body;
-            await comment.save();
-            return comment;
+            return await comment.save({ j: true });
         },
         deleteComment: async (id) => {
-            const comment = await Models.Comment.findById(id);
-            comment.body = "[removed]";
-            comment.creator = "[removed]";
-            comment.save(function (err) {
-                if (err) return handleError(err);
-            });
-            return comment;
+            const comment = await Models.Comment.findByIdAndDelete(id);
+            
+            return await comment.exec();
         },
 
         upvoteComment: async (id, username) => {

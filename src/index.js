@@ -1,137 +1,159 @@
 import { ApolloServer } from 'apollo-server-express';
 import mongoose from 'mongoose';
-import cors from "cors";
+// import cors from 'cors';
 import bodyParser from 'body-parser';
-
 import typeDefs from './graphql/schema';
 import resolvers from './graphql/resolvers';
-
 import jwt from 'jsonwebtoken';
 import config from './config';
-
 import request from 'request';
+import Models from './model';
 
-//import connectMongo from './mongo-connector.js';
+function handleError(err) {
+  console.log("\n\n---------BEGIN ERROR MESSAGE---------");
+  console.log("@@@ TIME: " + Date() + " @@@\n");
+  console.log(err);
+  console.log("\n--------END ERROR MESSAGE------------\n\n\n");
+}
+
 const express = require('express');
-
 const idp = require('./controllers/auth-controller');
-
-const bodyParser = require('body-parser');
-const cors = require('cors');
-
 var app = express();
 
+const mongoDB = 'mongodb+srv://davidcyyi:123@shryans-mr8uh.mongodb.net/ricediscuss?retryWrites=true&w=majority';
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 
-async function connectMongo() {
-  //Set up default mongoose connection
-  var mongoDB = 'mongodb+srv://davidcyyi:123@shryans-mr8uh.mongodb.net/ricediscuss?retryWrites=true&w=majority';
-  mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
+const schema = new ApolloServer({
+  typeDefs,
+  resolvers
+});
 
-  //Get the default connection
-  var db = mongoose.connection;
-
-  //Bind connection to error event (to get notification of connection errors)
-  db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
-  app.post('/insertData', (req, res) => {
+// Sample post data 
+app.post('/insertData', (req, res) => {
     var user = new Models.User({
+      _id: mongoose.Types.ObjectId(),
       username: "davidcyyi",
-      netID: "dcy2",
-      password: "password",
+      netID: "sg71",
+      password: "password1234"
     });
     user.save(function (err) {
       if (err)
         return handleError(err);
     });
-    user.findOne({ username: "davidcyyi" }).exec(function (err, u) {
+    user.constructor.findOne({ username: "davidcyyi" }).exec(function (err, u) {
       if (err)
         return handleError(err);
       console.log('The author is %s', u.netID);
     });
-  });
-}
+});
 
-// 2
-const start = async () => {
-  // 3
-  const mongo = await connectMongo();
-  var app = express();
+app.use('/hi', (req, res) => {
+  console.log(req.body);
+  console.log("in hi endpoint");
+  res.send("hello");
+})
 
-  const schema = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context: ({ req, res }) => {
-      const token = req.body.token || req.query.token || req.headers['x-access-token'];
+schema.applyMiddleware({ app, path: '/graphql'});
+const PORT = 3000;
 
-      if (token) {
-        try {
-          var decoded = jwt.verify(token, config.secret);
-        } catch (err) {
-          return { success: false, message: "token authentication failed", user: null };
-        }
+idp(app);
 
-        return { success: true, message: "Authentication successful", user: decoded.data.user };
-      }
-
-      return { success: false, message: "No token provided", user: null };
-    },
-  });
+app.listen(PORT, () => {
+  console.log(`Apollo Server on http://localhost:${PORT}/graphql`)
+});
 
 
 
-  /*
-  ***********
-  Middleware
-  ***********
-  */
+// async function connectMongo() {
+//   //Set up default mongoose connection
+//   var mongoDB = 'mongodb+srv://davidcyyi:123@shryans-mr8uh.mongodb.net/ricediscuss?retryWrites=true&w=majority';
+//   mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 
-  const whitelist = ['http://localhost:3000', 'http://localhost:3001'];
+//   //Get the default connection
+//   var db = mongoose.connection;
 
-  const corsOptions = {
-    origin: function (origin, callback) {
-      if (whitelist.indexOf(origin) !== -1) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS'))
+//   //Bind connection to error event (to get notification of connection errors)
+//   db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-      }
-    },
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-    credentials: true,
-  };
+//   app.post('/insertData', (req, res) => {
+//     var user = new Models.User({
+//       username: "davidcyyi",
+//       netID: "dcy2",
+//       password: "password",
+//     });
+//     user.save(function (err) {
+//       if (err)
+//         return handleError(err);
+//     });
+//     user.findOne({ username: "davidcyyi" }).exec(function (err, u) {
+//       if (err)
+//         return handleError(err);
+//       console.log('The author is %s', u.netID);
+//     });
+//   });
+// }
 
-  app.use(cors(corsOptions));
+// // 2
+// const start = async () => {
+//   // 3
+//   const mongo = await connectMongo();
 
-  schema.applyMiddleware({ app, path: '/graphql' });
-  app.use(bodyParser.json());
+//   const schema = new ApolloServer({
+//     typeDefs,
+//     resolvers,
+//   });
 
-  /*
-  ***********
-  Endpoints
-  ***********
-  */
-  idp(app);
+//   /*
+//   ***********
+//   Middleware
+//   ***********
+//   */
 
-  app.use('/hi', (req, res) => {
-    console.log(req.body);
-    console.log("in hi endpoint");
-    res.send("hello");
-  })
+//   const whitelist = ['http://localhost:3000', 'http://localhost:3001'];
 
-  const PORT = 3001;
+//   const corsOptions = {
+//     origin: function (origin, callback) {
+//       if (whitelist.indexOf(origin) !== -1) {
+//         callback(null, true)
+//       } else {
+//         callback(new Error('Not allowed by CORS'))
 
+//       }
+//     },
+//     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+//     credentials: true,
+//   };
 
-  schema.applyMiddleware({ app, path: '/graphql'});
+//   app.use(cors(corsOptions));
 
-  /*
-  ***********
-  Server
-  ***********
-  */
-  app.listen(PORT, () => {
-    console.log(`Apollo Server on http://localhost:${PORT}/graphql.`)
-  });
-};
+//   // schema.applyMiddleware({ app, path: '/graphql' });
+//   app.use(bodyParser.json());
 
-// 5
-start();
+//   /*
+//   ***********
+//   Endpoints
+//   ***********
+//   */
+//   idp(app);
+
+//   app.use('/hi', (req, res) => {
+//     console.log(req.body);
+//     console.log("in hi endpoint");
+//     res.send("hello");
+//   })
+
+//   const PORT = 3001;
+//   schema.applyMiddleware({ app, path: '/graphql'});
+
+//   /*
+//   ***********
+//   Server
+//   ***********
+//   */
+//   app.listen(PORT, () => {
+//     console.log(`Apollo Server on http://localhost:${PORT}/graphql.`)
+//   });
+// };
+
+// // 5
+// start();
