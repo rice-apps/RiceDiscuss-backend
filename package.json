@@ -23,14 +23,12 @@
   },
   "homepage": "https://github.com/rice-apps/RiceDiscuss-backend#readme",
   "devDependencies": {
-
     "@babel/core": "^7.9.0",
     "@babel/node": "^7.8.7",
     "@babel/preset-env": "^7.9.0",
     "eslint": "^6.4.0",
     "jest": "^24.9.0",
     "nodemon": "^1.19.4"
-
   },
   "dependencies": {
     "apollo-server": "^2.11.0",
