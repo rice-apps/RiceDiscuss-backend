@@ -48,7 +48,6 @@ function oAuth(req, res) {
 					Models.User.findOne({ username: authSuccess.user }, function (err, user) {
 						if (err)
 						{
-							console.log("Line 60");
 							return res.status(500).send('Internal Error');
 						}
 						var userID = null;

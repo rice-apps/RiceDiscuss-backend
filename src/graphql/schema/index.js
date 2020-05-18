@@ -5,13 +5,12 @@ import CommentGQLSchema from './Comment.js';
 
 import Mutation from './Mutation.js';
 
-
 const { gql } = require('apollo-server-express');
 
 import { merge } from 'lodash';
 
-//const typeDefs = merge([UserGQLSchema, PostGQLSchema, CommentGQLSchema, Mutation], QueryGQLSchema);
-const typeDefs =  gql`
+// const typeDefs = merge([UserGQLSchema, PostGQLSchema, CommentGQLSchema, Mutation], QueryGQLSchema);
+const typeDefs = gql`
     type Post {
         id: ID!,
         creator: String!,
@@ -46,7 +45,6 @@ const typeDefs =  gql`
         children: [Comment!],
         depth: Int!
     }
-
 
     type Mutation {
         updatePost(id: ID, body: String, title: String): Post

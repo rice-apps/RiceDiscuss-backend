@@ -37,6 +37,8 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "graphql": "^14.6.0",
+    "graphql-compose": "^7.15.0",
+    "graphql-compose-mongoose": "^7.3.8",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "mongodb": "^3.5.5",

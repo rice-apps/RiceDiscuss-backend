@@ -10,7 +10,7 @@ const CommentGQLSchema = gql`
         body: String!,
         upvotes: [User],
         downvotes: [User],
-        children: [Comment!],
+        children: [Comment],
         depth: Int!
     }
 `;
