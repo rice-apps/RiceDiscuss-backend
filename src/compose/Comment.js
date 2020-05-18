@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { composeWithMongooseDiscriminators } from 'graphql-compose-mongoose';
+import { composeWithMongoose } from 'graphql-compose-mongoose';
 import { schemaComposer } from 'graphql-compose';
 
 const CommentSchema = mongoose.Schema({
