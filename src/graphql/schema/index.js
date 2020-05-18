@@ -6,7 +6,6 @@ import CommentGQLSchema from './Comment.js';
 import Mutation from './Mutation.js';
 
 const { gql } = require('apollo-server-express');
-
 import { merge } from 'lodash';
 
 // const typeDefs = merge([UserGQLSchema, PostGQLSchema, CommentGQLSchema, Mutation], QueryGQLSchema);
