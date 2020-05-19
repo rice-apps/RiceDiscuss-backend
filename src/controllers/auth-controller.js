@@ -21,7 +21,7 @@ function oAuth(req, res) {
 
 		const url = `${casValidateURL}?ticket=${ticket}&service=${serviceURL}`;
 
-		request(url, function (err, _, body) {
+		request(url, function (err, res, body) {
 
 			if (err) return res.status(500);
 
