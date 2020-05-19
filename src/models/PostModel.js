@@ -13,7 +13,7 @@ const enumPostType = {
 };
 
 // Define base Post schema
-const PostSchema = mongoose.Schema({
+const PostSchema = new mongoose.Schema({
     kind: {
         type: String,
         require: true,
@@ -68,16 +68,16 @@ const PostSchema = mongoose.Schema({
 });
 
 // Schema definitions for enum types
-const DiscussionSchema = mongoose.Schema();
+const DiscussionSchema = new mongoose.Schema();
 
-const NoticeSchema = mongoose.Schema({
+const NoticeSchema = new mongoose.Schema({
     deadline: {
         type: Date,
         required: true
     }
 });
 
-const EventSchema = mongoose.Schema({
+const EventSchema = new mongoose.Schema({
     start: {
         type: Date,
         required: true
@@ -94,7 +94,7 @@ const EventSchema = mongoose.Schema({
     }
 });
 
-const JobSchema = mongoose.Schema({
+const JobSchema = new mongoose.Schema({
     start: {
         type: Date,
         required: true
@@ -125,16 +125,17 @@ const JobSchema = mongoose.Schema({
 PostSchema.set('discriminatorKey', DKey);
 
 export const Post = mongoose.model('Post', PostSchema);
-export const PostDTC = composeWithMongooseDiscriminators(Post);
 
 // Set the discriminiator for other sybtypes
-export const Discussion = PostModel.discriminator(enumPostType.Discussion, DiscussionSchema);
-export const Notice = PostModel.discriminator(enumPostType.Notice, NoticeSchema);
-export const Event = PostModel.discriminator(enumPostType.Event, EventSchema);
-export const Job = PostModel.discriminator(enumPostType.Job, JobSchema);
+export const Discussion = Post.discriminator(enumPostType.Discussion, DiscussionSchema);
+export const Notice = Post.discriminator(enumPostType.Notice, NoticeSchema);
+export const Event = Post.discriminator(enumPostType.Event, EventSchema);
+export const Job = Post.discriminator(enumPostType.Job, JobSchema);
 
 // TODO: add base options (https://graphql-compose.github.io/docs/plugins/plugin-mongoose.html#working-with-mongoose-collection-level-discriminators)
 // for Discriminator models and possible for base model
+
+export const PostDTC = composeWithMongooseDiscriminators(Post);
 
 export const DiscussionTC = PostDTC.discriminator(Discussion, {});
 export const NoticeTC = PostDTC.discriminator(Notice, {});

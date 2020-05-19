@@ -1,7 +1,9 @@
-require('dotenv').config();
+import 'dotenv/config';
 
 const CLIENT_TOKEN_SECRET = process.env.CLIENT_TOKEN_SECRET;
+const MONGODB_CONNECTION_URL = process.env.MONGODB_CONNECTION_URL;
 
-module.exports = {
-	CLIENT_TOKEN_SECRET
+export {
+	CLIENT_TOKEN_SECRET,
+	MONGODB_CONNECTION_URL,
 };

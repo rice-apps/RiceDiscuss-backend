@@ -11,7 +11,7 @@ CommentTC.addFields({
 });
 
 CommentTC.addRelation("creator", {
-    "resolver": () => UserTC.getResolver('userById'),
+    "resolver": () => UserTC.getResolver('findById'),
     
     prepareArgs: {
         _id: (source) => source.creator,
@@ -23,7 +23,7 @@ CommentTC.addRelation("creator", {
 });
 
 CommentTC.addRelation("post_id", {
-    "resolver": () => PostDTC.getResolver('postById'),
+    "resolver": () => PostDTC.getResolver('findById'),
 
     prepareArgs: {
         _id: (source) => source.post_id,
@@ -35,7 +35,7 @@ CommentTC.addRelation("post_id", {
 });
 
 CommentTC.addRelation("parent_id", {
-    "resolver": () => CommentTC.getResolver('commentById'),
+    "resolver": () => CommentTC.getResolver('findById'),
 
     prepareArgs: {
         _id: (source) => source.parent_id,
@@ -47,7 +47,7 @@ CommentTC.addRelation("parent_id", {
 });
 
 CommentTC.addRelation("upvotes", {
-    "resolver": () => UserTC.getResolver('userMany'),
+    "resolver": () => UserTC.getResolver('findMany'),
 
     prepareArgs: {
         _id: (source) => source._id,
@@ -59,7 +59,7 @@ CommentTC.addRelation("upvotes", {
 });
 
 CommentTC.addRelation("downvotes", {
-    "resolver": () => UserTC.getResolver('userMany'),
+    "resolver": () => UserTC.getResolver('findMany'),
 
     prepareArgs: {
         _id: (source) => source._id,
@@ -71,7 +71,7 @@ CommentTC.addRelation("downvotes", {
 });
 
 CommentTC.addRelation("children", {
-    "resolver": () => CommentTC.getResolver('commentMany'),
+    "resolver": () => CommentTC.getResolver('findMany'),
 
     prepareArgs: {
         _id: (source) => source._id,

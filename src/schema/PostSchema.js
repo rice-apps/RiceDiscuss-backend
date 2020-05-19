@@ -20,7 +20,7 @@ JobTC.addFields({
 });
 
 DiscussionTC.addRelation("comments", {
-    "resolver": CommentTC.getResolver('commentMany'),
+    "resolver": CommentTC.getResolver('findMany'),
 
     prepareArgs: {
         _id: (source) => source._id,
@@ -32,7 +32,7 @@ DiscussionTC.addRelation("comments", {
 });
 
 EventTC.addRelation("comments", {
-    "resolver": CommentTC.getResolver('commentMany'),
+    "resolver": CommentTC.getResolver('findMany'),
 
     prepareArgs: {
         _id: (source) => source._id,
@@ -44,7 +44,7 @@ EventTC.addRelation("comments", {
 });
 
 JobTC.addRelation("comments", {
-    "resolver": CommentTC.getResolver('commentMany'),
+    "resolver": CommentTC.getResolver('findMany'),
 
     prepareArgs: {
         _id: (source) => source._id,
@@ -74,7 +74,7 @@ const PostQuery = {
     discussionMany: DiscussionTC.getResolver('findMany'),
     eventMany: EventTC.getResolver('findMany'),
     noticeMany: NoticeTC.getResolver('findMany'),
-    jobMany: JobTc.getResolver('findMany'),
+    jobMany: JobTC.getResolver('findMany'),
     
     discussionCount: DiscussionTC.getResolver('count'),
     eventCount: EventTC.getResolver('count'),
