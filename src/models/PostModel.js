@@ -68,16 +68,7 @@ const PostSchema = mongoose.Schema({
 });
 
 // Schema definitions for enum types
-const DiscussionSchema = mongoose.Schema({
-    comments: {
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Comment"
-        }],
-        required: true,
-        default: []
-    }
-});
+const DiscussionSchema = mongoose.Schema();
 
 const NoticeSchema = mongoose.Schema({
     deadline: {
@@ -87,15 +78,6 @@ const NoticeSchema = mongoose.Schema({
 });
 
 const EventSchema = mongoose.Schema({
-    comments: {
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Comment"
-        }],
-        required: true,
-        default: []
-    },
-    
     start: {
         type: Date,
         required: true
@@ -113,15 +95,6 @@ const EventSchema = mongoose.Schema({
 });
 
 const JobSchema = mongoose.Schema({
-    comments: {
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Comment"
-        }],
-        required: true,
-        default: []
-    },
-    
     start: {
         type: Date,
         required: true

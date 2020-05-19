@@ -4,26 +4,104 @@ import {
     UserTC,
 } from '../models';
 
-CommentTC.addRelation("post", {
-    'resolver': () => PostDTC.getResolver('findById'),
+CommentTC.addFields({
+    upvotes: [UserTC],
+    downvotes: [UserTC],
+    children: [CommentTC],
+});
 
+CommentTC.addRelation("creator", {
+    "resolver": () => UserTC.getResolver('userById'),
+    
     prepareArgs: {
-        _id: (source) => source.post,
+        _id: (source) => source.creator,
     },
 
     projection: {
-        post: 1,
+        creator: 1,
     },
 });
 
-CommentTC.addRelation("user", {
-    'user': () => UserTC.getResolver('findById'),
+CommentTC.addRelation("post_id", {
+    "resolver": () => PostDTC.getResolver('postById'),
 
     prepareArgs: {
-        _id: (source) => source.user,
+        _id: (source) => source.post_id,
     },
 
     projection: {
-        user: 1,
+        post_id: 1,
     },
 });
+
+CommentTC.addRelation("parent_id", {
+    "resolver": () => CommentTC.getResolver('commentById'),
+
+    prepareArgs: {
+        _id: (source) => source.parent_id,
+    },
+
+    projection: {
+        parent_id: 1,
+    },
+});
+
+CommentTC.addRelation("upvotes", {
+    "resolver": () => UserTC.getResolver('userMany'),
+
+    prepareArgs: {
+        _id: (source) => source._id,
+    },
+
+    projection: {
+        upvotes: 1,
+    },
+});
+
+CommentTC.addRelation("downvotes", {
+    "resolver": () => UserTC.getResolver('userMany'),
+
+    prepareArgs: {
+        _id: (source) => source._id,
+    },
+
+    projection: {
+        downvotes: 1,
+    },
+});
+
+CommentTC.addRelation("children", {
+    "resolver": () => CommentTC.getResolver('commentMany'),
+
+    prepareArgs: {
+        _id: (source) => source._id,
+    },
+
+    projection: {
+        children: 1,
+    },
+});
+
+const CommentQuery = {
+    commentById: CommentTC.getResolver('findById'),
+    commentByIds: CommentTC.getResolver('findByIds'),
+    commentOne: CommentTC.getResolver('findOne'),
+    commentMany: CommentTC.getResolver('findMany'),
+    commentCount: CommentTC.getResolver('count'),
+};
+
+const CommentMutation = {
+    commentCreateOne: CommentTC.getResolver('createOne'),
+    commentCreateMany: CommentTC.getResolver('createMany'),
+    commentUpdateById: CommentTC.getResolver('updateById'),
+    commentUpdateOne: CommentTC.getResolver('updateOne'),
+    commentUpdateMany: CommentTC.getResolver('updateMany'),
+    commentRemoveById: CommentTC.getResolver('removeById'),
+    commentRemoveOne: CommentTC.getResolver('removeOne'),
+    commentRemoveMany: CommentTC.getResolver('removeMany'),
+};
+
+export {
+    CommentQuery,
+    CommentMutation,
+};

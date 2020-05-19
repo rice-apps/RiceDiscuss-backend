@@ -3,13 +3,15 @@ import { composeWithMongoose } from 'graphql-compose-mongoose';
 
 const CommentSchema = new mongoose.Schema({
     creator: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true,
     },
 
     post_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Post",
+        required: true,
     },
 
     parent_id: {
@@ -25,35 +27,6 @@ const CommentSchema = new mongoose.Schema({
     body: {
         type: String,
         required: true,
-    },
-
-    upvotes: {
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-
-        }],
-        required: true,
-        default: [],
-    },
-
-    downvotes: {
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-
-        }],
-        required: true,
-        default: [],
-    },
-
-    children: {
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Comment"
-        }],
-        required: true,
-        default: [],
     },
 
     depth: {
