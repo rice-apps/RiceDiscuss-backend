@@ -21,7 +21,7 @@ function oAuth(req, res) {
 
 		const url = `${casValidateURL}?ticket=${ticket}&service=${serviceURL}`;
 
-		request(url, function (err, res, body) {
+		request(url, function (err, _, body) {
 
 			if (err) return res.status(500);
 
@@ -48,6 +48,7 @@ function oAuth(req, res) {
 							return res.status(500).send('Internal Error');
 						}
 						var userID = null;
+						var netID = null;
 
 						if (!user) {
 							// Create a new user
@@ -69,6 +70,7 @@ function oAuth(req, res) {
 							// Existing user -- just need to send token to front end
 							newUserCheck = false;
 							userID = user._id;
+							netID = user.username;
 						}
 
 						res.json({
@@ -77,8 +79,9 @@ function oAuth(req, res) {
 							isNewUser: newUserCheck,
 							user: {
 								_id: userID,
-								token: token
-							}
+								netID: netID,
+								token: token,
+							},
 						});
 						return res.status(200);
 					});
