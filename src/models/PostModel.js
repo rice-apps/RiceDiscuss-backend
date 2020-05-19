@@ -21,11 +21,6 @@ const PostSchema = new mongoose.Schema({
         description: 'The type of the post (whether event, discussion, or notice)'
     },
 
-    creator: {
-        type : String,
-        required: true
-    },
-    
     title: {
         type: String,
         required: true
@@ -38,26 +33,8 @@ const PostSchema = new mongoose.Schema({
     
     date_created: {
         type: Date,
-        required: true
-    },
-    
-    upvotes: {
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            
-        }], 
-        required: true,
-        default: []
-    },
-    
-    downvotes: {
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        }], 
-        required: true,
-        default: []
+        required: false,
+        default: (new Date()).getTime(),
     },
 
     tags: {

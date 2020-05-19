@@ -23,6 +23,24 @@ const UserSchema = new mongoose.Schema({
         required: false,
     },
 });
+const User = mongoose.model('User', UserSchema);
+const UserTC = composeWithMongoose(User);
 
-export const User = mongoose.model('User', UserSchema);
-export const UserTC = composeWithMongoose(User);
+UserTC.addResolver({
+    name: 'findByNetID',
+
+    args: {
+        netID: 'String',
+    },
+
+    type: UserTC,
+
+    resolve: async ({ source, args, context, info }) => {
+        return await User.findOne({ netID: args.netID});
+    },
+});
+
+export {
+    User,
+    UserTC,
+};

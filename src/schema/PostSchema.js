@@ -1,10 +1,12 @@
 import {
+    Discussion,
     CommentTC,
     PostDTC,
     DiscussionTC,
     EventTC,
     NoticeTC,
     JobTC,
+    UserTC,
 } from '../models';
 
 DiscussionTC.addFields({
@@ -55,6 +57,40 @@ JobTC.addRelation("comments", {
     },
 });
 
+PostDTC.addRelation("creator", {
+    "resolver": () => UserTC.getResolver('findByNetID'),
+    
+    prepareArgs: {
+        netID: (source) => source.creator,
+    },
+
+    projection: {
+        creator: 1,
+    },
+});
+
+DiscussionTC.addResolver({
+    name: "createOneDiscussion",
+
+    args: {
+        kind: 'String',
+        title: 'String',
+        body: 'String',
+        creator: 'String',
+    },
+
+    type: DiscussionTC,
+
+    resolve: async ({ source, args, context, info }) => {
+        return await Discussion.create({
+            kind: args.kind,
+            title: args.title,
+            body: args.body,
+            creator: args.creator,
+        });
+    },
+})
+
 const PostQuery = {
     discussionById: DiscussionTC.getResolver('findById'),
     eventById: EventTC.getResolver('findById'),
@@ -103,7 +139,7 @@ const PostMutation = {
     noticeUpdateOne: NoticeTC.getResolver('updateOne'),
     jobUpdateOne: JobTC.getResolver('updateOne'),
 
-    discussionCreate: DiscussionTC.getResolver('createOne'),
+    discussionCreate: DiscussionTC.getResolver('createOneDiscussion'),
     eventCreate: EventTC.getResolver('createOne'),
     noticeCreate: NoticeTC.getResolver('createOne'),
     jobCreate: JobTC.getResolver('createOne'),
@@ -116,7 +152,17 @@ const PostMutation = {
     postRemoveById: PostDTC.getResolver('removeById'),
     postRemoveOne: PostDTC.getResolver('removeOne'),    
     postRemoveMany: PostDTC.getResolver('removeMany'),
+
 };
+
+const PostSubscription = {
+    discussionUpdated: {
+        type: PostDTC,
+        args: {
+            // TODO: figure out types of args
+        }
+    }
+}
 
 export {
     PostQuery,

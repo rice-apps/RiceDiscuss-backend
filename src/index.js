@@ -14,11 +14,12 @@ const server = new ApolloServer({
 });
 
 const app = express();
-server.applyMiddleware({ app });
 
+server.applyMiddleware({ app });
 app.use('/login', oAuth);
 
 const httpServer = http.createServer(app);
+
 server.installSubscriptionHandlers(httpServer);
 
 httpServer.listen({ port: PORT }, () => {

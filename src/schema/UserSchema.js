@@ -1,10 +1,12 @@
 import {
+    User,
     UserTC,
 } from '../models';
 
 const UserQuery = {
     userById: UserTC.getResolver('findById'),
     userByIds: UserTC.getResolver('findByIds'),
+    userByNetID: UserTC.getResolver('findByNetID'),
     userOne: UserTC.getResolver('findOne'),
     userMany: UserTC.getResolver('findMany'),
     userCount: UserTC.getResolver('count'),
