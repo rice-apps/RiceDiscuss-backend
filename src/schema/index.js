@@ -18,4 +18,6 @@ sc.Mutation.addFields({
     ...UserMutation,
 });
 
-export default sc.buildSchema();
+const Schema = sc.buildSchema();
+
+export default Schema;

@@ -3,6 +3,7 @@ import { ApolloServer } from 'apollo-server-express';
 import http from 'http';
 
 import Schema from './schema';
+import idp from './controllers/auth-controller';
 
 const PORT = 3000;
 
@@ -15,6 +16,8 @@ server.applyMiddleware({ app });
 
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
+
+idp(app);
 
 httpServer.listen({ port: PORT }, () => {
     console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
