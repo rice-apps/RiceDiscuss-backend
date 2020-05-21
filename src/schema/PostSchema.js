@@ -71,28 +71,6 @@ PostDTC.addRelation("creator", {
 
 });
 
-// DiscussionTC.addResolver({
-//     name: "createOneDiscussion",
-
-//     args: {
-//         kind: 'String',
-//         title: 'String',
-//         body: 'String',
-//         creator: 'String',
-//     },
-
-//     type: DiscussionTC,
-
-//     resolve: async ({ source, args, context, info }) => {
-//         return await Discussion.create({
-//             kind: args.kind,
-//             title: args.title,
-//             body: args.body,
-//             creator: args.creator,
-//         });
-//     },
-// })
-
 const PostQuery = {
     discussionById: DiscussionTC.getResolver('findById'),
     eventById: EventTC.getResolver('findById'),
