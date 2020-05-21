@@ -35,24 +35,6 @@ const CommentSchema = new mongoose.Schema({
         required: true,
         default: 0,
     },
-
-    upvotes: [
-        {
-            users: [{
-                type: String,
-                ref: 'User',
-            }]
-        }
-    ],
-
-    downvotes: [
-        {
-            users: [{
-                type: String,
-                ref: 'User',
-            }]
-        }
-    ]
 });
 
 export const Comment = mongoose.model("Comment", CommentSchema);

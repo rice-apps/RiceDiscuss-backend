@@ -5,7 +5,7 @@ import {
 } from '../models';
 
 CommentTC.addFields({
-    //upvotes: [UserTC],
+    upvotes: [UserTC],
     downvotes: [UserTC],
     children: [CommentTC],
 });
@@ -46,11 +46,11 @@ CommentTC.addRelation("parent_id", {
     },
 });
 
-CommentTC.getFieldOTC('upvotes').addRelation("User", {
-    "resolver": () => UserTC.getResolver('findByNetID'),
+CommentTC.addRelation("upvotes", {
+    "resolver": () => UserTC.getResolver('findManyByNetID'),
 
     prepareArgs: {
-        netID: (source) => source.netID,
+        netIDs: (source) => source.netID,
     },
 
     projection: {
