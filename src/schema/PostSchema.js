@@ -22,10 +22,10 @@ JobTC.addFields({
 });
 
 DiscussionTC.addRelation("comments", {
-    "resolver": CommentTC.getResolver('findMany'),
+    "resolver": CommentTC.getResolver('findManyByPostID'),
 
     prepareArgs: {
-        _id: (source) => source._id,
+        post_id: (source) => source._id,
     },
 
     projection: {
@@ -34,10 +34,10 @@ DiscussionTC.addRelation("comments", {
 });
 
 EventTC.addRelation("comments", {
-    "resolver": CommentTC.getResolver('findMany'),
+    "resolver": CommentTC.getResolver('findManyByPostID'),
 
     prepareArgs: {
-        _id: (source) => source._id,
+        post_id: (source) => source._id,
     },
 
     projection: {
@@ -49,7 +49,7 @@ JobTC.addRelation("comments", {
     "resolver": CommentTC.getResolver('findMany'),
 
     prepareArgs: {
-        _id: (source) => source._id,
+        post_id: (source) => source._id,
     },
 
     projection: {

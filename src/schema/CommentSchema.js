@@ -1,12 +1,13 @@
-import { 
+import {
+    Comment, 
     CommentTC,
     PostDTC,
     UserTC,
 } from '../models';
 
+import mongoose from 'mongoose';
+
 CommentTC.addFields({
-    upvotes: [UserTC],
-    downvotes: [UserTC],
     children: [CommentTC],
 });
 
@@ -50,7 +51,7 @@ CommentTC.addRelation("upvotes", {
     "resolver": () => UserTC.getResolver('findManyByNetID'),
 
     prepareArgs: {
-        netIDs: (source) => source.netID,
+        netIDs: (source) => source.upvotes,
     },
 
     projection: {
@@ -71,10 +72,10 @@ CommentTC.addRelation("downvotes", {
 });
 
 CommentTC.addRelation("children", {
-    "resolver": () => CommentTC.getResolver('findMany'),
+    "resolver": () => CommentTC.getResolver('findManyByParentID'),
 
     prepareArgs: {
-        _id: (source) => source._id,
+        parent_id: (source) => source._id,
     },
 
     projection: {
@@ -82,9 +83,29 @@ CommentTC.addRelation("children", {
     },
 });
 
+CommentTC.addResolver({
+    name: "updateCommentByID",
+
+    args: {
+        id: mongoose.Schema.Types.ObjectId,
+        newComment: CommentTC.getInputTypeComposer(),
+    },
+
+    type: CommentTC,
+
+    resolve: async ({ source, args, context, info }) => {
+        var target = await Comment.findById(args.id);
+
+
+    }
+
+});
+
 const CommentQuery = {
     commentById: CommentTC.getResolver('findById'),
     commentByIds: CommentTC.getResolver('findByIds'),
+    commentByParent: CommentTC.getResolver('findManyByParentID'),
+    commentByPost: CommentTC.getResolver('findManyByPostID'),
     commentOne: CommentTC.getResolver('findOne'),
     commentMany: CommentTC.getResolver('findMany'),
     commentCount: CommentTC.getResolver('count'),

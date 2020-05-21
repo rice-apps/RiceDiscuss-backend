@@ -4,7 +4,6 @@ import { composeWithMongoose } from 'graphql-compose-mongoose';
 const CommentSchema = new mongoose.Schema({
     creator: {
         type: String,
-        ref: "User",
         required: true,
     },
 
@@ -35,7 +34,54 @@ const CommentSchema = new mongoose.Schema({
         required: true,
         default: 0,
     },
+
+    upvotes: [
+        {
+            type: String,
+        }
+    ],
+
+    downvotes: [
+        {
+            type: String,
+        }
+    ],
 });
 
-export const Comment = mongoose.model("Comment", CommentSchema);
-export const CommentTC = composeWithMongoose(Comment);
+
+const Comment = mongoose.model("Comment", CommentSchema);
+const CommentTC = composeWithMongoose(Comment);
+
+CommentTC.addResolver({
+    name: 'findManyByParentID',
+
+    args: {
+        parent_id: 'ID',
+    },
+
+    type: [CommentTC],
+
+    resolve: async ({ source, args, context, info }) => {
+        return await Comment.find({ parent_id: args.parent_id });
+    },
+
+});
+
+CommentTC.addResolver({
+    name: 'findManyByPostID',
+
+    args: {
+        post_id: 'ID',
+    },
+
+    type: [CommentTC],
+
+    resolve: async ({ source, args, context, info }) => {
+        return await Comment.find({ post_id: args.post_id });
+    },
+});
+
+export {
+    Comment,
+    CommentTC,
+}

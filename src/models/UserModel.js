@@ -45,7 +45,7 @@ UserTC.addResolver({
 
     args: {
         netID: 'String',
-        newInfo: 'JSON',
+        newInfo: UserTC.getInputTypeComposer(),
     },
 
     type: UserTC,
@@ -82,7 +82,7 @@ UserTC.addResolver({
         netIDs: '[String]',
     },
 
-    type: UserTC,
+    type: [UserTC],
 
     resolve: async ({ source, args, context, info }) => {
         return await User.find({ netID: { $in: args.netIDs } });
