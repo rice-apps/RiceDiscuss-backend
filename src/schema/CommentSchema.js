@@ -5,23 +5,21 @@ import {
 } from '../models';
 
 CommentTC.addFields({
-    upvotes: [UserTC],
+    //upvotes: [UserTC],
     downvotes: [UserTC],
     children: [CommentTC],
 });
 
 CommentTC.addRelation("creator", {
-    "resolver": () => UserTC.getResolver('findById'),
+    "resolver": () => UserTC.getResolver('findByNetID'),
     
     prepareArgs: {
-        _id: (source) => source.creator,
+        netID: (source) => source.creator,
     },
 
     projection: {
         creator: 1,
     },
-
-    required: true,
 });
 
 CommentTC.addRelation("post_id", {
@@ -48,11 +46,11 @@ CommentTC.addRelation("parent_id", {
     },
 });
 
-CommentTC.addRelation("upvotes", {
-    "resolver": () => UserTC.getResolver('findMany'),
+CommentTC.getFieldOTC('upvotes').addRelation("User", {
+    "resolver": () => UserTC.getResolver('findByNetID'),
 
     prepareArgs: {
-        _id: (source) => source._id,
+        netID: (source) => source.netID,
     },
 
     projection: {
@@ -61,10 +59,10 @@ CommentTC.addRelation("upvotes", {
 });
 
 CommentTC.addRelation("downvotes", {
-    "resolver": () => UserTC.getResolver('findMany'),
+    "resolver": () => UserTC.getResolver('findManyByNetID'),
 
     prepareArgs: {
-        _id: (source) => source._id,
+        netIDs: (source) => source.downvotes,
     },
 
     projection: {

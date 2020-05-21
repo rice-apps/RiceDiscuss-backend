@@ -3,7 +3,7 @@ import { composeWithMongoose } from 'graphql-compose-mongoose';
 
 const CommentSchema = new mongoose.Schema({
     creator: {
-        type: mongoose.Schema.Types.String,
+        type: String,
         ref: "User",
         required: true,
     },
@@ -32,9 +32,27 @@ const CommentSchema = new mongoose.Schema({
 
     depth: {
         type: Number,
-        required: false,
+        required: true,
         default: 0,
     },
+
+    upvotes: [
+        {
+            users: [{
+                type: String,
+                ref: 'User',
+            }]
+        }
+    ],
+
+    downvotes: [
+        {
+            users: [{
+                type: String,
+                ref: 'User',
+            }]
+        }
+    ]
 });
 
 export const Comment = mongoose.model("Comment", CommentSchema);

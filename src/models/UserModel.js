@@ -69,11 +69,27 @@ UserTC.addResolver({
     type: UserTC,
 
     resolve: async ({ source, args, context, info }) => {
-        var target = await User.findOne({netID: args.netID});
+        var target = await User.findOne({ netID: args.netID });
 
         return await target.remove();
     }
-})
+});
+
+UserTC.addResolver({
+    name: "findManyByNetID",
+
+    args: {
+        netIDs: '[String]',
+    },
+
+    type: UserTC,
+
+    resolve: async ({ source, args, context, info }) => {
+        return await User.find({ netID: { $in: args.netIDs } });
+        // db.companies.find( { _id : { $in : arr} });
+
+    }
+});
 
 export {
     User,
