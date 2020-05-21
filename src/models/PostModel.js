@@ -45,7 +45,7 @@ const PostSchema = new mongoose.Schema({
 
     creator: {
         type: String,
-        required: true
+        required: true,
     }
 });
 

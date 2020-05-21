@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema({
     netID: {
         type: String,
         required: true,
+        unique: true,
     },
 
     date_joined: {
@@ -30,7 +31,7 @@ UserTC.addResolver({
     name: 'findByNetID',
 
     args: {
-        netID: 'String',
+        netID: `String`,
     },
 
     type: UserTC,
@@ -44,7 +45,7 @@ UserTC.addResolver({
     name: "updateByNetID",
 
     args: {
-        netID: 'String',
+        netID: `String`,
         newInfo: UserTC.getInputTypeComposer(),
     },
 
@@ -63,7 +64,7 @@ UserTC.addResolver({
     name: "removeByNetID",
 
     args: {
-        netID: 'String',
+        netID: `String`,
     },
 
     type: UserTC,
@@ -79,7 +80,7 @@ UserTC.addResolver({
     name: "findManyByNetID",
 
     args: {
-        netIDs: '[String]',
+        netIDs: `[String]`,
     },
 
     type: [UserTC],

@@ -13,7 +13,7 @@ UserTC.addRelation("posts", {
     resolver: PostDTC.getResolver("findManyByCreator"),
 
     prepareArgs: {
-        creator: (source) => source.creator,
+        creator: (source) => source.netID,
     },
 
     projection: {
@@ -21,11 +21,11 @@ UserTC.addRelation("posts", {
     },
 });
 
-UserTC.addRelation({
+UserTC.addRelation("comments", {
     resolver: CommentTC.getResolver("findManyByCreator"),
 
     prepareArgs: {
-        creator: (source) => source.creator,
+        creator: (source) => source.netID,
     },
 
     projection: {

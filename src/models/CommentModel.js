@@ -56,7 +56,7 @@ CommentTC.addResolver({
     name: 'findManyByParentID',
 
     args: {
-        parent_id: 'ID',
+        parent_id: `ID`,
     },
 
     type: [CommentTC],
@@ -71,7 +71,7 @@ CommentTC.addResolver({
     name: 'findManyByPostID',
 
     args: {
-        post_id: 'ID',
+        post_id: `ID`,
     },
 
     type: [CommentTC],
