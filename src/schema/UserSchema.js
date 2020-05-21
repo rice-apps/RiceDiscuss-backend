@@ -16,9 +16,11 @@ const UserMutation = {
     userCreateOne: UserTC.getResolver('createOne'),
     userCreateMany: UserTC.getResolver('createMany'),
     userUpdateById: UserTC.getResolver('updateById'),
+    userUpdateByNetID: UserTC.getResolver('updateByNetID'),
     userUpdateOne: UserTC.getResolver('updateOne'),
     userUpdateMany: UserTC.getResolver('updateMany'),
     userRemoveById: UserTC.getResolver('removeById'),
+    userRemoveByNetID: UserTC.getResolver('removeByNetID'),
     userRemoveOne: UserTC.getResolver('removeOne'),
     userRemoveMany: UserTC.getResolver('removeMany'),
 };

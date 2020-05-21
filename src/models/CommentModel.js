@@ -3,7 +3,7 @@ import { composeWithMongoose } from 'graphql-compose-mongoose';
 
 const CommentSchema = new mongoose.Schema({
     creator: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.String,
         ref: "User",
         required: true,
     },
@@ -21,7 +21,8 @@ const CommentSchema = new mongoose.Schema({
 
     date_created: {
         type: Date,
-        required: true,
+        required: false,
+        default: (new Date()).getTime(),
     },
 
     body: {
@@ -31,7 +32,7 @@ const CommentSchema = new mongoose.Schema({
 
     depth: {
         type: Number,
-        required: true,
+        required: false,
         default: 0,
     },
 });
