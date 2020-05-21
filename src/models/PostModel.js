@@ -41,6 +41,12 @@ const PostSchema = new mongoose.Schema({
         type: [String],
         required: false,
         default: []
+    },
+
+    creator: {
+        type: String,
+        ref: 'User',
+        required: true
     }
 });
 

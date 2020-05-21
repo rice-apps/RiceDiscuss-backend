@@ -20,6 +20,8 @@ CommentTC.addRelation("creator", {
     projection: {
         creator: 1,
     },
+
+    required: true,
 });
 
 CommentTC.addRelation("post_id", {

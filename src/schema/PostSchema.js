@@ -62,34 +62,36 @@ PostDTC.addRelation("creator", {
     
     prepareArgs: {
         netID: (source) => source.creator,
+        required: true,
     },
 
     projection: {
         creator: 1,
     },
+
 });
 
-DiscussionTC.addResolver({
-    name: "createOneDiscussion",
+// DiscussionTC.addResolver({
+//     name: "createOneDiscussion",
 
-    args: {
-        kind: 'String',
-        title: 'String',
-        body: 'String',
-        creator: 'String',
-    },
+//     args: {
+//         kind: 'String',
+//         title: 'String',
+//         body: 'String',
+//         creator: 'String',
+//     },
 
-    type: DiscussionTC,
+//     type: DiscussionTC,
 
-    resolve: async ({ source, args, context, info }) => {
-        return await Discussion.create({
-            kind: args.kind,
-            title: args.title,
-            body: args.body,
-            creator: args.creator,
-        });
-    },
-})
+//     resolve: async ({ source, args, context, info }) => {
+//         return await Discussion.create({
+//             kind: args.kind,
+//             title: args.title,
+//             body: args.body,
+//             creator: args.creator,
+//         });
+//     },
+// })
 
 const PostQuery = {
     discussionById: DiscussionTC.getResolver('findById'),
@@ -139,7 +141,7 @@ const PostMutation = {
     noticeUpdateOne: NoticeTC.getResolver('updateOne'),
     jobUpdateOne: JobTC.getResolver('updateOne'),
 
-    discussionCreate: DiscussionTC.getResolver('createOneDiscussion'),
+    discussionCreate: DiscussionTC.getResolver('createOne'),
     eventCreate: EventTC.getResolver('createOne'),
     noticeCreate: NoticeTC.getResolver('createOne'),
     jobCreate: JobTC.getResolver('createOne'),

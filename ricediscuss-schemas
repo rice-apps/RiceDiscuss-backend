@@ -13,6 +13,7 @@ enum PostType {
     EVENT
     JOB
     DISCUSSION
+    NOTICE
 }
 
 type Event {
