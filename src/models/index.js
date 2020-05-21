@@ -3,7 +3,7 @@ import {
     CommentTC,
 } from './CommentModel';
 
-import { 
+import {
     Discussion,
     Event,
     Job,

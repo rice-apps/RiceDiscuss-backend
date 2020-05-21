@@ -46,7 +46,7 @@ EventTC.addRelation("comments", {
 });
 
 JobTC.addRelation("comments", {
-    "resolver": CommentTC.getResolver('findMany'),
+    "resolver": CommentTC.getResolver('findManyByPostID'),
 
     prepareArgs: {
         post_id: (source) => source._id,
@@ -59,7 +59,7 @@ JobTC.addRelation("comments", {
 
 PostDTC.addRelation("creator", {
     "resolver": () => UserTC.getResolver('findByNetID'),
-    
+
     prepareArgs: {
         netID: (source) => source.creator,
         required: true,
@@ -76,22 +76,22 @@ const PostQuery = {
     eventById: EventTC.getResolver('findById'),
     noticeById: NoticeTC.getResolver('findById'),
     jobById: JobTC.getResolver('findById'),
-    
+
     discussionByIds: DiscussionTC.getResolver('findByIds'),
     eventByIds: EventTC.getResolver('findByIds'),
     noticeByIds: NoticeTC.getResolver('findByIds'),
     jobByIds: JobTC.getResolver('findByIds'),
-    
+
     discussionFindOne: DiscussionTC.getResolver('findOne'),
     eventFindOne: EventTC.getResolver('findOne'),
     noticeFindOne: NoticeTC.getResolver('findOne'),
     jobFindOne: JobTC.getResolver('findOne'),
-    
+
     discussionMany: DiscussionTC.getResolver('findMany'),
     eventMany: EventTC.getResolver('findMany'),
     noticeMany: NoticeTC.getResolver('findMany'),
     jobMany: JobTC.getResolver('findMany'),
-    
+
     discussionCount: DiscussionTC.getResolver('count'),
     eventCount: EventTC.getResolver('count'),
     noticeCount: NoticeTC.getResolver('count'),
@@ -128,9 +128,9 @@ const PostMutation = {
     eventUpdateMany: EventTC.getResolver('updateMany'),
     noticeUpdateMany: NoticeTC.getResolver('updateMany'),
     jobUpdateMany: JobTC.getResolver('updateMany'),
-    
+
     postRemoveById: PostDTC.getResolver('removeById'),
-    postRemoveOne: PostDTC.getResolver('removeOne'),    
+    postRemoveOne: PostDTC.getResolver('removeOne'),
     postRemoveMany: PostDTC.getResolver('removeMany'),
 
 };

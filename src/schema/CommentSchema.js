@@ -1,11 +1,9 @@
 import {
-    Comment, 
     CommentTC,
     PostDTC,
     UserTC,
 } from '../models';
 
-import mongoose from 'mongoose';
 
 CommentTC.addFields({
     children: [CommentTC],
@@ -13,7 +11,7 @@ CommentTC.addFields({
 
 CommentTC.addRelation("creator", {
     "resolver": () => UserTC.getResolver('findByNetID'),
-    
+
     prepareArgs: {
         netID: (source) => source.creator,
     },
@@ -81,24 +79,6 @@ CommentTC.addRelation("children", {
     projection: {
         children: 1,
     },
-});
-
-CommentTC.addResolver({
-    name: "updateCommentByID",
-
-    args: {
-        id: mongoose.Schema.Types.ObjectId,
-        newComment: CommentTC.getInputTypeComposer(),
-    },
-
-    type: CommentTC,
-
-    resolve: async ({ source, args, context, info }) => {
-        var target = await Comment.findById(args.id);
-
-
-    }
-
 });
 
 const CommentQuery = {

@@ -81,6 +81,20 @@ CommentTC.addResolver({
     },
 });
 
+CommentTC.addResolver({
+    name: 'findManyByCreator',
+
+    args: {
+        creator: `String`,
+    },
+
+    type: [CommentTC],
+
+    resolve: async ({ source, args, context, info }) => {
+        return await Comment.find({ creator: args.creator });
+    },
+});
+
 export {
     Comment,
     CommentTC,

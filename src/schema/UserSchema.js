@@ -1,7 +1,37 @@
 import {
-    User,
     UserTC,
+    PostDTC,
+    CommentTC,
 } from '../models';
+
+UserTC.addFields({
+    posts: [PostDTC],
+    comments: [CommentTC],
+});
+
+UserTC.addRelation("posts", {
+    resolver: PostDTC.getResolver("findManyByCreator"),
+
+    prepareArgs: {
+        creator: (source) => source.creator,
+    },
+
+    projection: {
+        posts: 1,
+    },
+});
+
+UserTC.addRelation({
+    resolver: CommentTC.getResolver("findManyByCreator"),
+
+    prepareArgs: {
+        creator: (source) => source.creator,
+    },
+
+    projection: {
+        comments: 1,
+    },
+});
 
 const UserQuery = {
     userById: UserTC.getResolver('findById'),

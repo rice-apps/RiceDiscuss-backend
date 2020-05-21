@@ -25,12 +25,12 @@ const PostSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    
+
     body: {
         type: String,
         required: true
     },
-    
+
     date_created: {
         type: Date,
         required: false,
@@ -45,7 +45,6 @@ const PostSchema = new mongoose.Schema({
 
     creator: {
         type: String,
-        ref: 'User',
         required: true
     }
 });
@@ -107,20 +106,47 @@ const JobSchema = new mongoose.Schema({
 // Set discriminator key and create the base model
 PostSchema.set('discriminatorKey', DKey);
 
-export const Post = mongoose.model('Post', PostSchema);
+const Post = mongoose.model('Post', PostSchema);
 
 // Set the discriminiator for other sybtypes
-export const Discussion = Post.discriminator(enumPostType.Discussion, DiscussionSchema);
-export const Notice = Post.discriminator(enumPostType.Notice, NoticeSchema);
-export const Event = Post.discriminator(enumPostType.Event, EventSchema);
-export const Job = Post.discriminator(enumPostType.Job, JobSchema);
+const Discussion = Post.discriminator(enumPostType.Discussion, DiscussionSchema);
+const Notice = Post.discriminator(enumPostType.Notice, NoticeSchema);
+const Event = Post.discriminator(enumPostType.Event, EventSchema);
+const Job = Post.discriminator(enumPostType.Job, JobSchema);
 
 // TODO: add base options (https://graphql-compose.github.io/docs/plugins/plugin-mongoose.html#working-with-mongoose-collection-level-discriminators)
 // for Discriminator models and possible for base model
 
-export const PostDTC = composeWithMongooseDiscriminators(Post);
+const PostDTC = composeWithMongooseDiscriminators(Post);
 
-export const DiscussionTC = PostDTC.discriminator(Discussion, {});
-export const NoticeTC = PostDTC.discriminator(Notice, {});
-export const EventTC = PostDTC.discriminator(Event, {});
-export const JobTC = PostDTC.discriminator(Job, {});
+const DiscussionTC = PostDTC.discriminator(Discussion, {});
+const NoticeTC = PostDTC.discriminator(Notice, {});
+const EventTC = PostDTC.discriminator(Event, {});
+const JobTC = PostDTC.discriminator(Job, {});
+
+PostDTC.addResolver({
+    name: 'findManyByCreator',
+
+    args: {
+        creator: `String`,
+    },
+
+    type: [PostDTC],
+
+    resolve: async ({ source, args, context, info }) => {
+        return await Post.find({ creator: args.creator });
+    },
+});
+
+export {
+    Post,
+    Discussion,
+    Notice,
+    Event,
+    Job,
+    PostDTC,
+    DiscussionTC,
+    NoticeTC,
+    EventTC,
+    JobTC,
+};
