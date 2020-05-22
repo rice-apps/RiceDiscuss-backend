@@ -60,10 +60,14 @@ JobTC.addRelation("comments", {
 });
 
 PostDTC.addRelation("creator", {
-    "resolver": () => UserTC.getResolver('findByNetID'),
+    "resolver": () => UserTC.getResolver('findOne'),
 
     prepareArgs: {
-        netID: (source) => source.creator,
+        filter: (source) => {
+            return {
+                netID: source.creator,
+            };
+        },
         required: true,
     },
 

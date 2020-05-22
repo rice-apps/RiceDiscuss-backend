@@ -11,10 +11,14 @@ CommentTC.addFields({
 });
 
 CommentTC.addRelation("creator", {
-    "resolver": () => UserTC.getResolver('findByNetID'),
+    "resolver": () => UserTC.getResolver('findOne'),
 
     prepareArgs: {
-        netID: (source) => source.creator,
+        filter: (source) => {
+            return {
+                netID: source.creator,
+            };
+        },
     },
 
     projection: {
@@ -47,10 +51,18 @@ CommentTC.addRelation("parent_id", {
 });
 
 CommentTC.addRelation("upvotes", {
-    "resolver": () => UserTC.getResolver('findManyByNetID'),
+    "resolver": () => UserTC.getResolver('findMany'),
 
     prepareArgs: {
-        netIDs: (source) => source.upvotes,
+        filter: (source) => {
+            return {
+                _operators: {
+                    netID: {
+                        in: source.upvotes,
+                    },
+                },
+            };
+        },
     },
 
     projection: {
@@ -59,10 +71,18 @@ CommentTC.addRelation("upvotes", {
 });
 
 CommentTC.addRelation("downvotes", {
-    "resolver": () => UserTC.getResolver('findManyByNetID'),
+    "resolver": () => UserTC.getResolver('findMany'),
 
     prepareArgs: {
-        netIDs: (source) => source.downvotes,
+        filter: (source) => {
+            return {
+                _operators: {
+                    netID: {
+                        in: source.upvotes,
+                    },
+                },
+            };
+        },
     },
 
     projection: {
@@ -120,19 +140,19 @@ const CommentMutation = {
 };
 
 const CommentSubscription = {
-    commentCreated : {
+    commentCreated: {
         type: CommentTC,
 
         subscribe: () => pubsub.asyncIterator('commentCreated'),
     },
 
-    commentUpdated : {
+    commentUpdated: {
         type: CommentTC,
 
         subscribe: () => pubsub.asyncIterator('commentUpdated'),
     },
 
-    commentRemoved : {
+    commentRemoved: {
         type: CommentTC,
 
         subscribe: () => pubsub.asyncIterator('commentRemoved'),
