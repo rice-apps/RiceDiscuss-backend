@@ -18,6 +18,9 @@ const server = new ApolloServer({
             console.log("WebSocket disconnected!");
         },
     },
+    context: {
+        
+    }
 });
 
 const app = express();
