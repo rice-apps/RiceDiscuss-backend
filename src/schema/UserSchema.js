@@ -4,6 +4,8 @@ import {
     CommentTC,
 } from '../models';
 
+import pubsub from '../pubsub';
+
 UserTC.addFields({
     posts: [PostDTC],
     comments: [CommentTC],
@@ -33,6 +35,7 @@ UserTC.addRelation("comments", {
     },
 });
 
+
 const UserQuery = {
     userById: UserTC.getResolver('findById'),
     userByIds: UserTC.getResolver('findByIds'),
@@ -49,7 +52,13 @@ const UserMutation = {
     userUpdateById: UserTC.getResolver('updateById'),
     userUpdateByNetID: UserTC.getResolver('updateByNetID'),
     userUpdateByNetID: UserTC.getResolver('updateByNetID'),
-    userUpdateOne: UserTC.getResolver('updateOne'),
+    userUpdateOne: UserTC.getResolver('updateOne').wrapResolve(next => rp => {
+        pubsub.publish('profileUpdated', {
+            profileUpdated: rp.args.record,
+        });
+
+        return next(rp);
+    }),
     userUpdateMany: UserTC.getResolver('updateMany'),
     userRemoveByNetID: UserTC.getResolver('removeByNetID'),
     userRemoveById: UserTC.getResolver('removeById'),
@@ -58,7 +67,16 @@ const UserMutation = {
     userRemoveMany: UserTC.getResolver('removeMany'),
 };
 
+const UserSubscription = {
+    profileUpdated: {
+        type: UserTC,
+
+        subscribe: () => pubsub.asyncIterator('profileUpdated'),
+    }
+};
+
 export {
     UserQuery,
     UserMutation,
+    UserSubscription,
 };

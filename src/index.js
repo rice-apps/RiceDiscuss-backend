@@ -1,16 +1,23 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import http from 'http';
-
 import Schema from './schema';
 import oAuth from './controllers/auth-controller';
-
 import './db';
 
 const PORT = 3000;
 
 const server = new ApolloServer({
-    schema: Schema
+    schema: Schema,
+    subscriptions: {
+        onConnect: (connectionParams, webSocket, context) => {
+            console.log("WebSocket connected!");
+        },
+
+        onDisconnect: (webSocket, context) => {
+            console.log("WebSocket disconnected!");
+        },
+    },
 });
 
 const app = express();

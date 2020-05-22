@@ -4,6 +4,7 @@ import {
     UserTC,
 } from '../models';
 
+import pubsub from '../pubsub';
 
 CommentTC.addFields({
     children: [CommentTC],
@@ -92,17 +93,54 @@ const CommentQuery = {
 };
 
 const CommentMutation = {
-    commentCreateOne: CommentTC.getResolver('createOne'),
+    commentCreateOne: CommentTC.getResolver('createOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+        pubsub.publish('commentCreated', { commentCreated: payload.record });
+
+        return payload;
+    }),
     commentCreateMany: CommentTC.getResolver('createMany'),
     commentUpdateById: CommentTC.getResolver('updateById'),
-    commentUpdateOne: CommentTC.getResolver('updateOne'),
+    commentUpdateOne: CommentTC.getResolver('updateOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+        pubsub.publish('commentUpdated', { commentUpdated: payload.record });
+
+        return payload;
+    }),
     commentUpdateMany: CommentTC.getResolver('updateMany'),
     commentRemoveById: CommentTC.getResolver('removeById'),
-    commentRemoveOne: CommentTC.getResolver('removeOne'),
+    commentRemoveOne: CommentTC.getResolver('removeOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+
+        pubsub.publish('commentRemoved', { commentRemoved: payload.record });
+
+        return payload;
+    }),
     commentRemoveMany: CommentTC.getResolver('removeMany'),
 };
+
+const CommentSubscription = {
+    commentCreated : {
+        type: CommentTC,
+
+        subscribe: () => pubsub.asyncIterator('commentCreated'),
+    },
+
+    commentUpdated : {
+        type: CommentTC,
+
+        subscribe: () => pubsub.asyncIterator('commentUpdated'),
+    },
+
+    commentRemoved : {
+        type: CommentTC,
+
+        subscribe: () => pubsub.asyncIterator('commentRemoved'),
+    },
+}
 
 export {
     CommentQuery,
     CommentMutation,
+    CommentSubscription,
 };

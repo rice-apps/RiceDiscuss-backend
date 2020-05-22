@@ -9,6 +9,8 @@ import {
     UserTC,
 } from '../models';
 
+import pubsub from '../pubsub';
+
 DiscussionTC.addFields({
     comments: [CommentTC],
 });
@@ -99,10 +101,34 @@ const PostQuery = {
 };
 
 const PostMutation = {
-    discussionCreateOne: DiscussionTC.getResolver('createOne'),
-    eventCreateOne: EventTC.getResolver('createOne'),
-    noticeCreateOne: NoticeTC.getResolver('createOne'),
-    jobCreateOne: JobTC.getResolver('createOne'),
+    discussionCreateOne: DiscussionTC.getResolver('createOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+
+        pubsub.publish('discussionCreated', { discussionCreated: payload.record });
+
+        return payload;
+    }),
+    eventCreateOne: EventTC.getResolver('createOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+
+        pubsub.publish('eventCreated', { eventCreated: payload.record });
+
+        return payload;
+    }),
+    noticeCreateOne: NoticeTC.getResolver('createOne').wrapResolve(next => async rp => {
+
+        const payload = await next(rp);
+        pubsub.publish('noticeCreated', { noticeCreated: payload.record });
+
+        return payload;
+    }),
+    jobCreateOne: JobTC.getResolver('createOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+        
+        pubsub.publish('jobCreated', { jobCreated: payload.record });
+
+        return payload;
+    }),
 
     discussionCreateMany: DiscussionTC.getResolver('createMany'),
     eventCreateMany: EventTC.getResolver('createMany'),
@@ -114,10 +140,34 @@ const PostMutation = {
     noticeUpdateById: NoticeTC.getResolver('updateById'),
     jobUpdateById: JobTC.getResolver('updateById'),
 
-    discussionUpdateOne: DiscussionTC.getResolver('updateOne'),
-    eventUpdateOne: EventTC.getResolver('updateOne'),
-    noticeUpdateOne: NoticeTC.getResolver('updateOne'),
-    jobUpdateOne: JobTC.getResolver('updateOne'),
+    discussionUpdateOne: DiscussionTC.getResolver('updateOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+
+        pubsub.publish('discussionUpdated', { discussionUpdated: payload.record });
+
+        return payload;
+    }),
+    eventUpdateOne: EventTC.getResolver('updateOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+
+        pubsub.publish('eventUpdated', { eventUpdated: payload.record });
+
+        return payload;
+    }),
+    noticeUpdateOne: NoticeTC.getResolver('updateOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+
+        pubsub.publish('noticeUpdated', { noticeUpdated: payload.record });
+
+        return payload;
+    }),
+    jobUpdateOne: JobTC.getResolver('updateOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+
+        pubsub.publish('jobUpdated', { jobUpdated: payload.record });
+
+        return payload;
+    }),
 
     discussionCreate: DiscussionTC.getResolver('createOne'),
     eventCreate: EventTC.getResolver('createOne'),
@@ -130,21 +180,100 @@ const PostMutation = {
     jobUpdateMany: JobTC.getResolver('updateMany'),
 
     postRemoveById: PostDTC.getResolver('removeById'),
-    postRemoveOne: PostDTC.getResolver('removeOne'),
+    postRemoveOne: PostDTC.getResolver('removeOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
+
+        pubsub.publish('postRemoved', { postRemoved: payload.record });
+
+        return payload;
+    }),
     postRemoveMany: PostDTC.getResolver('removeMany'),
 
 };
 
 const PostSubscription = {
     discussionUpdated: {
+        type: DiscussionTC,
+
+        subscribe: () => pubsub.asyncIterator('discussionUpdated'),
+    },
+
+    noticeUpdated: {
+        type: NoticeTC,
+
+        subscribe: () => pubsub.asyncIterator('noticeUpdated'),
+    },
+
+    eventUpdated: {
+        type: EventTC,
+        subscribe: () => pubsub.asyncIterator('eventUpdated'),
+
+    },
+
+    jobUpdated: {
+        type: JobTC,
+        subscribe: () => pubsub.asyncIterator('jobUpdated'),
+
+    },
+
+    discussionCreated: {
+        type: DiscussionTC,
+
+        subscribe: () => pubsub.asyncIterator('discussionCreated'),
+    },
+
+    noticeCreated: {
+        type: NoticeTC,
+
+        subscribe: () => pubsub.asyncIterator('noticeCreated'),
+    },
+
+    eventCreated: {
+        type: EventTC,
+        subscribe: () => pubsub.asyncIterator('eventCreated'),
+
+    },
+
+    jobCreated: {
+        type: JobTC,
+        subscribe: () => pubsub.asyncIterator('jobCreated'),
+
+    },
+
+    postRemoved: {
         type: PostDTC,
-        args: {
-            // TODO: figure out types of args
-        }
-    }
+        subscribe: () => pubsub.asyncIterator('postRemoved'),
+
+    },
+
+    // discussionUpdated: {
+    //     type: DiscussionTC,
+
+    // },
+
+    // discussionUpdated: {
+    //     type: DiscussionTC,
+
+    // },
+
+    // discussionUpdated: {
+    //     type: DiscussionTC,
+
+    // },
+
+    // discussionUpdated: {
+    //     type: DiscussionTC,
+
+    // },
+
+    // discussionUpdated: {
+    //     type: DiscussionTC,
+
+    // },
 }
 
 export {
     PostQuery,
     PostMutation,
+    PostSubscription,
 };

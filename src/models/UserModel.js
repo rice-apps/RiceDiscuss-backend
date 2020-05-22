@@ -5,6 +5,7 @@ const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
+        unique: true,
     },
 
     netID: {
@@ -23,6 +24,7 @@ const UserSchema = new mongoose.Schema({
     token: {
         type: String,
         required: false,
+        unique: true,
     },
 });
 const User = mongoose.model('User', UserSchema);
@@ -77,6 +79,7 @@ UserTC.addResolver({
     }
 });
 
+// Only used for test -- Do not use in frontend!
 UserTC.addResolver({
     name: "findManyByNetID",
 
