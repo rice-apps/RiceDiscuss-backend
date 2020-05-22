@@ -15,7 +15,8 @@ const UserSchema = new mongoose.Schema({
 
     date_joined: {
         type: Date,
-        required: true,
+        required: false,
+        default: (new Date()).getTime(),
     },
 
     // We should store expiry date and net ID in the token.

@@ -55,7 +55,6 @@ function oAuth(req, res) {
 							User.create({
 								netID: authSuccess.user,
 								username: authSuccess.user,
-								date_joined: Math.round((d.getTime() / 1000)),
 								token: token,
 							}, function (err, newUser) {
 								if (err) {
