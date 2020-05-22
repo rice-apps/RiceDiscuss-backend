@@ -48,12 +48,12 @@ const UserMutation = {
     userCreateOne: UserTC.getResolver('createOne'),
     userCreateMany: UserTC.getResolver('createMany'),
     userUpdateById: UserTC.getResolver('updateById'),
-    userUpdateOne: UserTC.getResolver('updateOne').wrapResolve(next => rp => {
-        pubsub.publish('profileUpdated', {
-            profileUpdated: rp.args.record,
-        });
+    userUpdateOne: UserTC.getResolver('updateOne').wrapResolve(next => async rp => {
+        const payload = await next(rp);
 
-        return next(rp);
+        pubsub.publish('profileUpdated', { profileUpdated: payload.record });
+
+        return payload;
     }),
     userUpdateMany: UserTC.getResolver('updateMany'),
     userRemoveById: UserTC.getResolver('removeById'),
