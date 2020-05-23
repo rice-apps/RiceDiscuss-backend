@@ -60,7 +60,7 @@ async function oAuth(request, response) {
                         username: result.serviceResponse.authenticationSuccess.user,
                         token: newToken,
                     }).catch(() => {
-                        return res
+                        return response
                             .status(500)
                             .send();
                     });
