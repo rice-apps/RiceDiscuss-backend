@@ -2,6 +2,7 @@ import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import http from 'http';
 import jwt from 'jsonwebtoken';
+import cors from 'cors';
 
 import Schema from './schema';
 import oAuth from './controllers/auth-controller';
@@ -15,11 +16,11 @@ import {
 
 const server = new ApolloServer({
     schema: Schema,
-    context: (req, res) => {
+    context: ({ req, res }) => {
         /*
             TODO: check where the token is actually sent
         */
-        const token = req.token | req.headers.authorization;
+        const token = req.token;
         var decoded = null;
 
         try {
@@ -60,7 +61,10 @@ const server = new ApolloServer({
 const app = express();
 
 server.applyMiddleware({ app });
-app.use('/login', oAuth);
+
+app.use('/login', cors({
+    origin: "https://idp.rice.edu/",
+}), oAuth);
 
 const httpServer = http.createServer(app);
 
