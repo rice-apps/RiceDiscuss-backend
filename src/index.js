@@ -26,12 +26,15 @@ const server = new ApolloServer({
         try {
             decoded = jwt.verify(token, CLIENT_TOKEN_SECRET);
         } catch {
-            return res.status(403);
+            console.log("authentication failed!");
+            // return res.status(403);
         }
 
-        return {
-            netID: decoded.data.user,
-        };
+        // return {
+        //     netID: decoded.data.user,
+        // };
+
+        return
     },
     subscriptions: {
         onConnect: (connectionParams, webSocket, context) => {
@@ -40,7 +43,7 @@ const server = new ApolloServer({
                 TODO: chekc where the WebSocket token is actually sent
             */
             try {
-                decoded = jwt.verify(connectionParams.authToken, CLIENT_TOKEN_SECRET)
+                decoded = jwt.verify(connectionParams.authToken, CLIENT_TOKEN_SECRET);
             } catch {
                 console.log("Invalid token");
             }
@@ -62,9 +65,9 @@ const app = express();
 
 server.applyMiddleware({ app });
 
-app.use('/login', cors({
-    origin: "https://idp.rice.edu/",
-}), oAuth);
+// cors({ origin: "https://idp.rice.edu/" })
+
+app.use('/login', oAuth);
 
 const httpServer = http.createServer(app);
 
