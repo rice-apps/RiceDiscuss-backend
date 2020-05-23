@@ -1,11 +1,13 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import http from 'http';
+
 import Schema from './schema';
 import oAuth from './controllers/auth-controller';
+
 import './db';
 
-const PORT = 3000;
+import { DEV_PORT } from './config';
 
 const server = new ApolloServer({
     schema: Schema,
@@ -32,7 +34,7 @@ const httpServer = http.createServer(app);
 
 server.installSubscriptionHandlers(httpServer);
 
-httpServer.listen({ port: PORT }, () => {
+httpServer.listen({ port: DEV_PORT }, () => {
     console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}!`);
     console.log(`🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}!`);
 });
