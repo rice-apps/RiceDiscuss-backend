@@ -16,6 +16,9 @@ import {
 const server = new ApolloServer({
     schema: Schema,
     context: (req, res) => {
+        /*
+            TODO: check where the token is actually sent
+        */
         const token = req.token | req.headers.authorization;
         var decoded = null;
 
@@ -24,13 +27,27 @@ const server = new ApolloServer({
         } catch {
             return res.status(403);
         }
-    
+
         return {
             netID: decoded.data.user,
         };
     },
     subscriptions: {
         onConnect: (connectionParams, webSocket, context) => {
+            var decoded = null;
+            /*
+                TODO: chekc where the WebSocket token is actually sent
+            */
+            try {
+                decoded = jwt.verify(connectionParams.authToken, CLIENT_TOKEN_SECRET)
+            } catch {
+                console.log("Invalid token");
+            }
+
+            if (decoded.data.user == context.netID) {
+                console.log("WebSocket request matches logged in user!");
+            }
+
             console.log("WebSocket connected!");
         },
 
