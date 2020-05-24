@@ -1,9 +1,7 @@
 import mongoose from 'mongoose';
-import { MONGODB_CONNECTION_URL } from './config';
+import {MONGODB_CONNECTION_URL} from './config';
 
-const url = MONGODB_CONNECTION_URL;
-
-mongoose.connect(url, {
+mongoose.connect(MONGODB_CONNECTION_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });

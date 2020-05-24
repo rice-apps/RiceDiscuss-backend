@@ -115,7 +115,7 @@ const CommentQuery = {
 const CommentMutation = {
     commentCreateOne: CommentTC.getResolver('createOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
-        pubsub.publish('commentCreated', { commentCreated: payload.record });
+        await pubsub.publish('commentCreated', {commentCreated: payload.record});
 
         return payload;
     }),
@@ -123,7 +123,7 @@ const CommentMutation = {
     commentUpdateById: CommentTC.getResolver('updateById'),
     commentUpdateOne: CommentTC.getResolver('updateOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
-        pubsub.publish('commentUpdated', { commentUpdated: payload.record });
+        await pubsub.publish('commentUpdated', {commentUpdated: payload.record});
 
         return payload;
     }),
@@ -132,7 +132,7 @@ const CommentMutation = {
     commentRemoveOne: CommentTC.getResolver('removeOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
 
-        pubsub.publish('commentRemoved', { commentRemoved: payload.record });
+        await pubsub.publish('commentRemoved', {commentRemoved: payload.record});
 
         return payload;
     }),

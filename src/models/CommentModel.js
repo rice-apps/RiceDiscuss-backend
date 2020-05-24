@@ -69,7 +69,7 @@ CommentTC.addResolver({
     type: [CommentTC],
 
     resolve: async ({ args }) => {
-        return await Comment.find({ parent_id: args.parent_id });
+        return Comment.find({parent_id: args.parent_id});
     },
 
 });
@@ -84,7 +84,7 @@ CommentTC.addResolver({
     type: [CommentTC],
 
     resolve: async ({ args }) => {
-        return await Comment.find({ post_id: args.post_id });
+        return Comment.find({post_id: args.post_id});
     },
 });
 
@@ -98,7 +98,7 @@ CommentTC.addResolver({
     type: [CommentTC],
 
     resolve: async ({ args }) => {
-        return await Comment.find({ creator: args.creator });
+        return Comment.find({creator: args.creator});
     },
 });
 

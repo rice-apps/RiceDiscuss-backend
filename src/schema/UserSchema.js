@@ -51,7 +51,7 @@ const UserMutation = {
     userUpdateOne: UserTC.getResolver('updateOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
 
-        pubsub.publish('profileUpdated', { profileUpdated: payload.record });
+        await pubsub.publish('profileUpdated', {profileUpdated: payload.record});
 
         return payload;
     }),

@@ -114,7 +114,7 @@ PostSchema.set('discriminatorKey', DKey);
 
 const Post = mongoose.model('Post', PostSchema);
 
-// Set the discriminiator for other sybtypes
+// Set the discriminator for other subtypes
 const Discussion = Post.discriminator(enumPostType.Discussion, DiscussionSchema);
 const Notice = Post.discriminator(enumPostType.Notice, NoticeSchema);
 const Event = Post.discriminator(enumPostType.Event, EventSchema);
@@ -140,7 +140,7 @@ PostDTC.addResolver({
     type: [PostDTC],
 
     resolve: async ({ source, args, context, info }) => {
-        return await Post.find({ creator: args.creator });
+        return Post.find({creator: args.creator});
     },
 });
 

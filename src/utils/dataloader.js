@@ -1,4 +1,4 @@
-import { ObjectTypeComposer } from 'graphql-compose';
+import {ObjectTypeComposer} from 'graphql-compose';
 import DataLoader from 'dataloader';
 import crypto from 'crypto';
 import assert from 'assert';
@@ -14,14 +14,12 @@ function getHashKey(key) {
         { rawQuery: JSON.stringify(key.rawQuery || {}) },
         { context: JSON.stringify(key.context || {}) });
 
-    let hash = md5(JSON.stringify(object));
-
-    return hash;
+    return md5(JSON.stringify(object));
 }
 
 function composeDataloader(tc, resNames, options) {
     if (!(tc instanceof ObjectTypeComposer)) {
-        throw new Error("Provide TypeComposer to composeDataloader function!");
+        throw new Error("Provide ObjectTypeComposer to composeDataloader function!");
     }
 
     assert(Array.isArray(resNames), "Resolver names should be provided as array of strings");

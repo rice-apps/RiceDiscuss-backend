@@ -21,30 +21,28 @@ const server = new ApolloServer({
             TODO: check where the token is actually sent
         */
 
-        if (!req) {
-            return
+        if (req != null) {
+            const token = req.token | '';
+            let decoded = null;
+
+            try {
+                decoded = jwt.verify(token, CLIENT_TOKEN_SECRET);
+            } catch {
+                console.log("authentication failed!");
+                // return res.status(403);
+            }
+
+            return {
+                netID: decoded.data.user,
+            };
         }
-        const token = req.token | '';
-        var decoded = null;
 
-        try {
-            decoded = jwt.verify(token, CLIENT_TOKEN_SECRET);
-        } catch {
-            console.log("authentication failed!");
-            // return res.status(403);
-        }
-
-        // return {
-        //     netID: decoded.data.user,
-        // };
-
-        return
     },
     subscriptions: {
         onConnect: (connectionParams, webSocket, context) => {
-            var decoded = null;
+            let decoded = null;
             /*
-                TODO: chekc where the WebSocket token is actually sent
+                TODO: check where the WebSocket token is actually sent
             */
             try {
                 decoded = jwt.verify(connectionParams.authToken, CLIENT_TOKEN_SECRET);
@@ -52,7 +50,7 @@ const server = new ApolloServer({
                 console.log("Invalid token");
             }
 
-            if (decoded != null && decoded.data.user == context.netID) {
+            if (decoded != null && decoded.data.user === context.netID) {
                 console.log("WebSocket request matches logged in user!");
             }
 

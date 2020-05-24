@@ -43,9 +43,9 @@ async function oAuth(request, response) {
 
             const isNewUser = currentUser == null;
 
-            var userID = null;
-            var netID = null;
-            var token = null;
+            let userID;
+            let netID;
+            let token;
 
             if (isNewUser) {
                 const newToken = jwt.sign({

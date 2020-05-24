@@ -108,28 +108,28 @@ const PostMutation = {
     discussionCreateOne: DiscussionTC.getResolver('createOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
 
-        pubsub.publish('discussionCreated', { discussionCreated: payload.record });
+        await pubsub.publish('discussionCreated', {discussionCreated: payload.record});
 
         return payload;
     }),
     eventCreateOne: EventTC.getResolver('createOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
 
-        pubsub.publish('eventCreated', { eventCreated: payload.record });
+        await pubsub.publish('eventCreated', {eventCreated: payload.record});
 
         return payload;
     }),
     noticeCreateOne: NoticeTC.getResolver('createOne').wrapResolve(next => async rp => {
 
         const payload = await next(rp);
-        pubsub.publish('noticeCreated', { noticeCreated: payload.record });
+        await pubsub.publish('noticeCreated', {noticeCreated: payload.record});
 
         return payload;
     }),
     jobCreateOne: JobTC.getResolver('createOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
         
-        pubsub.publish('jobCreated', { jobCreated: payload.record });
+        await pubsub.publish('jobCreated', {jobCreated: payload.record});
 
         return payload;
     }),
@@ -147,28 +147,28 @@ const PostMutation = {
     discussionUpdateOne: DiscussionTC.getResolver('updateOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
 
-        pubsub.publish('discussionUpdated', { discussionUpdated: payload.record });
+        await pubsub.publish('discussionUpdated', {discussionUpdated: payload.record});
 
         return payload;
     }),
     eventUpdateOne: EventTC.getResolver('updateOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
 
-        pubsub.publish('eventUpdated', { eventUpdated: payload.record });
+        await pubsub.publish('eventUpdated', {eventUpdated: payload.record});
 
         return payload;
     }),
     noticeUpdateOne: NoticeTC.getResolver('updateOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
 
-        pubsub.publish('noticeUpdated', { noticeUpdated: payload.record });
+        await pubsub.publish('noticeUpdated', {noticeUpdated: payload.record});
 
         return payload;
     }),
     jobUpdateOne: JobTC.getResolver('updateOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
 
-        pubsub.publish('jobUpdated', { jobUpdated: payload.record });
+        await pubsub.publish('jobUpdated', {jobUpdated: payload.record});
 
         return payload;
     }),
