@@ -20,7 +20,11 @@ const server = new ApolloServer({
         /*
             TODO: check where the token is actually sent
         */
-        const token = req.token;
+
+        if (!req) {
+            return
+        }
+        const token = req.token | '';
         var decoded = null;
 
         try {
@@ -48,7 +52,7 @@ const server = new ApolloServer({
                 console.log("Invalid token");
             }
 
-            if (decoded.data.user == context.netID) {
+            if (decoded != null && decoded.data.user == context.netID) {
                 console.log("WebSocket request matches logged in user!");
             }
 
@@ -74,6 +78,6 @@ const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 httpServer.listen({ port: DEV_PORT }, () => {
-    console.log(`🚀 Server ready at http://localhost:${DEV_PORT}${server.graphqlPath}!`);
-    console.log(`🚀 Subscriptions ready at ws://localhost:${DEV_PORT}${server.subscriptionsPath}!`);
+    console.log(`🚀 Server ready at http://localhost:${DEV_PORT}${server.graphqlPath}`);
+    console.log(`🚀 Subscriptions ready at ws://localhost:${DEV_PORT}${server.subscriptionsPath}`);
 });

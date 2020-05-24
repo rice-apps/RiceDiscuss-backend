@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 import { composeWithMongooseDiscriminators } from 'graphql-compose-mongoose';
 
+import composeDataloader from '../utils/dataloader';
+
+const resolverList = ['findById', 'findByIds', 'findOne', 'findMany',
+    'count', 'createOne', 'createMany', 'updateById', 'updateOne',
+    'updateMany', 'removeById', 'removeOne', 'removeMany'];
+
 // Create discriminator key
 const DKey = 'kind';
 
@@ -138,15 +144,45 @@ PostDTC.addResolver({
     },
 });
 
+const PostDTCDL = composeDataloader(PostDTC, [...resolverList, ...['findManyByCreator']], {
+    cacheExpiration: 3000,
+    removeProjection: true,
+    debug: false,
+});
+
+const DiscussionTCDL = composeDataloader(DiscussionTC, resolverList, {
+    cacheExpiration: 3000,
+    removeProjection: true,
+    debug: false,
+});
+
+const NoticeTCDL = composeDataloader(NoticeTC, resolverList, {
+    cacheExpiration: 3000,
+    removeProjection: true,
+    debug: false,
+});
+
+const EventTCDL = composeDataloader(EventTC, resolverList, {
+    cacheExpiration: 3000,
+    removeProjection: true,
+    debug: false,
+});
+
+const JobTCDL = composeDataloader(JobTC, resolverList, {
+    cacheExpiration: 3000,
+    removeProjection: true,
+    debug: false,
+});
+
 export {
     Post,
     Discussion,
     Notice,
     Event,
     Job,
-    PostDTC,
-    DiscussionTC,
-    NoticeTC,
-    EventTC,
-    JobTC,
+    PostDTCDL as PostDTC,
+    DiscussionTCDL as DiscussionTC,
+    NoticeTCDL as NoticeTC,
+    EventTCDL as EventTC,
+    JobTCDL as JobTC,
 };

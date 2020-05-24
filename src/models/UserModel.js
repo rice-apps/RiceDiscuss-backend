@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 import { composeWithMongoose } from 'graphql-compose-mongoose';
 
+import composeDataloader from '../utils/dataloader';
+
+const resolverList = ['findById', 'findByIds', 'findOne', 'findMany',
+    'count', 'createOne', 'createMany', 'updateById', 'updateOne',
+    'updateMany', 'removeById', 'removeOne', 'removeMany'];
+
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -27,10 +33,17 @@ const UserSchema = new mongoose.Schema({
         unique: true,
     },
 });
+
 const User = mongoose.model('User', UserSchema);
 const UserTC = composeWithMongoose(User);
 
+const UserTCDL = composeDataloader(UserTC, resolverList, {
+    cacheExpiration: 3000,
+    removeProjection: true,
+    debug: false,
+});
+
 export {
     User,
-    UserTC,
+    UserTCDL as UserTC,
 };

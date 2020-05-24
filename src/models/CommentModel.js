@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 import { composeWithMongoose } from 'graphql-compose-mongoose';
 
+import composeDataloader from '../utils/dataloader';
+
+const resolverList = ['findById', 'findByIds', 'findManyByParentID', 'findManyByPostID',
+    'findOne', 'findMany', 'count', 'createOne', 'createMany', 'updateById', 'updateOne',
+    'updateMany', 'removeById', 'removeOne', 'removeMany'];
+
 const CommentSchema = new mongoose.Schema({
     creator: {
         type: String,
@@ -62,7 +68,7 @@ CommentTC.addResolver({
 
     type: [CommentTC],
 
-    resolve: async ({ source, args, context, info }) => {
+    resolve: async ({ args }) => {
         return await Comment.find({ parent_id: args.parent_id });
     },
 
@@ -77,7 +83,7 @@ CommentTC.addResolver({
 
     type: [CommentTC],
 
-    resolve: async ({ source, args, context, info }) => {
+    resolve: async ({ args }) => {
         return await Comment.find({ post_id: args.post_id });
     },
 });
@@ -91,12 +97,18 @@ CommentTC.addResolver({
 
     type: [CommentTC],
 
-    resolve: async ({ source, args, context, info }) => {
+    resolve: async ({ args }) => {
         return await Comment.find({ creator: args.creator });
     },
 });
 
+const CommentTCDL = composeDataloader(CommentTC, resolverList, {
+    cacheExpiration: 3000,
+    removeProjection: true,
+    debug: false,
+});
+
 export {
     Comment,
-    CommentTC,
+    CommentTCDL as CommentTC,
 }
