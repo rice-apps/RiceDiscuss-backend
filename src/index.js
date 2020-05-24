@@ -21,21 +21,19 @@ const server = new ApolloServer({
             TODO: check where the token is actually sent
         */
 
-        if (req != null) {
-            const token = req.token | '';
-            let decoded = null;
+        const token = req.token;
+        let decoded = null;
 
-            try {
-                decoded = jwt.verify(token, CLIENT_TOKEN_SECRET);
-            } catch {
-                console.log("authentication failed!");
-                // return res.status(403);
-            }
-
-            return {
-                netID: decoded.data.user,
-            };
+        try {
+            decoded = jwt.verify(token, CLIENT_TOKEN_SECRET);
+        } catch {
+            console.log("authentication failed!");
+            return
         }
+
+        return {
+            netID: decoded.data.user,
+        };
 
     },
     subscriptions: {
