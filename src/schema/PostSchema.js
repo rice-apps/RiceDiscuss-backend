@@ -1,5 +1,4 @@
 import {
-    Discussion,
     CommentTC,
     PostDTC,
     DiscussionTC,
@@ -83,11 +82,6 @@ const PostQuery = {
     noticeById: NoticeTC.getResolver('findById'),
     jobById: JobTC.getResolver('findById'),
 
-    discussionByIds: DiscussionTC.getResolver('findByIds'),
-    eventByIds: EventTC.getResolver('findByIds'),
-    noticeByIds: NoticeTC.getResolver('findByIds'),
-    jobByIds: JobTC.getResolver('findByIds'),
-
     discussionFindOne: DiscussionTC.getResolver('findOne'),
     eventFindOne: EventTC.getResolver('findOne'),
     noticeFindOne: NoticeTC.getResolver('findOne'),
@@ -134,11 +128,6 @@ const PostMutation = {
         return payload;
     }),
 
-    discussionCreateMany: DiscussionTC.getResolver('createMany'),
-    eventCreateMany: EventTC.getResolver('createMany'),
-    noticeCreateMany: NoticeTC.getResolver('createMany'),
-    jobCreateMany: JobTC.getResolver('createMany'),
-
     discussionUpdateById: DiscussionTC.getResolver('updateById'),
     eventUpdateById: EventTC.getResolver('updateById'),
     noticeUpdateById: NoticeTC.getResolver('updateById'),
@@ -172,16 +161,6 @@ const PostMutation = {
 
         return payload;
     }),
-
-    discussionCreate: DiscussionTC.getResolver('createOne'),
-    eventCreate: EventTC.getResolver('createOne'),
-    noticeCreate: NoticeTC.getResolver('createOne'),
-    jobCreate: JobTC.getResolver('createOne'),
-
-    discussionUpdateMany: DiscussionTC.getResolver('updateMany'),
-    eventUpdateMany: EventTC.getResolver('updateMany'),
-    noticeUpdateMany: NoticeTC.getResolver('updateMany'),
-    jobUpdateMany: JobTC.getResolver('updateMany'),
 
     postRemoveById: PostDTC.getResolver('removeById'),
     postRemoveOne: PostDTC.getResolver('removeOne').wrapResolve(next => async rp => {

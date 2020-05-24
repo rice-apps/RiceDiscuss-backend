@@ -104,7 +104,6 @@ CommentTC.addRelation("children", {
 
 const CommentQuery = {
     commentById: CommentTC.getResolver('findById'),
-    commentByIds: CommentTC.getResolver('findByIds'),
     commentByParent: CommentTC.getResolver('findManyByParentID'),
     commentByPost: CommentTC.getResolver('findManyByPostID'),
     commentOne: CommentTC.getResolver('findOne'),
@@ -119,7 +118,6 @@ const CommentMutation = {
 
         return payload;
     }),
-    commentCreateMany: CommentTC.getResolver('createMany'),
     commentUpdateById: CommentTC.getResolver('updateById'),
     commentUpdateOne: CommentTC.getResolver('updateOne').wrapResolve(next => async rp => {
         const payload = await next(rp);
@@ -136,7 +134,6 @@ const CommentMutation = {
 
         return payload;
     }),
-    commentRemoveMany: CommentTC.getResolver('removeMany'),
 };
 
 const CommentSubscription = {
