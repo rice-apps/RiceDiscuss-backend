@@ -78,7 +78,7 @@ CommentTC.addRelation("downvotes", {
             return {
                 _operators: {
                     netID: {
-                        in: source.upvotes,
+                        in: source.downvotes,
                     },
                 },
             };
