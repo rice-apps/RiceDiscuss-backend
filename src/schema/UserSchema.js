@@ -1,10 +1,6 @@
-import {
-    UserTC,
-    PostDTC,
-    CommentTC,
-} from '../models';
+import { UserTC, PostDTC, CommentTC } from "../models";
 
-import pubsub from '../pubsub';
+import pubsub from "../pubsub";
 
 UserTC.addFields({
     posts: [PostDTC],
@@ -35,39 +31,38 @@ UserTC.addRelation("comments", {
     },
 });
 
-
 const UserQuery = {
-    userById: UserTC.getResolver('findById'),
-    userOne: UserTC.getResolver('findOne'),
-    userMany: UserTC.getResolver('findMany'),
-    userCount: UserTC.getResolver('count'),
+    userById: UserTC.getResolver("findById"),
+    userOne: UserTC.getResolver("findOne"),
+    userMany: UserTC.getResolver("findMany"),
+    userCount: UserTC.getResolver("count"),
 };
 
 const UserMutation = {
-    userCreateOne: UserTC.getResolver('createOne'),
-    userUpdateById: UserTC.getResolver('updateById'),
-    userUpdateOne: UserTC.getResolver('updateOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
+    userCreateOne: UserTC.getResolver("createOne"),
+    userUpdateById: UserTC.getResolver("updateById"),
+    userUpdateOne: UserTC.getResolver("updateOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
 
-        await pubsub.publish('profileUpdated', {profileUpdated: payload.record});
+            await pubsub.publish("profileUpdated", {
+                profileUpdated: payload.record,
+            });
 
-        return payload;
-    }),
-    userUpdateMany: UserTC.getResolver('updateMany'),
-    userRemoveById: UserTC.getResolver('removeById'),
-    userRemoveOne: UserTC.getResolver('removeOne'),
+            return payload;
+        }
+    ),
+    userUpdateMany: UserTC.getResolver("updateMany"),
+    userRemoveById: UserTC.getResolver("removeById"),
+    userRemoveOne: UserTC.getResolver("removeOne"),
 };
 
 const UserSubscription = {
     profileUpdated: {
         type: UserTC,
 
-        subscribe: () => pubsub.asyncIterator('profileUpdated'),
-    }
+        subscribe: () => pubsub.asyncIterator("profileUpdated"),
+    },
 };
 
-export {
-    UserQuery,
-    UserMutation,
-    UserSubscription,
-};
+export { UserQuery, UserMutation, UserSubscription };

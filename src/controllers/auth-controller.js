@@ -1,28 +1,29 @@
-import jwt from 'jsonwebtoken';
-import bent from 'bent';
-import { parseStringPromise } from 'xml2js';
-import { processors } from 'xml2js';
+import jwt from "jsonwebtoken";
+import bent from "bent";
+import { parseStringPromise } from "xml2js";
+import { processors } from "xml2js";
 
-import { User } from '../models';
-import { CLIENT_TOKEN_SECRET, SERVICE_URL } from '../config';
+import { User } from "../models";
+import { CLIENT_TOKEN_SECRET, SERVICE_URL } from "../config";
 
-const get = bent('GET', 'string');
+const get = bent("GET", "string");
 
 async function oAuth(request, response) {
     const ticket = request.query.ticket;
 
     if (ticket) {
-        const casValidateURL = 'https://idp.rice.edu/idp/profile/cas/serviceValidate';
+        const casValidateURL =
+            "https://idp.rice.edu/idp/profile/cas/serviceValidate";
         const url = `${casValidateURL}?ticket=${ticket}&service=${SERVICE_URL}`;
 
-        const rawXML = await get(url)
-            .catch(() => {
-                return response
-                    .status(500)
-                    .send();
-            });
+        const rawXML = await get(url).catch(() => {
+            return response.status(500).send();
+        });
 
-        const result = await parseStringPromise(rawXML, { tagNameProcessors: [processors.stripPrefix], explicitArray: false })
+        const result = await parseStringPromise(rawXML, {
+            tagNameProcessors: [processors.stripPrefix],
+            explicitArray: false,
+        })
             .then((value) => {
                 if (value.authenticationSuccess) {
                     value.serviceResponse.authenticationSuccess.user = value.serviceResponse.authenticationSuccess.user.toLowerCase();
@@ -31,14 +32,12 @@ async function oAuth(request, response) {
                 return value;
             })
             .catch(() => {
-                return response
-                    .status(500)
-                    .send();
+                return response.status(500).send();
             });
 
         if (result.serviceResponse.authenticationSuccess) {
             const currentUser = await User.findOne({
-                netID: result.serviceResponse.authenticationSuccess.user
+                netID: result.serviceResponse.authenticationSuccess.user,
             });
 
             const isNewUser = currentUser == null;
@@ -48,22 +47,23 @@ async function oAuth(request, response) {
             let token;
 
             if (isNewUser) {
-                const newToken = jwt.sign({
-                    data: result.serviceResponse.authenticationSuccess,
-                }, CLIENT_TOKEN_SECRET, {
-                    expiresIn: 60 * 60 * 24 * 7,
-                });
+                const newToken = jwt.sign(
+                    {
+                        data: result.serviceResponse.authenticationSuccess,
+                    },
+                    CLIENT_TOKEN_SECRET,
+                    {
+                        expiresIn: 60 * 60 * 24 * 7,
+                    }
+                );
 
-                const newUser = await User
-                    .create({
-                        netID: result.serviceResponse.authenticationSuccess.user,
-                        username: result.serviceResponse.authenticationSuccess.user,
-                        token: newToken,
-                    }).catch(() => {
-                        return response
-                            .status(500)
-                            .send();
-                    });
+                const newUser = await User.create({
+                    netID: result.serviceResponse.authenticationSuccess.user,
+                    username: result.serviceResponse.authenticationSuccess.user,
+                    token: newToken,
+                }).catch(() => {
+                    return response.status(500).send();
+                });
                 userID = newUser._id;
                 netID = newUser.netID;
                 token = newToken;
@@ -71,11 +71,15 @@ async function oAuth(request, response) {
                 try {
                     jwt.verify(currentUser.token, CLIENT_TOKEN_SECRET);
                 } catch {
-                    currentUser.token = jwt.sign({
-                        data: result.serviceResponse.authenticationSuccess,
-                    }, CLIENT_TOKEN_SECRET, {
-                        expiresIn: 60 * 60 * 24 * 7,
-                    });
+                    currentUser.token = jwt.sign(
+                        {
+                            data: result.serviceResponse.authenticationSuccess,
+                        },
+                        CLIENT_TOKEN_SECRET,
+                        {
+                            expiresIn: 60 * 60 * 24 * 7,
+                        }
+                    );
 
                     await currentUser.save();
                 }
@@ -85,35 +89,26 @@ async function oAuth(request, response) {
                 token = currentUser.token;
             }
 
-            return response
-                .status(200)
-                .json({
-                    success: true,
-                    message: "CAS authentication succeeeded!",
-                    isNewUser: isNewUser,
-                    user: {
-                        _id: userID,
-                        netID: netID,
-                        token: token,
-                    }
-                });
-
+            return response.status(200).json({
+                success: true,
+                message: "CAS authentication succeeeded!",
+                isNewUser: isNewUser,
+                user: {
+                    _id: userID,
+                    netID: netID,
+                    token: token,
+                },
+            });
         } else if (result.authenticationFailure) {
-            return response
-                .status(401)
-                .json({
-                    success: false,
-                    message: "CAS authentication failed!",
-                });
+            return response.status(401).json({
+                success: false,
+                message: "CAS authentication failed!",
+            });
         } else {
-            return response
-                .status(500)
-                .send();
+            return response.status(500).send();
         }
     } else {
-        return response
-            .status(400)
-            .send();
+        return response.status(400).send();
     }
 }
 

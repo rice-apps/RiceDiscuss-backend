@@ -1,11 +1,23 @@
-import mongoose from 'mongoose';
-import { composeWithMongoose } from 'graphql-compose-mongoose';
+import mongoose from "mongoose";
+import { composeWithMongoose } from "graphql-compose-mongoose";
 
-import composeDataloader from '../utils/dataloader';
+import composeDataloader from "../utils/dataloader";
 
-const resolverList = ['findById', 'findByIds', 'findOne', 'findMany',
-    'count', 'createOne', 'createMany', 'updateById', 'updateOne',
-    'updateMany', 'removeById', 'removeOne', 'removeMany'];
+const resolverList = [
+    "findById",
+    "findByIds",
+    "findOne",
+    "findMany",
+    "count",
+    "createOne",
+    "createMany",
+    "updateById",
+    "updateOne",
+    "updateMany",
+    "removeById",
+    "removeOne",
+    "removeMany",
+];
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -23,7 +35,7 @@ const UserSchema = new mongoose.Schema({
     date_joined: {
         type: Date,
         required: false,
-        default: (new Date()).getTime(),
+        default: new Date().getTime(),
     },
 
     // We should store expiry date and net ID in the token.
@@ -34,7 +46,7 @@ const UserSchema = new mongoose.Schema({
     },
 });
 
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model("User", UserSchema);
 const UserTC = composeWithMongoose(User);
 
 const UserTCDL = composeDataloader(UserTC, resolverList, {
@@ -43,7 +55,4 @@ const UserTCDL = composeDataloader(UserTC, resolverList, {
     debug: false,
 });
 
-export {
-    User,
-    UserTCDL as UserTC,
-};
+export { User, UserTCDL as UserTC };

@@ -1,8 +1,12 @@
-import { SchemaComposer } from 'graphql-compose';
+import { SchemaComposer } from "graphql-compose";
 
-import { CommentQuery, CommentMutation, CommentSubscription } from './CommentSchema';
-import { PostQuery, PostMutation, PostSubscription } from './PostSchema';
-import { UserQuery, UserMutation, UserSubscription } from './UserSchema';
+import {
+    CommentQuery,
+    CommentMutation,
+    CommentSubscription,
+} from "./CommentSchema";
+import { PostQuery, PostMutation, PostSubscription } from "./PostSchema";
+import { UserQuery, UserMutation, UserSubscription } from "./UserSchema";
 
 const sc = new SchemaComposer();
 

@@ -1,18 +1,15 @@
-import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
-import http from 'http';
-import jwt from 'jsonwebtoken';
-import cors from 'cors';
+import express from "express";
+import { ApolloServer } from "apollo-server-express";
+import http from "http";
+import jwt from "jsonwebtoken";
+import cors from "cors";
 
-import Schema from './schema';
-import oAuth from './controllers/auth-controller';
+import Schema from "./schema";
+import oAuth from "./controllers/auth-controller";
 
-import './db';
+import "./db";
 
-import {
-    CLIENT_TOKEN_SECRET,
-    DEV_PORT
-} from './config';
+import { CLIENT_TOKEN_SECRET, DEV_PORT } from "./config";
 
 const server = new ApolloServer({
     schema: Schema,
@@ -20,23 +17,22 @@ const server = new ApolloServer({
         /*
             TODO: check where the token is actually sent
         */
-	if (!req) {
-	    return
-	}
+        if (!req) {
+            return;
+        }
         const token = req.token;
         let decoded = null;
 
         try {
             decoded = jwt.verify(token, CLIENT_TOKEN_SECRET);
         } catch {
-            console.log("authentication failed!");
-            return
+            // console.log("authentication failed!");
+            return;
         }
 
         return {
             netID: decoded.data.user,
         };
-
     },
     subscriptions: {
         onConnect: (connectionParams, webSocket, context) => {
@@ -45,12 +41,15 @@ const server = new ApolloServer({
                 TODO: check where the WebSocket token is actually sent
             */
             try {
-                decoded = jwt.verify(connectionParams.authToken, CLIENT_TOKEN_SECRET);
+                decoded = jwt.verify(
+                    connectionParams.authToken,
+                    CLIENT_TOKEN_SECRET
+                );
             } catch {
                 console.log("Invalid token");
-		return
+                return;
             }
-	
+
             if (decoded != null && decoded.data.user === context.netID) {
                 console.log("WebSocket request matches logged in user!");
             }
@@ -70,13 +69,17 @@ server.applyMiddleware({ app });
 
 // cors({ origin: "https://idp.rice.edu/" })
 
-app.use('/login', oAuth);
+app.use("/login", oAuth);
 
 const httpServer = http.createServer(app);
 
 server.installSubscriptionHandlers(httpServer);
 
 httpServer.listen({ port: DEV_PORT }, () => {
-    console.log(`🚀 Server ready at http://localhost:${DEV_PORT}${server.graphqlPath}`);
-    console.log(`🚀 Subscriptions ready at ws://localhost:${DEV_PORT}${server.subscriptionsPath}`);
+    console.log(
+        `🚀 Server ready at http://localhost:${DEV_PORT}${server.graphqlPath}`
+    );
+    console.log(
+        `🚀 Subscriptions ready at ws://localhost:${DEV_PORT}${server.subscriptionsPath}`
+    );
 });

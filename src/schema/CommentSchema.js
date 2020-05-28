@@ -1,17 +1,13 @@
-import {
-    CommentTC,
-    PostDTC,
-    UserTC,
-} from '../models';
+import { CommentTC, PostDTC, UserTC } from "../models";
 
-import pubsub from '../pubsub';
+import pubsub from "../pubsub";
 
 CommentTC.addFields({
     children: [CommentTC],
 });
 
 CommentTC.addRelation("creator", {
-    "resolver": () => UserTC.getResolver('findOne'),
+    resolver: () => UserTC.getResolver("findOne"),
 
     prepareArgs: {
         filter: (source) => {
@@ -27,7 +23,7 @@ CommentTC.addRelation("creator", {
 });
 
 CommentTC.addRelation("post_id", {
-    "resolver": () => PostDTC.getResolver('findById'),
+    resolver: () => PostDTC.getResolver("findById"),
 
     prepareArgs: {
         _id: (source) => source.post_id,
@@ -39,7 +35,7 @@ CommentTC.addRelation("post_id", {
 });
 
 CommentTC.addRelation("parent_id", {
-    "resolver": () => CommentTC.getResolver('findById'),
+    resolver: () => CommentTC.getResolver("findById"),
 
     prepareArgs: {
         _id: (source) => source.parent_id,
@@ -51,7 +47,7 @@ CommentTC.addRelation("parent_id", {
 });
 
 CommentTC.addRelation("upvotes", {
-    "resolver": () => UserTC.getResolver('findMany'),
+    resolver: () => UserTC.getResolver("findMany"),
 
     prepareArgs: {
         filter: (source) => {
@@ -71,7 +67,7 @@ CommentTC.addRelation("upvotes", {
 });
 
 CommentTC.addRelation("downvotes", {
-    "resolver": () => UserTC.getResolver('findMany'),
+    resolver: () => UserTC.getResolver("findMany"),
 
     prepareArgs: {
         filter: (source) => {
@@ -91,7 +87,7 @@ CommentTC.addRelation("downvotes", {
 });
 
 CommentTC.addRelation("children", {
-    "resolver": () => CommentTC.getResolver('findManyByParentID'),
+    resolver: () => CommentTC.getResolver("findManyByParentID"),
 
     prepareArgs: {
         parent_id: (source) => source._id,
@@ -103,61 +99,69 @@ CommentTC.addRelation("children", {
 });
 
 const CommentQuery = {
-    commentById: CommentTC.getResolver('findById'),
-    commentByParent: CommentTC.getResolver('findManyByParentID'),
-    commentByPost: CommentTC.getResolver('findManyByPostID'),
-    commentOne: CommentTC.getResolver('findOne'),
-    commentMany: CommentTC.getResolver('findMany'),
-    commentCount: CommentTC.getResolver('count'),
+    commentById: CommentTC.getResolver("findById"),
+    commentByParent: CommentTC.getResolver("findManyByParentID"),
+    commentByPost: CommentTC.getResolver("findManyByPostID"),
+    commentOne: CommentTC.getResolver("findOne"),
+    commentMany: CommentTC.getResolver("findMany"),
+    commentCount: CommentTC.getResolver("count"),
 };
 
 const CommentMutation = {
-    commentCreateOne: CommentTC.getResolver('createOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
-        await pubsub.publish('commentCreated', {commentCreated: payload.record});
+    commentCreateOne: CommentTC.getResolver("createOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
+            await pubsub.publish("commentCreated", {
+                commentCreated: payload.record,
+            });
 
-        return payload;
-    }),
-    commentUpdateById: CommentTC.getResolver('updateById'),
-    commentUpdateOne: CommentTC.getResolver('updateOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
-        await pubsub.publish('commentUpdated', {commentUpdated: payload.record});
+            return payload;
+        }
+    ),
+    commentUpdateById: CommentTC.getResolver("updateById"),
+    commentUpdateOne: CommentTC.getResolver("updateOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
+            await pubsub.publish("commentUpdated", {
+                commentUpdated: payload.record,
+            });
 
-        return payload;
-    }),
-    commentUpdateMany: CommentTC.getResolver('updateMany'),
-    commentRemoveById: CommentTC.getResolver('removeById'),
-    commentRemoveOne: CommentTC.getResolver('removeOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
+            return payload;
+        }
+    ),
+    commentUpdateMany: CommentTC.getResolver("updateMany"),
+    commentRemoveById: CommentTC.getResolver("removeById"),
+    commentRemoveOne: CommentTC.getResolver("removeOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
 
-        await pubsub.publish('commentRemoved', {commentRemoved: payload.record});
+            await pubsub.publish("commentRemoved", {
+                commentRemoved: payload.record,
+            });
 
-        return payload;
-    }),
+            return payload;
+        }
+    ),
 };
 
 const CommentSubscription = {
     commentCreated: {
         type: CommentTC,
 
-        subscribe: () => pubsub.asyncIterator('commentCreated'),
+        subscribe: () => pubsub.asyncIterator("commentCreated"),
     },
 
     commentUpdated: {
         type: CommentTC,
 
-        subscribe: () => pubsub.asyncIterator('commentUpdated'),
+        subscribe: () => pubsub.asyncIterator("commentUpdated"),
     },
 
     commentRemoved: {
         type: CommentTC,
 
-        subscribe: () => pubsub.asyncIterator('commentRemoved'),
+        subscribe: () => pubsub.asyncIterator("commentRemoved"),
     },
-}
-
-export {
-    CommentQuery,
-    CommentMutation,
-    CommentSubscription,
 };
+
+export { CommentQuery, CommentMutation, CommentSubscription };

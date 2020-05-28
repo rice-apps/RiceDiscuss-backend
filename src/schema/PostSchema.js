@@ -6,9 +6,9 @@ import {
     NoticeTC,
     JobTC,
     UserTC,
-} from '../models';
+} from "../models";
 
-import pubsub from '../pubsub';
+import pubsub from "../pubsub";
 
 DiscussionTC.addFields({
     comments: [CommentTC],
@@ -23,7 +23,7 @@ JobTC.addFields({
 });
 
 DiscussionTC.addRelation("comments", {
-    "resolver": CommentTC.getResolver('findManyByPostID'),
+    resolver: CommentTC.getResolver("findManyByPostID"),
 
     prepareArgs: {
         post_id: (source) => source._id,
@@ -35,7 +35,7 @@ DiscussionTC.addRelation("comments", {
 });
 
 EventTC.addRelation("comments", {
-    "resolver": CommentTC.getResolver('findManyByPostID'),
+    resolver: CommentTC.getResolver("findManyByPostID"),
 
     prepareArgs: {
         post_id: (source) => source._id,
@@ -47,7 +47,7 @@ EventTC.addRelation("comments", {
 });
 
 JobTC.addRelation("comments", {
-    "resolver": CommentTC.getResolver('findManyByPostID'),
+    resolver: CommentTC.getResolver("findManyByPostID"),
 
     prepareArgs: {
         post_id: (source) => source._id,
@@ -59,7 +59,7 @@ JobTC.addRelation("comments", {
 });
 
 PostDTC.addRelation("creator", {
-    "resolver": () => UserTC.getResolver('findOne'),
+    resolver: () => UserTC.getResolver("findOne"),
 
     prepareArgs: {
         filter: (source) => {
@@ -73,160 +73,182 @@ PostDTC.addRelation("creator", {
     projection: {
         creator: 1,
     },
-
 });
 
 const PostQuery = {
-    discussionById: DiscussionTC.getResolver('findById'),
-    eventById: EventTC.getResolver('findById'),
-    noticeById: NoticeTC.getResolver('findById'),
-    jobById: JobTC.getResolver('findById'),
+    discussionById: DiscussionTC.getResolver("findById"),
+    eventById: EventTC.getResolver("findById"),
+    noticeById: NoticeTC.getResolver("findById"),
+    jobById: JobTC.getResolver("findById"),
 
-    discussionFindOne: DiscussionTC.getResolver('findOne'),
-    eventFindOne: EventTC.getResolver('findOne'),
-    noticeFindOne: NoticeTC.getResolver('findOne'),
-    jobFindOne: JobTC.getResolver('findOne'),
+    discussionFindOne: DiscussionTC.getResolver("findOne"),
+    eventFindOne: EventTC.getResolver("findOne"),
+    noticeFindOne: NoticeTC.getResolver("findOne"),
+    jobFindOne: JobTC.getResolver("findOne"),
 
-    discussionMany: DiscussionTC.getResolver('findMany'),
-    eventMany: EventTC.getResolver('findMany'),
-    noticeMany: NoticeTC.getResolver('findMany'),
-    jobMany: JobTC.getResolver('findMany'),
+    discussionMany: DiscussionTC.getResolver("findMany"),
+    eventMany: EventTC.getResolver("findMany"),
+    noticeMany: NoticeTC.getResolver("findMany"),
+    jobMany: JobTC.getResolver("findMany"),
 
-    discussionCount: DiscussionTC.getResolver('count'),
-    eventCount: EventTC.getResolver('count'),
-    noticeCount: NoticeTC.getResolver('count'),
-    jobCount: JobTC.getResolver('count'),
+    discussionCount: DiscussionTC.getResolver("count"),
+    eventCount: EventTC.getResolver("count"),
+    noticeCount: NoticeTC.getResolver("count"),
+    jobCount: JobTC.getResolver("count"),
 };
 
 const PostMutation = {
-    discussionCreateOne: DiscussionTC.getResolver('createOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
+    discussionCreateOne: DiscussionTC.getResolver("createOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
 
-        await pubsub.publish('discussionCreated', {discussionCreated: payload.record});
+            await pubsub.publish("discussionCreated", {
+                discussionCreated: payload.record,
+            });
 
-        return payload;
-    }),
-    eventCreateOne: EventTC.getResolver('createOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
+            return payload;
+        }
+    ),
+    eventCreateOne: EventTC.getResolver("createOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
 
-        await pubsub.publish('eventCreated', {eventCreated: payload.record});
+            await pubsub.publish("eventCreated", {
+                eventCreated: payload.record,
+            });
 
-        return payload;
-    }),
-    noticeCreateOne: NoticeTC.getResolver('createOne').wrapResolve(next => async rp => {
+            return payload;
+        }
+    ),
+    noticeCreateOne: NoticeTC.getResolver("createOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
+            await pubsub.publish("noticeCreated", {
+                noticeCreated: payload.record,
+            });
 
-        const payload = await next(rp);
-        await pubsub.publish('noticeCreated', {noticeCreated: payload.record});
+            return payload;
+        }
+    ),
+    jobCreateOne: JobTC.getResolver("createOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
 
-        return payload;
-    }),
-    jobCreateOne: JobTC.getResolver('createOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
-        
-        await pubsub.publish('jobCreated', {jobCreated: payload.record});
+            await pubsub.publish("jobCreated", { jobCreated: payload.record });
 
-        return payload;
-    }),
+            return payload;
+        }
+    ),
 
-    discussionUpdateById: DiscussionTC.getResolver('updateById'),
-    eventUpdateById: EventTC.getResolver('updateById'),
-    noticeUpdateById: NoticeTC.getResolver('updateById'),
-    jobUpdateById: JobTC.getResolver('updateById'),
+    discussionUpdateById: DiscussionTC.getResolver("updateById"),
+    eventUpdateById: EventTC.getResolver("updateById"),
+    noticeUpdateById: NoticeTC.getResolver("updateById"),
+    jobUpdateById: JobTC.getResolver("updateById"),
 
-    discussionUpdateOne: DiscussionTC.getResolver('updateOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
+    discussionUpdateOne: DiscussionTC.getResolver("updateOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
 
-        await pubsub.publish('discussionUpdated', {discussionUpdated: payload.record});
+            await pubsub.publish("discussionUpdated", {
+                discussionUpdated: payload.record,
+            });
 
-        return payload;
-    }),
-    eventUpdateOne: EventTC.getResolver('updateOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
+            return payload;
+        }
+    ),
+    eventUpdateOne: EventTC.getResolver("updateOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
 
-        await pubsub.publish('eventUpdated', {eventUpdated: payload.record});
+            await pubsub.publish("eventUpdated", {
+                eventUpdated: payload.record,
+            });
 
-        return payload;
-    }),
-    noticeUpdateOne: NoticeTC.getResolver('updateOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
+            return payload;
+        }
+    ),
+    noticeUpdateOne: NoticeTC.getResolver("updateOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
 
-        await pubsub.publish('noticeUpdated', {noticeUpdated: payload.record});
+            await pubsub.publish("noticeUpdated", {
+                noticeUpdated: payload.record,
+            });
 
-        return payload;
-    }),
-    jobUpdateOne: JobTC.getResolver('updateOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
+            return payload;
+        }
+    ),
+    jobUpdateOne: JobTC.getResolver("updateOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
 
-        await pubsub.publish('jobUpdated', {jobUpdated: payload.record});
+            await pubsub.publish("jobUpdated", { jobUpdated: payload.record });
 
-        return payload;
-    }),
+            return payload;
+        }
+    ),
 
-    postRemoveById: PostDTC.getResolver('removeById'),
-    postRemoveOne: PostDTC.getResolver('removeOne').wrapResolve(next => async rp => {
-        const payload = await next(rp);
+    postRemoveById: PostDTC.getResolver("removeById"),
+    postRemoveOne: PostDTC.getResolver("removeOne").wrapResolve(
+        (next) => async (rp) => {
+            const payload = await next(rp);
 
-        pubsub.publish('postRemoved', { postRemoved: payload.record });
+            pubsub.publish("postRemoved", { postRemoved: payload.record });
 
-        return payload;
-    }),
-    postRemoveMany: PostDTC.getResolver('removeMany'),
-
+            return payload;
+        }
+    ),
+    postRemoveMany: PostDTC.getResolver("removeMany"),
 };
 
 const PostSubscription = {
     discussionUpdated: {
         type: DiscussionTC,
 
-        subscribe: () => pubsub.asyncIterator('discussionUpdated'),
+        subscribe: () => pubsub.asyncIterator("discussionUpdated"),
     },
 
     noticeUpdated: {
         type: NoticeTC,
 
-        subscribe: () => pubsub.asyncIterator('noticeUpdated'),
+        subscribe: () => pubsub.asyncIterator("noticeUpdated"),
     },
 
     eventUpdated: {
         type: EventTC,
-        subscribe: () => pubsub.asyncIterator('eventUpdated'),
-
+        subscribe: () => pubsub.asyncIterator("eventUpdated"),
     },
 
     jobUpdated: {
         type: JobTC,
-        subscribe: () => pubsub.asyncIterator('jobUpdated'),
-
+        subscribe: () => pubsub.asyncIterator("jobUpdated"),
     },
 
     discussionCreated: {
         type: DiscussionTC,
 
-        subscribe: () => pubsub.asyncIterator('discussionCreated'),
+        subscribe: () => pubsub.asyncIterator("discussionCreated"),
     },
 
     noticeCreated: {
         type: NoticeTC,
 
-        subscribe: () => pubsub.asyncIterator('noticeCreated'),
+        subscribe: () => pubsub.asyncIterator("noticeCreated"),
     },
 
     eventCreated: {
         type: EventTC,
-        subscribe: () => pubsub.asyncIterator('eventCreated'),
-
+        subscribe: () => pubsub.asyncIterator("eventCreated"),
     },
 
     jobCreated: {
         type: JobTC,
-        subscribe: () => pubsub.asyncIterator('jobCreated'),
-
+        subscribe: () => pubsub.asyncIterator("jobCreated"),
     },
 
     postRemoved: {
         type: PostDTC,
-        subscribe: () => pubsub.asyncIterator('postRemoved'),
-
+        subscribe: () => pubsub.asyncIterator("postRemoved"),
     },
 
     // discussionUpdated: {
@@ -253,10 +275,6 @@ const PostSubscription = {
     //     type: DiscussionTC,
 
     // },
-}
-
-export {
-    PostQuery,
-    PostMutation,
-    PostSubscription,
 };
+
+export { PostQuery, PostMutation, PostSubscription };

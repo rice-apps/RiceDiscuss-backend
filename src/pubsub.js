@@ -1,4 +1,4 @@
-import { PubSub } from 'apollo-server-express';
+import { PubSub } from "apollo-server-express";
 
 const pubsub = new PubSub();
 

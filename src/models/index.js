@@ -1,7 +1,4 @@
-import {
-    Comment,
-    CommentTC,
-} from './CommentModel';
+import { Comment, CommentTC } from "./CommentModel";
 
 import {
     Discussion,
@@ -14,12 +11,9 @@ import {
     JobTC,
     NoticeTC,
     PostDTC,
-} from './PostModel';
+} from "./PostModel";
 
-import {
-    User,
-    UserTC,
-} from './UserModel';
+import { User, UserTC } from "./UserModel";
 
 export {
     Comment,
