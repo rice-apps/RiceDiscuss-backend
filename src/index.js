@@ -20,7 +20,9 @@ const server = new ApolloServer({
         /*
             TODO: check where the token is actually sent
         */
-
+	if (!req) {
+	    return
+	}
         const token = req.token;
         let decoded = null;
 
@@ -46,8 +48,9 @@ const server = new ApolloServer({
                 decoded = jwt.verify(connectionParams.authToken, CLIENT_TOKEN_SECRET);
             } catch {
                 console.log("Invalid token");
+		return
             }
-
+	
             if (decoded != null && decoded.data.user === context.netID) {
                 console.log("WebSocket request matches logged in user!");
             }
