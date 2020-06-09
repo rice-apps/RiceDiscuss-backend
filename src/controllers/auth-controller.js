@@ -9,7 +9,7 @@ import { CLIENT_TOKEN_SECRET, SERVICE_URL } from "../config";
 const get = bent("GET", "string");
 
 async function oAuth(request, response) {
-    const ticket = request.query.ticket;
+    const ticket = request.body.ticket;
 
     if (ticket) {
         const casValidateURL =

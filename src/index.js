@@ -67,9 +67,7 @@ const app = express();
 
 server.applyMiddleware({ app });
 
-// cors({ origin: "https://idp.rice.edu/" })
-
-app.use("/login", oAuth);
+app.use("/login", cors({origin: false}), express.json({type: "text/plain"}), oAuth);
 
 const httpServer = http.createServer(app);
 
