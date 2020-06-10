@@ -13,7 +13,7 @@ function getHashKey(key) {
         { args: key.args || {} },
         { projection: key.projection || {} },
         { rawQuery: JSON.stringify(key.rawQuery || {}) },
-        { context: JSON.stringify(key.context || {}) }
+        { context: JSON.stringify(key.context || {}) },
     );
 
     return md5(JSON.stringify(object));
@@ -22,13 +22,13 @@ function getHashKey(key) {
 function composeDataloader(tc, resNames, options) {
     if (!(tc instanceof ObjectTypeComposer)) {
         throw new Error(
-            "Provide ObjectTypeComposer to composeDataloader function!"
+            "Provide ObjectTypeComposer to composeDataloader function!",
         );
     }
 
     assert(
         Array.isArray(resNames),
-        "Resolver names should be provided as array of strings"
+        "Resolver names should be provided as array of strings",
     );
 
     const safeOptions = {
@@ -48,8 +48,8 @@ function composeDataloader(tc, resNames, options) {
 
                     resolve(
                         resolveParamsArray.map((rp) =>
-                            cachedResolver.resolve(rp)
-                        )
+                            cachedResolver.resolve(rp),
+                        ),
                     );
                 }),
             {
@@ -57,7 +57,7 @@ function composeDataloader(tc, resNames, options) {
                     let newKey = getHashKey(key);
                     return newKey;
                 },
-            }
+            },
         );
 
         tc.setResolver(
@@ -72,7 +72,7 @@ function composeDataloader(tc, resNames, options) {
                 }, safeOptions.cacheExpiration);
 
                 return resLoader.load(rp);
-            })
+            }),
         );
     }
 

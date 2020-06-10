@@ -9,7 +9,8 @@
     "test": "jest -i --verbose --coverage --runInBand",
     "dboff": "killall mongod",
     "watch": "nodemon src/index.js",
-    "dbon": "mkdir -p ./db && mongod --dbpath ./db"
+    "dbon": "mkdir -p ./db && mongod --dbpath ./db",
+    "format": "npx prettier --write \"src/**/*.{js,html,css,scss,json}\""
   },
   "repository": {
     "type": "git",

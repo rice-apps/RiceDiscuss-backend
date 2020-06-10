@@ -130,7 +130,7 @@ const Post = mongoose.model("Post", PostSchema);
 // Set the discriminator for other subtypes
 const Discussion = Post.discriminator(
     enumPostType.Discussion,
-    DiscussionSchema
+    DiscussionSchema,
 );
 const Notice = Post.discriminator(enumPostType.Notice, NoticeSchema);
 const Event = Post.discriminator(enumPostType.Event, EventSchema);
@@ -167,7 +167,7 @@ const PostDTCDL = composeDataloader(
         cacheExpiration: 3000,
         removeProjection: true,
         debug: false,
-    }
+    },
 );
 
 const DiscussionTCDL = composeDataloader(DiscussionTC, resolverList, {

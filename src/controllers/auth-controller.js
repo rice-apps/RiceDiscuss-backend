@@ -11,6 +11,8 @@ const get = bent("GET", "string");
 async function oAuth(request, response) {
     const ticket = request.body.ticket;
 
+    response.setHeader("Access-Control-Allow-Origin", "*");
+
     if (ticket) {
         const casValidateURL =
             "https://idp.rice.edu/idp/profile/cas/serviceValidate";
@@ -54,7 +56,7 @@ async function oAuth(request, response) {
                     CLIENT_TOKEN_SECRET,
                     {
                         expiresIn: 60 * 60 * 24 * 7,
-                    }
+                    },
                 );
 
                 const newUser = await User.create({
@@ -78,7 +80,7 @@ async function oAuth(request, response) {
                         CLIENT_TOKEN_SECRET,
                         {
                             expiresIn: 60 * 60 * 24 * 7,
-                        }
+                        },
                     );
 
                     await currentUser.save();

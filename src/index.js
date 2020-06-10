@@ -43,7 +43,7 @@ const server = new ApolloServer({
             try {
                 decoded = jwt.verify(
                     connectionParams.authToken,
-                    CLIENT_TOKEN_SECRET
+                    CLIENT_TOKEN_SECRET,
                 );
             } catch {
                 console.log("Invalid token");
@@ -67,7 +67,12 @@ const app = express();
 
 server.applyMiddleware({ app });
 
-app.use("/login", cors({origin: false}), express.json({type: "text/plain"}), oAuth);
+app.use(
+    "/login",
+    cors(),
+    express.json(),
+    oAuth,
+);
 
 const httpServer = http.createServer(app);
 
@@ -75,9 +80,9 @@ server.installSubscriptionHandlers(httpServer);
 
 httpServer.listen({ port: DEV_PORT }, () => {
     console.log(
-        `🚀 Server ready at http://localhost:${DEV_PORT}${server.graphqlPath}`
+        `🚀 Server ready at http://localhost:${DEV_PORT}${server.graphqlPath}`,
     );
     console.log(
-        `🚀 Subscriptions ready at ws://localhost:${DEV_PORT}${server.subscriptionsPath}`
+        `🚀 Subscriptions ready at ws://localhost:${DEV_PORT}${server.subscriptionsPath}`,
     );
 });

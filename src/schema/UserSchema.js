@@ -50,7 +50,7 @@ const UserMutation = {
             });
 
             return payload;
-        }
+        },
     ),
     userUpdateMany: UserTC.getResolver("updateMany"),
     userRemoveById: UserTC.getResolver("removeById"),

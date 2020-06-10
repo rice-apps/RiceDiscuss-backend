@@ -116,7 +116,7 @@ const CommentMutation = {
             });
 
             return payload;
-        }
+        },
     ),
     commentUpdateById: CommentTC.getResolver("updateById"),
     commentUpdateOne: CommentTC.getResolver("updateOne").wrapResolve(
@@ -127,7 +127,7 @@ const CommentMutation = {
             });
 
             return payload;
-        }
+        },
     ),
     commentUpdateMany: CommentTC.getResolver("updateMany"),
     commentRemoveById: CommentTC.getResolver("removeById"),
@@ -140,7 +140,7 @@ const CommentMutation = {
             });
 
             return payload;
-        }
+        },
     ),
 };
 

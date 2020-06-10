@@ -107,7 +107,7 @@ const PostMutation = {
             });
 
             return payload;
-        }
+        },
     ),
     eventCreateOne: EventTC.getResolver("createOne").wrapResolve(
         (next) => async (rp) => {
@@ -118,7 +118,7 @@ const PostMutation = {
             });
 
             return payload;
-        }
+        },
     ),
     noticeCreateOne: NoticeTC.getResolver("createOne").wrapResolve(
         (next) => async (rp) => {
@@ -128,7 +128,7 @@ const PostMutation = {
             });
 
             return payload;
-        }
+        },
     ),
     jobCreateOne: JobTC.getResolver("createOne").wrapResolve(
         (next) => async (rp) => {
@@ -137,7 +137,7 @@ const PostMutation = {
             await pubsub.publish("jobCreated", { jobCreated: payload.record });
 
             return payload;
-        }
+        },
     ),
 
     discussionUpdateById: DiscussionTC.getResolver("updateById"),
@@ -154,7 +154,7 @@ const PostMutation = {
             });
 
             return payload;
-        }
+        },
     ),
     eventUpdateOne: EventTC.getResolver("updateOne").wrapResolve(
         (next) => async (rp) => {
@@ -165,7 +165,7 @@ const PostMutation = {
             });
 
             return payload;
-        }
+        },
     ),
     noticeUpdateOne: NoticeTC.getResolver("updateOne").wrapResolve(
         (next) => async (rp) => {
@@ -176,7 +176,7 @@ const PostMutation = {
             });
 
             return payload;
-        }
+        },
     ),
     jobUpdateOne: JobTC.getResolver("updateOne").wrapResolve(
         (next) => async (rp) => {
@@ -185,7 +185,7 @@ const PostMutation = {
             await pubsub.publish("jobUpdated", { jobUpdated: payload.record });
 
             return payload;
-        }
+        },
     ),
 
     postRemoveById: PostDTC.getResolver("removeById"),
@@ -196,7 +196,7 @@ const PostMutation = {
             pubsub.publish("postRemoved", { postRemoved: payload.record });
 
             return payload;
-        }
+        },
     ),
     postRemoveMany: PostDTC.getResolver("removeMany"),
 };
