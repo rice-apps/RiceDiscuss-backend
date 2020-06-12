@@ -3,6 +3,7 @@ import { ApolloServer } from "apollo-server-express";
 import http from "http";
 import jwt from "jsonwebtoken";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import Schema from "./schema";
 import oAuth from "./controllers/auth-controller";
@@ -17,17 +18,15 @@ const server = new ApolloServer({
         /*
             TODO: check where the token is actually sent
         */
-        if (!req) {
-            return;
-        }
-        const token = req.token;
+        const token = req.headers.authorization;
         let decoded = null;
 
         try {
             decoded = jwt.verify(token, CLIENT_TOKEN_SECRET);
         } catch {
-            // console.log("authentication failed!");
-            return;
+            return {
+                netID: null,
+            };
         }
 
         return {
@@ -40,6 +39,7 @@ const server = new ApolloServer({
             /*
                 TODO: check where the WebSocket token is actually sent
             */
+
             try {
                 decoded = jwt.verify(
                     connectionParams.authToken,
@@ -67,12 +67,18 @@ const app = express();
 
 server.applyMiddleware({ app });
 
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+}));
+
 app.use(
     "/login",
-    cors(),
     express.json(),
     oAuth,
 );
+
+app.use(cookieParser());
 
 const httpServer = http.createServer(app);
 

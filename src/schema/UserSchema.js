@@ -1,5 +1,7 @@
 import { UserTC, PostDTC, CommentTC } from "../models";
 
+import { authMiddleware } from "../utils/middlewares";
+
 import pubsub from "../pubsub";
 
 UserTC.addFields({
@@ -33,7 +35,7 @@ UserTC.addRelation("comments", {
 
 const UserQuery = {
     userById: UserTC.getResolver("findById"),
-    userOne: UserTC.getResolver("findOne"),
+    userOne: UserTC.getResolver("findOne").withMiddlewares([authMiddleware]),
     userMany: UserTC.getResolver("findMany"),
     userCount: UserTC.getResolver("count"),
 };

@@ -11,8 +11,6 @@ const get = bent("GET", "string");
 async function oAuth(request, response) {
     const ticket = request.body.ticket;
 
-    response.setHeader("Access-Control-Allow-Origin", "*");
-
     if (ticket) {
         const casValidateURL =
             "https://idp.rice.edu/idp/profile/cas/serviceValidate";
