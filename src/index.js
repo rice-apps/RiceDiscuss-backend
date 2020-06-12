@@ -3,7 +3,6 @@ import { ApolloServer } from "apollo-server-express";
 import http from "http";
 import jwt from "jsonwebtoken";
 import cors from "cors";
-import cookieParser from "cookie-parser";
 
 import Schema from "./schema";
 import oAuth from "./controllers/auth-controller";
@@ -15,30 +14,26 @@ import { CLIENT_TOKEN_SECRET, DEV_PORT } from "./config";
 const server = new ApolloServer({
     schema: Schema,
     context: ({ req, res }) => {
-        /*
-            TODO: check where the token is actually sent
-        */
-        const token = req.headers.authorization;
-        let decoded = null;
+        if (req) {
+            const token = req.headers.authorization;
+            let decoded = null;
 
-        try {
-            decoded = jwt.verify(token, CLIENT_TOKEN_SECRET);
-        } catch {
+            try {
+                decoded = jwt.verify(token, CLIENT_TOKEN_SECRET);
+            } catch {
+                return {
+                    netID: null,
+                };
+            }
+
             return {
-                netID: null,
+                netID: decoded.data.user,
             };
         }
-
-        return {
-            netID: decoded.data.user,
-        };
     },
     subscriptions: {
         onConnect: (connectionParams, webSocket, context) => {
             let decoded = null;
-            /*
-                TODO: check where the WebSocket token is actually sent
-            */
 
             try {
                 decoded = jwt.verify(
@@ -48,10 +43,6 @@ const server = new ApolloServer({
             } catch {
                 console.log("Invalid token");
                 return;
-            }
-
-            if (decoded != null && decoded.data.user === context.netID) {
-                console.log("WebSocket request matches logged in user!");
             }
 
             console.log("WebSocket connected!");
@@ -67,18 +58,14 @@ const app = express();
 
 server.applyMiddleware({ app });
 
-app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-}));
-
 app.use(
-    "/login",
-    express.json(),
-    oAuth,
+    cors({
+        origin: "http://localhost:3000",
+        credentials: true,
+    }),
 );
 
-app.use(cookieParser());
+app.use("/login", express.json(), oAuth);
 
 const httpServer = http.createServer(app);
 

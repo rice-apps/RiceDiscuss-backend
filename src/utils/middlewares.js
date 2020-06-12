@@ -4,8 +4,6 @@ const authMiddleware = async (resolve, source, args, context, info) => {
     }
 
     throw new Error("Not logged in!");
-}
-
-export {
-    authMiddleware,
 };
+
+export { authMiddleware };
