@@ -1,6 +1,6 @@
 import { UserTC, PostDTC, CommentTC } from "../models";
 
-import { authMiddleware } from "../utils/middlewares";
+import { checkLoggedIn } from "../utils/middlewares";
 
 import pubsub from "../pubsub";
 
@@ -34,17 +34,27 @@ UserTC.addRelation("comments", {
 });
 
 const UserQuery = {
-    userById: UserTC.getResolver("findById"),
-    userOne: UserTC.getResolver("findOne").withMiddlewares([authMiddleware]),
-    userMany: UserTC.getResolver("findMany"),
-    userCount: UserTC.getResolver("count"),
+    userById: UserTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
+    userOne: UserTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
+    userMany: UserTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
+    userCount: UserTC.getResolver("count").withMiddlewares([checkLoggedIn]),
 };
 
 const UserMutation = {
-    userCreateOne: UserTC.getResolver("createOne"),
-    userUpdateById: UserTC.getResolver("updateById"),
-    userUpdateOne: UserTC.getResolver("updateOne").wrapResolve(
-        (next) => async (rp) => {
+    userCreateOne: UserTC.getResolver("createOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("profileCreated", {
+                profileCreated: payload.record,
+            });
+
+            return payload;
+        }),
+    userUpdateById: UserTC.getResolver("updateById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("profileUpdated", {
@@ -52,18 +62,70 @@ const UserMutation = {
             });
 
             return payload;
-        },
-    ),
-    userUpdateMany: UserTC.getResolver("updateMany"),
-    userRemoveById: UserTC.getResolver("removeById"),
-    userRemoveOne: UserTC.getResolver("removeOne"),
+        }),
+    userUpdateOne: UserTC.getResolver("updateOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("profileUpdated", {
+                profileUpdated: payload.record,
+            });
+
+            return payload;
+        }),
+    userUpdateMany: UserTC.getResolver("updateMany")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("profileUpdated", {
+                profileUpdated: payload.record,
+            });
+
+            return payload;
+        }),
+    userRemoveById: UserTC.getResolver("removeById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("profileRemoved", {
+                profileRemoved: payload.record,
+            });
+
+            return payload;
+        }),
+    userRemoveOne: UserTC.getResolver("removeOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("profileRemoved", {
+                profileRemoved: payload.record,
+            });
+
+            return payload;
+        }),
 };
 
 const UserSubscription = {
+    profileCreated: {
+        type: UserTC,
+
+        subscribe: () => pubsub.asyncIterator("profileCreated"),
+    },
+
     profileUpdated: {
         type: UserTC,
 
         subscribe: () => pubsub.asyncIterator("profileUpdated"),
+    },
+
+    profileRemoved: {
+        type: UserTC,
+
+        subscribe: () => pubsub.asyncIterator("profileRemoved"),
     },
 };
 

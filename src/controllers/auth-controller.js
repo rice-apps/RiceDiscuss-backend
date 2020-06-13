@@ -4,7 +4,7 @@ import { parseStringPromise } from "xml2js";
 import { processors } from "xml2js";
 
 import { User } from "../models";
-import { CLIENT_TOKEN_SECRET, SERVICE_URL } from "../config";
+import { CLIENT_TOKEN_SECRET, CAS_VALIDATE_URL, SERVICE_URL } from "../config";
 
 const get = bent("GET", "string");
 
@@ -12,28 +12,15 @@ async function oAuth(request, response) {
     const ticket = request.body.ticket;
 
     if (ticket) {
-        const casValidateURL =
-            "https://idp.rice.edu/idp/profile/cas/serviceValidate";
-        const url = `${casValidateURL}?ticket=${ticket}&service=${SERVICE_URL}`;
+        const url = `${CAS_VALIDATE_URL}?ticket=${ticket}&service=${SERVICE_URL}`;
 
         const rawXML = await get(url).catch(() => {
             return response.status(500).send();
         });
 
-        const result = await parseStringPromise(rawXML, {
-            tagNameProcessors: [processors.stripPrefix],
-            explicitArray: false,
-        })
-            .then((value) => {
-                if (value.authenticationSuccess) {
-                    value.serviceResponse.authenticationSuccess.user = value.serviceResponse.authenticationSuccess.user.toLowerCase();
-                }
-
-                return value;
-            })
-            .catch(() => {
-                return response.status(500).send();
-            });
+        const result = await parseCASResponseXML(rawXML).catch(() => {
+            return response.status(500).send();
+        });
 
         if (result.serviceResponse.authenticationSuccess) {
             const currentUser = await User.findOne({
@@ -110,6 +97,19 @@ async function oAuth(request, response) {
     } else {
         return response.status(400).send();
     }
+}
+
+async function parseCASResponseXML(casResponse) {
+    return parseStringPromise(casResponse, {
+        tagNameProcessors: [processors.stripPrefix],
+        explicitArray: false,
+    }).then((value) => {
+        if (value.authenticationSuccess) {
+            value.serviceResponse.authenticationSuccess.user = value.serviceResponse.authenticationSuccess.user.toLowerCase();
+        }
+
+        return value;
+    });
 }
 
 export default oAuth;

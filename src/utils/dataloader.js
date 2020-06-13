@@ -1,23 +1,6 @@
-import { ObjectTypeComposer } from "graphql-compose";
 import DataLoader from "dataloader";
+import { ObjectTypeComposer } from "graphql-compose";
 import crypto from "crypto";
-import assert from "assert";
-
-const md5 = (str) => crypto.createHash("md5").update(str).digest("hex");
-
-function getHashKey(key) {
-    let object = {};
-
-    Object.assign(
-        object,
-        { args: key.args || {} },
-        { projection: key.projection || {} },
-        { rawQuery: JSON.stringify(key.rawQuery || {}) },
-        { context: JSON.stringify(key.context || {}) },
-    );
-
-    return md5(JSON.stringify(object));
-}
 
 function composeDataloader(tc, resNames, options) {
     if (!(tc instanceof ObjectTypeComposer)) {
@@ -25,11 +8,6 @@ function composeDataloader(tc, resNames, options) {
             "Provide ObjectTypeComposer to composeDataloader function!",
         );
     }
-
-    assert(
-        Array.isArray(resNames),
-        "Resolver names should be provided as array of strings",
-    );
 
     const safeOptions = {
         cacheExpiration: options.cacheExpiration || 300,
@@ -77,6 +55,24 @@ function composeDataloader(tc, resNames, options) {
     }
 
     return tc;
+}
+
+function getHashKey(key) {
+    let object = {};
+
+    Object.assign(
+        object,
+        { args: key.args || {} },
+        { projection: key.projection || {} },
+        { rawQuery: JSON.stringify(key.rawQuery || {}) },
+        { context: JSON.stringify(key.context || {}) },
+    );
+
+    return md5(JSON.stringify(object));
+}
+
+function md5(obj) {
+    return crypto.createHash("md5").update(obj).digest("hex");
 }
 
 export default composeDataloader;

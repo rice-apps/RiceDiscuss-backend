@@ -8,6 +8,8 @@ import {
     UserTC,
 } from "../models";
 
+import { checkLoggedIn } from "../utils/middlewares";
+
 import pubsub from "../pubsub";
 
 DiscussionTC.addFields({
@@ -76,30 +78,47 @@ PostDTC.addRelation("creator", {
 });
 
 const PostQuery = {
-    discussionById: DiscussionTC.getResolver("findById"),
-    eventById: EventTC.getResolver("findById"),
-    noticeById: NoticeTC.getResolver("findById"),
-    jobById: JobTC.getResolver("findById"),
+    discussionById: DiscussionTC.getResolver("findById").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    eventById: EventTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
+    noticeById: NoticeTC.getResolver("findById").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    jobById: JobTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
 
-    discussionFindOne: DiscussionTC.getResolver("findOne"),
-    eventFindOne: EventTC.getResolver("findOne"),
-    noticeFindOne: NoticeTC.getResolver("findOne"),
-    jobFindOne: JobTC.getResolver("findOne"),
+    discussionFindOne: DiscussionTC.getResolver("findOne").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    eventFindOne: EventTC.getResolver("findOne").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    noticeFindOne: NoticeTC.getResolver("findOne").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    jobFindOne: JobTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
 
-    discussionMany: DiscussionTC.getResolver("findMany"),
-    eventMany: EventTC.getResolver("findMany"),
-    noticeMany: NoticeTC.getResolver("findMany"),
-    jobMany: JobTC.getResolver("findMany"),
+    discussionMany: DiscussionTC.getResolver("findMany").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    eventMany: EventTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
+    noticeMany: NoticeTC.getResolver("findMany").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    jobMany: JobTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
 
-    discussionCount: DiscussionTC.getResolver("count"),
-    eventCount: EventTC.getResolver("count"),
-    noticeCount: NoticeTC.getResolver("count"),
-    jobCount: JobTC.getResolver("count"),
+    discussionCount: DiscussionTC.getResolver("count").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    eventCount: EventTC.getResolver("count").withMiddlewares([checkLoggedIn]),
+    noticeCount: NoticeTC.getResolver("count").withMiddlewares([checkLoggedIn]),
+    jobCount: JobTC.getResolver("count").withMiddlewares([checkLoggedIn]),
 };
 
 const PostMutation = {
-    discussionCreateOne: DiscussionTC.getResolver("createOne").wrapResolve(
-        (next) => async (rp) => {
+    discussionCreateOne: DiscussionTC.getResolver("createOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("discussionCreated", {
@@ -107,10 +126,10 @@ const PostMutation = {
             });
 
             return payload;
-        },
-    ),
-    eventCreateOne: EventTC.getResolver("createOne").wrapResolve(
-        (next) => async (rp) => {
+        }),
+    eventCreateOne: EventTC.getResolver("createOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("eventCreated", {
@@ -118,35 +137,30 @@ const PostMutation = {
             });
 
             return payload;
-        },
-    ),
-    noticeCreateOne: NoticeTC.getResolver("createOne").wrapResolve(
-        (next) => async (rp) => {
+        }),
+    noticeCreateOne: NoticeTC.getResolver("createOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
             await pubsub.publish("noticeCreated", {
                 noticeCreated: payload.record,
             });
 
             return payload;
-        },
-    ),
-    jobCreateOne: JobTC.getResolver("createOne").wrapResolve(
-        (next) => async (rp) => {
+        }),
+    jobCreateOne: JobTC.getResolver("createOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("jobCreated", { jobCreated: payload.record });
 
             return payload;
-        },
-    ),
+        }),
 
-    discussionUpdateById: DiscussionTC.getResolver("updateById"),
-    eventUpdateById: EventTC.getResolver("updateById"),
-    noticeUpdateById: NoticeTC.getResolver("updateById"),
-    jobUpdateById: JobTC.getResolver("updateById"),
-
-    discussionUpdateOne: DiscussionTC.getResolver("updateOne").wrapResolve(
-        (next) => async (rp) => {
+    discussionUpdateById: DiscussionTC.getResolver("updateById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("discussionUpdated", {
@@ -154,10 +168,10 @@ const PostMutation = {
             });
 
             return payload;
-        },
-    ),
-    eventUpdateOne: EventTC.getResolver("updateOne").wrapResolve(
-        (next) => async (rp) => {
+        }),
+    eventUpdateById: EventTC.getResolver("updateById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("eventUpdated", {
@@ -165,10 +179,10 @@ const PostMutation = {
             });
 
             return payload;
-        },
-    ),
-    noticeUpdateOne: NoticeTC.getResolver("updateOne").wrapResolve(
-        (next) => async (rp) => {
+        }),
+    noticeUpdateById: NoticeTC.getResolver("updateById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("noticeUpdated", {
@@ -176,29 +190,93 @@ const PostMutation = {
             });
 
             return payload;
-        },
-    ),
-    jobUpdateOne: JobTC.getResolver("updateOne").wrapResolve(
-        (next) => async (rp) => {
+        }),
+    jobUpdateById: JobTC.getResolver("updateById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("jobUpdated", {
+                jobUpdated: payload.record,
+            });
+
+            return payload;
+        }),
+
+    discussionUpdateOne: DiscussionTC.getResolver("updateOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("discussionUpdated", {
+                discussionUpdated: payload.record,
+            });
+
+            return payload;
+        }),
+    eventUpdateOne: EventTC.getResolver("updateOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("eventUpdated", {
+                eventUpdated: payload.record,
+            });
+
+            return payload;
+        }),
+    noticeUpdateOne: NoticeTC.getResolver("updateOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("noticeUpdated", {
+                noticeUpdated: payload.record,
+            });
+
+            return payload;
+        }),
+    jobUpdateOne: JobTC.getResolver("updateOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("jobUpdated", { jobUpdated: payload.record });
 
             return payload;
-        },
-    ),
+        }),
 
-    postRemoveById: PostDTC.getResolver("removeById"),
-    postRemoveOne: PostDTC.getResolver("removeOne").wrapResolve(
-        (next) => async (rp) => {
+    postRemoveById: PostDTC.getResolver("removeById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("postRemoved", {
+                postRemoved: payload.record,
+            });
+
+            return payload;
+        }),
+    postRemoveOne: PostDTC.getResolver("removeOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             pubsub.publish("postRemoved", { postRemoved: payload.record });
 
             return payload;
-        },
-    ),
-    postRemoveMany: PostDTC.getResolver("removeMany"),
+        }),
+    postRemoveMany: PostDTC.getResolver("removeMany")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            pubsub.publish("postRemoved", {
+                postRemoved: payload.record,
+            });
+
+            return payload;
+        }),
 };
 
 const PostSubscription = {
@@ -250,31 +328,6 @@ const PostSubscription = {
         type: PostDTC,
         subscribe: () => pubsub.asyncIterator("postRemoved"),
     },
-
-    // discussionUpdated: {
-    //     type: DiscussionTC,
-
-    // },
-
-    // discussionUpdated: {
-    //     type: DiscussionTC,
-
-    // },
-
-    // discussionUpdated: {
-    //     type: DiscussionTC,
-
-    // },
-
-    // discussionUpdated: {
-    //     type: DiscussionTC,
-
-    // },
-
-    // discussionUpdated: {
-    //     type: DiscussionTC,
-
-    // },
 };
 
 export { PostQuery, PostMutation, PostSubscription };

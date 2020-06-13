@@ -1,5 +1,7 @@
 import { CommentTC, PostDTC, UserTC } from "../models";
 
+import { checkLoggedIn } from "../utils/middlewares";
+
 import pubsub from "../pubsub";
 
 CommentTC.addFields({
@@ -99,40 +101,80 @@ CommentTC.addRelation("children", {
 });
 
 const CommentQuery = {
-    commentById: CommentTC.getResolver("findById"),
-    commentByParent: CommentTC.getResolver("findManyByParentID"),
-    commentByPost: CommentTC.getResolver("findManyByPostID"),
-    commentOne: CommentTC.getResolver("findOne"),
-    commentMany: CommentTC.getResolver("findMany"),
-    commentCount: CommentTC.getResolver("count"),
+    commentById: CommentTC.getResolver("findById").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    commentByParent: CommentTC.getResolver(
+        "findManyByParentID",
+    ).withMiddlewares([checkLoggedIn]),
+    commentByPost: CommentTC.getResolver("findManyByPostID").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    commentOne: CommentTC.getResolver("findOne").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    commentMany: CommentTC.getResolver("findMany").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    commentCount: CommentTC.getResolver("count").withMiddlewares([
+        checkLoggedIn,
+    ]),
 };
 
 const CommentMutation = {
-    commentCreateOne: CommentTC.getResolver("createOne").wrapResolve(
-        (next) => async (rp) => {
+    commentCreateOne: CommentTC.getResolver("createOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
             await pubsub.publish("commentCreated", {
                 commentCreated: payload.record,
             });
 
             return payload;
-        },
-    ),
-    commentUpdateById: CommentTC.getResolver("updateById"),
-    commentUpdateOne: CommentTC.getResolver("updateOne").wrapResolve(
-        (next) => async (rp) => {
+        }),
+    commentUpdateById: CommentTC.getResolver("updateById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+            await pubsub.publish("commentUpdated", {
+                commentCreated: payload.record,
+            });
+
+            return payload;
+        }),
+    commentUpdateOne: CommentTC.getResolver("updateOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
             await pubsub.publish("commentUpdated", {
                 commentUpdated: payload.record,
             });
 
             return payload;
-        },
-    ),
-    commentUpdateMany: CommentTC.getResolver("updateMany"),
-    commentRemoveById: CommentTC.getResolver("removeById"),
-    commentRemoveOne: CommentTC.getResolver("removeOne").wrapResolve(
-        (next) => async (rp) => {
+        }),
+    commentUpdateMany: CommentTC.getResolver("updateMany")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+            await pubsub.publish("commentUpdated", {
+                commentUpdated: payload.record,
+            });
+
+            return payload;
+        }),
+    commentRemoveById: CommentTC.getResolver("removeById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+            await pubsub.publish("commentRemoved", {
+                commentUpdated: payload.record,
+            });
+
+            return payload;
+        }),
+    commentRemoveOne: CommentTC.getResolver("removeOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("commentRemoved", {
@@ -140,8 +182,7 @@ const CommentMutation = {
             });
 
             return payload;
-        },
-    ),
+        }),
 };
 
 const CommentSubscription = {

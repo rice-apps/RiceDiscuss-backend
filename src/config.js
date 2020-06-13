@@ -5,6 +5,7 @@ const MONGODB_CONNECTION_URL = process.env.MONGODB_CONNECTION_URL;
 const SERVICE_URL = process.env.SERVICE_URL;
 const DEV_PORT = parseInt(process.env.DEV_PORT);
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS.split(",");
+const CAS_VALIDATE_URL = process.env.CAS_VALIDATE_URL;
 
 export {
     CLIENT_TOKEN_SECRET,
@@ -12,4 +13,5 @@ export {
     SERVICE_URL,
     DEV_PORT,
     ALLOWED_ORIGINS,
+    CAS_VALIDATE_URL,
 };
