@@ -9,46 +9,45 @@ import oAuth from "./controllers/auth-controller";
 
 import "./db";
 
-import { CLIENT_TOKEN_SECRET, DEV_PORT } from "./config";
+import { CLIENT_TOKEN_SECRET, DEV_PORT, ALLOWED_ORIGINS } from "./config";
 
 const server = new ApolloServer({
     schema: Schema,
-    context: ({ req, res }) => {
+    context: ({ req }) => {
         if (req) {
-            const token = req.headers.authorization;
-            let decoded = null;
-
             try {
-                decoded = jwt.verify(token, CLIENT_TOKEN_SECRET);
-            } catch {
-                return {
-                    netID: null,
-                };
-            }
+                let decoded = jwt.verify(
+                    req.headers.authorization,
+                    CLIENT_TOKEN_SECRET,
+                );
 
-            return {
-                netID: decoded.data.user,
-            };
+                return {
+                    netID: decoded.data.user,
+                };
+            } catch {
+                throw new Error("User authentication failed");
+            }
         }
     },
     subscriptions: {
-        onConnect: (connectionParams, webSocket, context) => {
-            let decoded = null;
+        onConnect: (connectionParams, _websocket, _context) => {
+            if (connectionParams.authToken) {
+                try {
+                    const decoded = jwt.verify(
+                        connectionParams.authToken,
+                        CLIENT_TOKEN_SECRET,
+                    );
 
-            try {
-                decoded = jwt.verify(
-                    connectionParams.authToken,
-                    CLIENT_TOKEN_SECRET,
-                );
-            } catch {
-                console.log("Invalid token");
-                return;
+                    return {
+                        user: decoded.user,
+                    };
+                } catch {
+                    throw new Error("WebSocket authentication failed");
+                }
             }
-
-            console.log("WebSocket connected!");
         },
 
-        onDisconnect: (webSocket, context) => {
+        onDisconnect: (_websocket, _context) => {
             console.log("WebSocket disconnected!");
         },
     },
@@ -60,7 +59,7 @@ server.applyMiddleware({ app });
 
 app.use(
     cors({
-        origin: "http://localhost:3000",
+        origin: ALLOWED_ORIGINS,
         credentials: true,
     }),
 );
