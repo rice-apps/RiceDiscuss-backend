@@ -38,6 +38,9 @@ const UserQuery = {
     userOne: UserTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
     userMany: UserTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
     userCount: UserTC.getResolver("count").withMiddlewares([checkLoggedIn]),
+    userPagination: UserTC.getResolver("pagination").withMiddlewares([
+        checkLoggedIn,
+    ]),
 };
 
 const UserMutation = {

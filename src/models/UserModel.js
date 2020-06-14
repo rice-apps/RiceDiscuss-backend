@@ -9,6 +9,7 @@ const resolverList = [
     "findOne",
     "findMany",
     "count",
+    "pagination",
     "createOne",
     "createMany",
     "updateById",
@@ -47,7 +48,12 @@ const UserSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", UserSchema);
-const UserTC = composeWithMongoose(User);
+const UserTC = composeWithMongoose(User, {
+    paginationResolverName: "pagination", // Default
+    findResolverName: "findMany",
+    countResolverName: "count",
+    perPage: 20, // Default
+});
 
 const UserTCDL = composeDataloader(UserTC, resolverList, {
     cacheExpiration: 3000,

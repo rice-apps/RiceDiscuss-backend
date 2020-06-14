@@ -38,6 +38,8 @@ const server = new ApolloServer({
                         CLIENT_TOKEN_SECRET,
                     );
 
+                    console.log("Websocket connected");
+
                     return {
                         user: decoded.user,
                     };
@@ -48,7 +50,7 @@ const server = new ApolloServer({
         },
 
         onDisconnect: (_websocket, _context) => {
-            console.log("WebSocket disconnected!");
+            console.log("WebSocket disconnected");
         },
     },
 });

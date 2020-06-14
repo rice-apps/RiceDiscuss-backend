@@ -9,6 +9,7 @@ const resolverList = [
     "findOne",
     "findMany",
     "count",
+    "pagination",
     "createOne",
     "createMany",
     "updateById",
@@ -139,7 +140,12 @@ const Job = Post.discriminator(enumPostType.Job, JobSchema);
 // TODO: add base options (https://graphql-compose.github.io/docs/plugins/plugin-mongoose.html#working-with-mongoose-collection-level-discriminators)
 // for Discriminator models and possible for base model
 
-const PostDTC = composeWithMongooseDiscriminators(Post);
+const PostDTC = composeWithMongooseDiscriminators(Post, {
+    paginationResolverName: "pagination", // Default
+    findResolverName: "findMany",
+    countResolverName: "count",
+    perPage: 20, // Default
+});
 
 const DiscussionTC = PostDTC.discriminator(Discussion, {});
 const NoticeTC = PostDTC.discriminator(Notice, {});
