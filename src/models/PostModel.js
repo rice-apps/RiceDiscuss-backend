@@ -20,6 +20,13 @@ const resolverList = [
     "removeMany",
 ];
 
+const paginationOptions = {
+    paginationResolverName: "pagination", // Default
+    findResolverName: "findMany",
+    countResolverName: "count",
+    perPage: 20, // Default
+};
+
 // Create discriminator key
 const DKey = "kind";
 
@@ -140,17 +147,12 @@ const Job = Post.discriminator(enumPostType.Job, JobSchema);
 // TODO: add base options (https://graphql-compose.github.io/docs/plugins/plugin-mongoose.html#working-with-mongoose-collection-level-discriminators)
 // for Discriminator models and possible for base model
 
-const PostDTC = composeWithMongooseDiscriminators(Post, {
-    paginationResolverName: "pagination", // Default
-    findResolverName: "findMany",
-    countResolverName: "count",
-    perPage: 20, // Default
-});
+const PostDTC = composeWithMongooseDiscriminators(Post, paginationOptions);
 
-const DiscussionTC = PostDTC.discriminator(Discussion, {});
-const NoticeTC = PostDTC.discriminator(Notice, {});
-const EventTC = PostDTC.discriminator(Event, {});
-const JobTC = PostDTC.discriminator(Job, {});
+const DiscussionTC = PostDTC.discriminator(Discussion, paginationOptions);
+const NoticeTC = PostDTC.discriminator(Notice, paginationOptions);
+const EventTC = PostDTC.discriminator(Event, paginationOptions);
+const JobTC = PostDTC.discriminator(Job, paginationOptions);
 
 PostDTC.addResolver({
     name: "findManyByCreator",
@@ -161,7 +163,7 @@ PostDTC.addResolver({
 
     type: [PostDTC],
 
-    resolve: async ({ source, args, context, info }) => {
+    resolve: async ({ args }) => {
         return Post.find({ creator: args.creator });
     },
 });
