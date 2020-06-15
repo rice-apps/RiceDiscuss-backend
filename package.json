@@ -49,6 +49,7 @@
     "graphql": "^14.6.0",
     "graphql-compose": "^7.15.0",
     "graphql-compose-mongoose": "^7.3.8",
+    "graphql-compose-pagination": "^6.0.3",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.5",
     "mongoose": "^5.9.5",

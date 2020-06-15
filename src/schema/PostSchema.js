@@ -113,6 +113,18 @@ const PostQuery = {
     eventCount: EventTC.getResolver("count").withMiddlewares([checkLoggedIn]),
     noticeCount: NoticeTC.getResolver("count").withMiddlewares([checkLoggedIn]),
     jobCount: JobTC.getResolver("count").withMiddlewares([checkLoggedIn]),
+    discussionPagination: DiscussionTC.getResolver(
+        "pagination",
+    ).withMiddlewares([checkLoggedIn]),
+    eventPagination: EventTC.getResolver("pagination").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    noticePagination: NoticeTC.getResolver("pagination").withMiddlewares([
+        checkLoggedIn,
+    ]),
+    jobPagination: JobTC.getResolver("pagination").withMiddlewares([
+        checkLoggedIn,
+    ]),
 };
 
 const PostMutation = {

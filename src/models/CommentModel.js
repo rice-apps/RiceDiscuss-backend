@@ -11,6 +11,7 @@ const resolverList = [
     "findOne",
     "findMany",
     "count",
+    "pagination",
     "createOne",
     "createMany",
     "updateById",
@@ -70,7 +71,12 @@ const CommentSchema = new mongoose.Schema({
 });
 
 const Comment = mongoose.model("Comment", CommentSchema);
-const CommentTC = composeWithMongoose(Comment);
+const CommentTC = composeWithMongoose(Comment, {
+    paginationResolverName: "pagination", // Default
+    findResolverName: "findMany",
+    countResolverName: "count",
+    perPage: 20, // Default
+});
 
 CommentTC.addResolver({
     name: "findManyByParentID",

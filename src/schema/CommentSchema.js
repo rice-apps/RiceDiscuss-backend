@@ -119,6 +119,9 @@ const CommentQuery = {
     commentCount: CommentTC.getResolver("count").withMiddlewares([
         checkLoggedIn,
     ]),
+    commentPagination: CommentTC.getResolver("pagination").withMiddlewares([
+        checkLoggedIn,
+    ]),
 };
 
 const CommentMutation = {
