@@ -6,6 +6,8 @@ import {
     NoticeTC,
     JobTC,
     UserTC,
+    Job,
+    Post,
 } from "../models";
 
 import { checkLoggedIn } from "../utils/middlewares";
@@ -78,51 +80,15 @@ PostDTC.addRelation("creator", {
 });
 
 const PostQuery = {
-    discussionById: DiscussionTC.getResolver("findById").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    eventById: EventTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
-    noticeById: NoticeTC.getResolver("findById").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    jobById: JobTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
+    postById: PostDTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
 
-    discussionFindOne: DiscussionTC.getResolver("findOne").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    eventFindOne: EventTC.getResolver("findOne").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    noticeFindOne: NoticeTC.getResolver("findOne").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    jobFindOne: JobTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
+    postFindOne: PostDTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
 
-    discussionMany: DiscussionTC.getResolver("findMany").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    eventMany: EventTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
-    noticeMany: NoticeTC.getResolver("findMany").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    jobMany: JobTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
+    postMany: PostDTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
 
-    discussionCount: DiscussionTC.getResolver("count").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    eventCount: EventTC.getResolver("count").withMiddlewares([checkLoggedIn]),
-    noticeCount: NoticeTC.getResolver("count").withMiddlewares([checkLoggedIn]),
-    jobCount: JobTC.getResolver("count").withMiddlewares([checkLoggedIn]),
-    discussionPagination: DiscussionTC.getResolver(
-        "pagination",
-    ).withMiddlewares([checkLoggedIn]),
-    eventPagination: EventTC.getResolver("pagination").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    noticePagination: NoticeTC.getResolver("pagination").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    jobPagination: JobTC.getResolver("pagination").withMiddlewares([
+    postCount: PostDTC.getResolver("count").withMiddlewares([checkLoggedIn]),
+
+    postPagination: PostDTC.getResolver("pagination").withMiddlewares([
         checkLoggedIn,
     ]),
 };
