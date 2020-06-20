@@ -6,8 +6,6 @@ import {
     NoticeTC,
     JobTC,
     UserTC,
-    Job,
-    Post,
 } from "../models";
 
 import { checkLoggedIn } from "../utils/middlewares";
@@ -82,7 +80,7 @@ PostDTC.addRelation("creator", {
 const PostQuery = {
     postById: PostDTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
 
-    postFindOne: PostDTC.getResolver("findOne").withMiddlewares([
+    postOne: PostDTC.getResolver("findOne").withMiddlewares([
         checkLoggedIn,
     ]),
 
