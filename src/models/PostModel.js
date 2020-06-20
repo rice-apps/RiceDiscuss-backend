@@ -27,6 +27,12 @@ const paginationOptions = {
     perPage: 20, // Default
 };
 
+const dataloaderOptions = {
+    cacheExpiration: 3000,
+    removeProjection: true,
+    debug: false,
+};
+
 // Create discriminator key
 const DKey = "kind";
 
@@ -178,36 +184,20 @@ PostDTC.addResolver({
 const PostDTCDL = composeDataloader(
     PostDTC,
     [...resolverList, ...["findManyByCreator"]],
-    {
-        cacheExpiration: 3000,
-        removeProjection: true,
-        debug: false,
-    },
+    dataloaderOptions,
 );
 
-const DiscussionTCDL = composeDataloader(DiscussionTC, resolverList, {
-    cacheExpiration: 3000,
-    removeProjection: true,
-    debug: false,
-});
+const DiscussionTCDL = composeDataloader(
+    DiscussionTC,
+    resolverList,
+    dataloaderOptions,
+);
 
-const NoticeTCDL = composeDataloader(NoticeTC, resolverList, {
-    cacheExpiration: 3000,
-    removeProjection: true,
-    debug: false,
-});
+const NoticeTCDL = composeDataloader(NoticeTC, resolverList, dataloaderOptions);
 
-const EventTCDL = composeDataloader(EventTC, resolverList, {
-    cacheExpiration: 3000,
-    removeProjection: true,
-    debug: false,
-});
+const EventTCDL = composeDataloader(EventTC, resolverList, dataloaderOptions);
 
-const JobTCDL = composeDataloader(JobTC, resolverList, {
-    cacheExpiration: 3000,
-    removeProjection: true,
-    debug: false,
-});
+const JobTCDL = composeDataloader(JobTC, resolverList, dataloaderOptions);
 
 export {
     Post,
