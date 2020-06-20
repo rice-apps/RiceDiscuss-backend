@@ -75,6 +75,12 @@ const PostSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+
+    reports: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
 });
 
 // Schema definitions for enum types

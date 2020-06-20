@@ -80,9 +80,7 @@ PostDTC.addRelation("creator", {
 const PostQuery = {
     postById: PostDTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
 
-    postOne: PostDTC.getResolver("findOne").withMiddlewares([
-        checkLoggedIn,
-    ]),
+    postOne: PostDTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
 
     postMany: PostDTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
 

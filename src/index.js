@@ -16,7 +16,7 @@ const server = new ApolloServer({
     context: ({ req }) => {
         if (req) {
             try {
-                let decoded = jwt.verify(
+                const decoded = jwt.verify(
                     req.headers.authorization,
                     CLIENT_TOKEN_SECRET,
                 );
@@ -24,7 +24,7 @@ const server = new ApolloServer({
                 return {
                     netID: decoded.data.user,
                 };
-            } catch {
+            } catch (err) {
                 throw new Error("User authentication failed");
             }
         }
@@ -43,7 +43,7 @@ const server = new ApolloServer({
                     return {
                         user: decoded.user,
                     };
-                } catch {
+                } catch (err) {
                     throw new Error("WebSocket authentication failed");
                 }
             }

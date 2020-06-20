@@ -57,7 +57,7 @@ async function oAuth(request, response) {
             } else {
                 try {
                     jwt.verify(currentUser.token, CLIENT_TOKEN_SECRET);
-                } catch {
+                } catch (err) {
                     currentUser.token = jwt.sign(
                         {
                             data: result.serviceResponse.authenticationSuccess,

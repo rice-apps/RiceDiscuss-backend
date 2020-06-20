@@ -16,8 +16,8 @@ function composeDataloader(tc, resNames, options) {
     };
 
     for (let i = 0; i < resNames.length; i++) {
-        let cachedResolver = tc.getResolver(resNames[i]);
-        let resLoader = new DataLoader(
+        const cachedResolver = tc.getResolver(resNames[i]);
+        const resLoader = new DataLoader(
             (resolveParamsArray) =>
                 new Promise((resolve, _) => {
                     if (safeOptions.debug) {
@@ -32,7 +32,7 @@ function composeDataloader(tc, resNames, options) {
                 }),
             {
                 cacheKeyFn: (key) => {
-                    let newKey = getHashKey(key);
+                    const newKey = getHashKey(key);
                     return newKey;
                 },
             },
@@ -58,7 +58,7 @@ function composeDataloader(tc, resNames, options) {
 }
 
 function getHashKey(key) {
-    let object = {};
+    const object = {};
 
     Object.assign(
         object,
