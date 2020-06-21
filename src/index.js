@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import cors from "cors";
 
 import Schema from "./schema";
-import oAuth from "./controllers/auth-controller";
+import { verifyTicket } from "./controllers/auth-controller";
 
 import "./db";
 
@@ -16,15 +16,15 @@ const server = new ApolloServer({
     context: ({ req }) => {
         if (req) {
             try {
-                let decoded = jwt.verify(
+                const decoded = jwt.verify(
                     req.headers.authorization,
                     CLIENT_TOKEN_SECRET,
                 );
 
                 return {
-                    netID: decoded.data.user,
+                    netID: decoded.netID,
                 };
-            } catch {
+            } catch (err) {
                 throw new Error("User authentication failed");
             }
         }
@@ -41,9 +41,9 @@ const server = new ApolloServer({
                     console.log("Websocket connected");
 
                     return {
-                        user: decoded.user,
+                        user: decoded.netID,
                     };
-                } catch {
+                } catch (err) {
                     throw new Error("WebSocket authentication failed");
                 }
             }
@@ -66,7 +66,7 @@ app.use(
     }),
 );
 
-app.use("/login", express.json(), oAuth);
+app.use("/login", express.json(), verifyTicket);
 
 const httpServer = http.createServer(app);
 

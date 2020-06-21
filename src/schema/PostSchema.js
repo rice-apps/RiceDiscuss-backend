@@ -12,43 +12,11 @@ import { checkLoggedIn } from "../utils/middlewares";
 
 import pubsub from "../pubsub";
 
-DiscussionTC.addFields({
+PostDTC.addFields({
     comments: [CommentTC],
 });
 
-EventTC.addFields({
-    comments: [CommentTC],
-});
-
-JobTC.addFields({
-    comments: [CommentTC],
-});
-
-DiscussionTC.addRelation("comments", {
-    resolver: CommentTC.getResolver("findManyByPostID"),
-
-    prepareArgs: {
-        post_id: (source) => source._id,
-    },
-
-    projection: {
-        comments: 1,
-    },
-});
-
-EventTC.addRelation("comments", {
-    resolver: CommentTC.getResolver("findManyByPostID"),
-
-    prepareArgs: {
-        post_id: (source) => source._id,
-    },
-
-    projection: {
-        comments: 1,
-    },
-});
-
-JobTC.addRelation("comments", {
+PostDTC.addRelation("comments", {
     resolver: CommentTC.getResolver("findManyByPostID"),
 
     prepareArgs: {
@@ -78,51 +46,15 @@ PostDTC.addRelation("creator", {
 });
 
 const PostQuery = {
-    discussionById: DiscussionTC.getResolver("findById").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    eventById: EventTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
-    noticeById: NoticeTC.getResolver("findById").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    jobById: JobTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
+    postById: PostDTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
 
-    discussionFindOne: DiscussionTC.getResolver("findOne").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    eventFindOne: EventTC.getResolver("findOne").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    noticeFindOne: NoticeTC.getResolver("findOne").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    jobFindOne: JobTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
+    postOne: PostDTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
 
-    discussionMany: DiscussionTC.getResolver("findMany").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    eventMany: EventTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
-    noticeMany: NoticeTC.getResolver("findMany").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    jobMany: JobTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
+    postMany: PostDTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
 
-    discussionCount: DiscussionTC.getResolver("count").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    eventCount: EventTC.getResolver("count").withMiddlewares([checkLoggedIn]),
-    noticeCount: NoticeTC.getResolver("count").withMiddlewares([checkLoggedIn]),
-    jobCount: JobTC.getResolver("count").withMiddlewares([checkLoggedIn]),
-    discussionPagination: DiscussionTC.getResolver(
-        "pagination",
-    ).withMiddlewares([checkLoggedIn]),
-    eventPagination: EventTC.getResolver("pagination").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    noticePagination: NoticeTC.getResolver("pagination").withMiddlewares([
-        checkLoggedIn,
-    ]),
-    jobPagination: JobTC.getResolver("pagination").withMiddlewares([
+    postCount: PostDTC.getResolver("count").withMiddlewares([checkLoggedIn]),
+
+    postPagination: PostDTC.getResolver("pagination").withMiddlewares([
         checkLoggedIn,
     ]),
 };
@@ -139,6 +71,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     eventCreateOne: EventTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -150,6 +83,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     noticeCreateOne: NoticeTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -160,6 +94,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     jobCreateOne: JobTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -181,6 +116,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     eventUpdateById: EventTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -192,6 +128,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     noticeUpdateById: NoticeTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -203,6 +140,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     jobUpdateById: JobTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -226,6 +164,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     eventUpdateOne: EventTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -237,6 +176,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     noticeUpdateOne: NoticeTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -248,6 +188,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     jobUpdateOne: JobTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -269,6 +210,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     postRemoveOne: PostDTC.getResolver("removeOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -278,6 +220,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     postRemoveMany: PostDTC.getResolver("removeMany")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {

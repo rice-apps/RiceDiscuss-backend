@@ -28,13 +28,13 @@ const CommentSchema = new mongoose.Schema({
         required: true,
     },
 
-    post_id: {
+    post: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Post",
         required: true,
     },
 
-    parent_id: {
+    parent: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Comment",
         required: false,
@@ -44,6 +44,7 @@ const CommentSchema = new mongoose.Schema({
         type: Date,
         required: false,
         default: new Date().getTime(),
+        index: true,
     },
 
     body: {
@@ -82,13 +83,13 @@ CommentTC.addResolver({
     name: "findManyByParentID",
 
     args: {
-        parent_id: `ID`,
+        parent: `ID`,
     },
 
     type: [CommentTC],
 
     resolve: async ({ args }) => {
-        return Comment.find({ parent_id: args.parent_id });
+        return Comment.find({ parent: args.parent });
     },
 });
 
@@ -96,13 +97,13 @@ CommentTC.addResolver({
     name: "findManyByPostID",
 
     args: {
-        post_id: `ID`,
+        post: `ID`,
     },
 
     type: [CommentTC],
 
     resolve: async ({ args }) => {
-        return Comment.find({ post_id: args.post_id });
+        return Comment.find({ post: args.post });
     },
 });
 
