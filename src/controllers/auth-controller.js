@@ -22,7 +22,7 @@ async function verifyTicket(request, response) {
     const ticket = request.body.ticket;
 
     let status = 400;
-    let payload = {
+    const payload = {
         success: false,
     };
 

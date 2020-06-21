@@ -3,24 +3,11 @@ import { composeWithMongoose } from "graphql-compose-mongoose";
 
 import composeDataloader from "../utils/dataloader";
 
-const resolverList = [
-    "findById",
-    "findByIds",
-    "findManyByParentID",
-    "findManyByPostID",
-    "findOne",
-    "findMany",
-    "count",
-    "pagination",
-    "createOne",
-    "createMany",
-    "updateById",
-    "updateOne",
-    "updateMany",
-    "removeById",
-    "removeOne",
-    "removeMany",
-];
+import {
+    PAGINATION_OPTIONS,
+    DATALOADER_OPTIONS,
+    DATALOADER_RESOLVERS,
+} from "../config";
 
 const CommentSchema = new mongoose.Schema({
     creator: {
@@ -72,12 +59,8 @@ const CommentSchema = new mongoose.Schema({
 });
 
 const Comment = mongoose.model("Comment", CommentSchema);
-const CommentTC = composeWithMongoose(Comment, {
-    paginationResolverName: "pagination", // Default
-    findResolverName: "findMany",
-    countResolverName: "count",
-    perPage: 20, // Default
-});
+
+const CommentTC = composeWithMongoose(Comment, PAGINATION_OPTIONS);
 
 CommentTC.addResolver({
     name: "findManyByParentID",
@@ -121,10 +104,10 @@ CommentTC.addResolver({
     },
 });
 
-const CommentTCDL = composeDataloader(CommentTC, resolverList, {
-    cacheExpiration: 3000,
-    removeProjection: true,
-    debug: false,
-});
+const CommentTCDL = composeDataloader(
+    CommentTC,
+    DATALOADER_RESOLVERS,
+    DATALOADER_OPTIONS,
+);
 
 export { Comment, CommentTCDL as CommentTC };

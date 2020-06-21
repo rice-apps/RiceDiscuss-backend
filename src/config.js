@@ -11,6 +11,36 @@ const COLLEGES = process.env.COLLEGES.split(",");
 const MAJORS = process.env.MAJORS.split(",");
 const MINORS = process.env.MINORS.split(",");
 
+const PAGINATION_OPTIONS = {
+    paginationResolverName: "pagination", // Default
+    findResolverName: "findMany",
+    countResolverName: "count",
+    perPage: 20, // Default
+};
+
+const DATALOADER_OPTIONS = {
+    cacheExpiration: 3000,
+    removeProjection: true,
+    debug: false,
+};
+
+const DATALOADER_RESOLVERS = [
+    "findById",
+    "findByIds",
+    "findOne",
+    "findMany",
+    "count",
+    "pagination",
+    "createOne",
+    "createMany",
+    "updateById",
+    "updateOne",
+    "updateMany",
+    "removeById",
+    "removeOne",
+    "removeMany",
+];
+
 export {
     CLIENT_TOKEN_SECRET,
     TOKEN_EXPIRE_TIME,
@@ -22,4 +52,7 @@ export {
     COLLEGES,
     MAJORS,
     MINORS,
+    PAGINATION_OPTIONS,
+    DATALOADER_OPTIONS,
+    DATALOADER_RESOLVERS,
 };

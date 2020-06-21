@@ -3,35 +3,11 @@ import { composeWithMongooseDiscriminators } from "graphql-compose-mongoose";
 
 import composeDataloader from "../utils/dataloader";
 
-const resolverList = [
-    "findById",
-    "findByIds",
-    "findOne",
-    "findMany",
-    "count",
-    "pagination",
-    "createOne",
-    "createMany",
-    "updateById",
-    "updateOne",
-    "updateMany",
-    "removeById",
-    "removeOne",
-    "removeMany",
-];
-
-const paginationOptions = {
-    paginationResolverName: "pagination", // Default
-    findResolverName: "findMany",
-    countResolverName: "count",
-    perPage: 20, // Default
-};
-
-const dataloaderOptions = {
-    cacheExpiration: 3000,
-    removeProjection: true,
-    debug: false,
-};
+import {
+    PAGINATION_OPTIONS,
+    DATALOADER_OPTIONS,
+    DATALOADER_RESOLVERS,
+} from "../config";
 
 // Create discriminator key
 const DKey = "kind";
@@ -160,12 +136,12 @@ const Job = Post.discriminator(enumPostType.Job, JobSchema);
 // TODO: add base options (https://graphql-compose.github.io/docs/plugins/plugin-mongoose.html#working-with-mongoose-collection-level-discriminators)
 // for Discriminator models and possible for base model
 
-const PostDTC = composeWithMongooseDiscriminators(Post, paginationOptions);
+const PostDTC = composeWithMongooseDiscriminators(Post, PAGINATION_OPTIONS);
 
-const DiscussionTC = PostDTC.discriminator(Discussion, paginationOptions);
-const NoticeTC = PostDTC.discriminator(Notice, paginationOptions);
-const EventTC = PostDTC.discriminator(Event, paginationOptions);
-const JobTC = PostDTC.discriminator(Job, paginationOptions);
+const DiscussionTC = PostDTC.discriminator(Discussion, PAGINATION_OPTIONS);
+const NoticeTC = PostDTC.discriminator(Notice, PAGINATION_OPTIONS);
+const EventTC = PostDTC.discriminator(Event, PAGINATION_OPTIONS);
+const JobTC = PostDTC.discriminator(Job, PAGINATION_OPTIONS);
 
 PostDTC.addResolver({
     name: "findManyByCreator",
@@ -183,21 +159,33 @@ PostDTC.addResolver({
 
 const PostDTCDL = composeDataloader(
     PostDTC,
-    [...resolverList, ...["findManyByCreator"]],
-    dataloaderOptions,
+    [...DATALOADER_RESOLVERS, ...["findManyByCreator"]],
+    DATALOADER_OPTIONS,
 );
 
 const DiscussionTCDL = composeDataloader(
     DiscussionTC,
     resolverList,
-    dataloaderOptions,
+    DATALOADER_OPTIONS,
 );
 
-const NoticeTCDL = composeDataloader(NoticeTC, resolverList, dataloaderOptions);
+const NoticeTCDL = composeDataloader(
+    NoticeTC,
+    DATALOADER_RESOLVERS,
+    DATALOADER_OPTIONS,
+);
 
-const EventTCDL = composeDataloader(EventTC, resolverList, dataloaderOptions);
+const EventTCDL = composeDataloader(
+    EventTC,
+    DATALOADER_RESOLVERS,
+    DATALOADER_OPTIONS,
+);
 
-const JobTCDL = composeDataloader(JobTC, resolverList, dataloaderOptions);
+const JobTCDL = composeDataloader(
+    JobTC,
+    DATALOADER_RESOLVERS,
+    DATALOADER_OPTIONS,
+);
 
 export {
     Post,

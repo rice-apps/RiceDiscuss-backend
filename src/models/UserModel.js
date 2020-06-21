@@ -5,22 +5,11 @@ import composeDataloader from "../utils/dataloader";
 
 import { COLLEGES, MAJORS, MINORS } from "../config";
 
-const resolverList = [
-    "findById",
-    "findByIds",
-    "findOne",
-    "findMany",
-    "count",
-    "pagination",
-    "createOne",
-    "createMany",
-    "updateById",
-    "updateOne",
-    "updateMany",
-    "removeById",
-    "removeOne",
-    "removeMany",
-];
+import {
+    PAGINATION_OPTIONS,
+    DATALOADER_OPTIONS,
+    DATALOADER_RESOLVERS,
+} from "../config";
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -78,17 +67,12 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", UserSchema);
 
-const UserTC = composeWithMongoose(User, {
-    paginationResolverName: "pagination", // Default
-    findResolverName: "findMany",
-    countResolverName: "count",
-    perPage: 20, // Default
-});
+const UserTC = composeWithMongoose(User, PAGINATION_OPTIONS);
 
-const UserTCDL = composeDataloader(UserTC, resolverList, {
-    cacheExpiration: 3000,
-    removeProjection: true,
-    debug: false,
-});
+const UserTCDL = composeDataloader(
+    UserTC,
+    DATALOADER_RESOLVERS,
+    DATALOADER_OPTIONS,
+);
 
 export { User, UserTCDL as UserTC };
