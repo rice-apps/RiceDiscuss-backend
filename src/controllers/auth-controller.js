@@ -1,115 +1,145 @@
-import jwt from "jsonwebtoken";
 import bent from "bent";
-import { parseStringPromise } from "xml2js";
-import { processors } from "xml2js";
+import jwt from "jsonwebtoken";
+import { Parser, processors } from "xml2js";
 
 import { User } from "../models";
-import { CLIENT_TOKEN_SECRET, CAS_VALIDATE_URL, SERVICE_URL } from "../config";
+
+import {
+    CAS_VALIDATE_URL,
+    CLIENT_TOKEN_SECRET,
+    SERVICE_URL,
+    TOKEN_EXPIRE_TIME,
+} from "../config";
 
 const get = bent("GET", "string");
 
-async function oAuth(request, response) {
+const casParser = new Parser({
+    tagNameProcessors: [processors.stripPrefix],
+    explicitArray: false,
+});
+
+async function verifyTicket(request, response) {
     const ticket = request.body.ticket;
 
+    let status = 400;
+    let payload = {
+        success: false,
+    };
+
     if (ticket) {
+        status = 500;
+
         const url = `${CAS_VALIDATE_URL}?ticket=${ticket}&service=${SERVICE_URL}`;
 
-        const rawXML = await get(url).catch(() => {
-            return response.status(500).send();
-        });
+        const rawXML = await get(url).catch(() => null);
 
-        const result = await parseCASResponseXML(rawXML).catch(() => {
-            return response.status(500).send();
-        });
+        if (rawXML) {
+            const result = await casParser
+                .parseStringPromise(rawXML)
+                .catch(() => null);
 
-        if (result.serviceResponse.authenticationSuccess) {
-            const currentUser = await User.findOne({
-                netID: result.serviceResponse.authenticationSuccess.user,
-            });
+            if (result) {
+                status = 401;
 
-            const isNewUser = currentUser == null;
+                if (result.serviceResponse.authenticationSuccess) {
+                    status = 500;
 
-            let userID;
-            let netID;
-            let token;
+                    const cas = result.serviceResponse.authenticationSuccess;
 
-            if (isNewUser) {
-                const newToken = jwt.sign(
-                    {
-                        data: result.serviceResponse.authenticationSuccess,
-                    },
-                    CLIENT_TOKEN_SECRET,
-                    {
-                        expiresIn: 60 * 60 * 24 * 7,
-                    },
-                );
+                    const user = await User.findOne({
+                        netID: cas.user,
+                    }).catch(() => null);
 
-                const newUser = await User.create({
-                    netID: result.serviceResponse.authenticationSuccess.user,
-                    username: result.serviceResponse.authenticationSuccess.user,
-                    token: newToken,
-                }).catch(() => {
-                    return response.status(500).send();
-                });
-                userID = newUser._id;
-                netID = newUser.netID;
-                token = newToken;
-            } else {
-                try {
-                    jwt.verify(currentUser.token, CLIENT_TOKEN_SECRET);
-                } catch (err) {
-                    currentUser.token = jwt.sign(
-                        {
-                            data: result.serviceResponse.authenticationSuccess,
-                        },
-                        CLIENT_TOKEN_SECRET,
-                        {
-                            expiresIn: 60 * 60 * 24 * 7,
-                        },
-                    );
+                    payload.isNewUser = user === null;
 
-                    await currentUser.save();
+                    if (payload.isNewUser) {
+                        payload.user = await createNewUserFromCAS(cas);
+
+                        if (payload.user) {
+                            status = 200;
+                            payload.success = true;
+                        }
+                    } else {
+                        payload.user = await tryTokenReissue(user);
+
+                        if (payload.user) {
+                            status = 200;
+                            payload.success = true;
+                        }
+                    }
                 }
-
-                userID = currentUser._id;
-                netID = currentUser.netID;
-                token = currentUser.token;
             }
-
-            return response.status(200).json({
-                success: true,
-                message: "CAS authentication succeeeded!",
-                isNewUser: isNewUser,
-                user: {
-                    _id: userID,
-                    netID: netID,
-                    token: token,
-                },
-            });
-        } else if (result.authenticationFailure) {
-            return response.status(401).json({
-                success: false,
-                message: "CAS authentication failed!",
-            });
-        } else {
-            return response.status(500).send();
         }
-    } else {
-        return response.status(400).send();
+    }
+
+    return response.status(status).send(payload);
+}
+
+async function createNewUserFromCAS(casRes) {
+    let res = null;
+    let saved = null;
+
+    const newUser = await User.create({
+        netID: casRes.user,
+        username: casRes.user,
+    }).catch(() => null);
+
+    if (newUser) {
+        newUser.token = createTokenFromUser(newUser);
+        saved = await newUser.save().catch(() => null);
+
+        if (saved) {
+            res = {
+                _id: newUser._id,
+                netID: newUser.netID,
+                token: newUser.token,
+            };
+        }
+    }
+
+    return res;
+}
+
+async function tryTokenReissue(user) {
+    try {
+        jwt.verify(user.token, CLIENT_TOKEN_SECRET);
+
+        return {
+            _id: user._id,
+            netID: user.netID,
+            token: user.token,
+        };
+    } catch (err) {
+        user.token = createTokenFromUser(user);
+
+        success = await user
+            .save()
+            .then(() => true)
+            .catch(() => false);
+
+        if (success) {
+            return {
+                _id: user._id,
+                netID: user.netID,
+                token: user.token,
+            };
+        } else {
+            return null;
+        }
     }
 }
 
-async function parseCASResponseXML(casResponse) {
-    return parseStringPromise(casResponse, {
-        tagNameProcessors: [processors.stripPrefix],
-        explicitArray: false,
-    }).then((value) => {
-        if (value.authenticationSuccess) {
-            value.serviceResponse.authenticationSuccess.user = value.serviceResponse.authenticationSuccess.user.toLowerCase();
-        }
-
-        return value;
-    });
+function createTokenFromUser(user) {
+    return jwt.sign(
+        {
+            _id: user._id,
+            netID: user.netID,
+        },
+        CLIENT_TOKEN_SECRET,
+        {
+            expiresIn: TOKEN_EXPIRE_TIME,
+        },
+    );
 }
 
-export default oAuth;
+export { verifyTicket };
