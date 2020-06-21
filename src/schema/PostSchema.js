@@ -12,43 +12,11 @@ import { checkLoggedIn } from "../utils/middlewares";
 
 import pubsub from "../pubsub";
 
-DiscussionTC.addFields({
+PostDTC.addFields({
     comments: [CommentTC],
 });
 
-EventTC.addFields({
-    comments: [CommentTC],
-});
-
-JobTC.addFields({
-    comments: [CommentTC],
-});
-
-DiscussionTC.addRelation("comments", {
-    resolver: CommentTC.getResolver("findManyByPostID"),
-
-    prepareArgs: {
-        post_id: (source) => source._id,
-    },
-
-    projection: {
-        comments: 1,
-    },
-});
-
-EventTC.addRelation("comments", {
-    resolver: CommentTC.getResolver("findManyByPostID"),
-
-    prepareArgs: {
-        post_id: (source) => source._id,
-    },
-
-    projection: {
-        comments: 1,
-    },
-});
-
-JobTC.addRelation("comments", {
+PostDTC.addRelation("comments", {
     resolver: CommentTC.getResolver("findManyByPostID"),
 
     prepareArgs: {

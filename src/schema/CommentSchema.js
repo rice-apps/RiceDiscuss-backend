@@ -24,11 +24,11 @@ CommentTC.addRelation("creator", {
     },
 });
 
-CommentTC.addRelation("post_id", {
+CommentTC.addRelation("post", {
     resolver: () => PostDTC.getResolver("findById"),
 
     prepareArgs: {
-        _id: (source) => source.post_id,
+        _id: (source) => source.post,
     },
 
     projection: {
@@ -36,11 +36,11 @@ CommentTC.addRelation("post_id", {
     },
 });
 
-CommentTC.addRelation("parent_id", {
+CommentTC.addRelation("parent", {
     resolver: () => CommentTC.getResolver("findById"),
 
     prepareArgs: {
-        _id: (source) => source.parent_id,
+        _id: (source) => source.parent,
     },
 
     projection: {
@@ -104,21 +104,27 @@ const CommentQuery = {
     commentById: CommentTC.getResolver("findById").withMiddlewares([
         checkLoggedIn,
     ]),
+
     commentByParent: CommentTC.getResolver(
         "findManyByParentID",
     ).withMiddlewares([checkLoggedIn]),
+
     commentByPost: CommentTC.getResolver("findManyByPostID").withMiddlewares([
         checkLoggedIn,
     ]),
+
     commentOne: CommentTC.getResolver("findOne").withMiddlewares([
         checkLoggedIn,
     ]),
+
     commentMany: CommentTC.getResolver("findMany").withMiddlewares([
         checkLoggedIn,
     ]),
+
     commentCount: CommentTC.getResolver("count").withMiddlewares([
         checkLoggedIn,
     ]),
+
     commentPagination: CommentTC.getResolver("pagination").withMiddlewares([
         checkLoggedIn,
     ]),
@@ -135,6 +141,7 @@ const CommentMutation = {
 
             return payload;
         }),
+
     commentUpdateById: CommentTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -145,6 +152,7 @@ const CommentMutation = {
 
             return payload;
         }),
+
     commentUpdateOne: CommentTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -155,6 +163,7 @@ const CommentMutation = {
 
             return payload;
         }),
+
     commentUpdateMany: CommentTC.getResolver("updateMany")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -165,6 +174,7 @@ const CommentMutation = {
 
             return payload;
         }),
+
     commentRemoveById: CommentTC.getResolver("removeById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -175,6 +185,7 @@ const CommentMutation = {
 
             return payload;
         }),
+
     commentRemoveOne: CommentTC.getResolver("removeOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
