@@ -35,9 +35,13 @@ UserTC.addRelation("comments", {
 
 const UserQuery = {
     userById: UserTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
+
     userOne: UserTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
+
     userMany: UserTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
+
     userCount: UserTC.getResolver("count").withMiddlewares([checkLoggedIn]),
+
     userPagination: UserTC.getResolver("pagination").withMiddlewares([
         checkLoggedIn,
     ]),
@@ -55,6 +59,7 @@ const UserMutation = {
 
             return payload;
         }),
+
     userUpdateById: UserTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -66,6 +71,7 @@ const UserMutation = {
 
             return payload;
         }),
+
     userUpdateOne: UserTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -77,6 +83,7 @@ const UserMutation = {
 
             return payload;
         }),
+
     userUpdateMany: UserTC.getResolver("updateMany")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -88,6 +95,7 @@ const UserMutation = {
 
             return payload;
         }),
+
     userRemoveById: UserTC.getResolver("removeById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -99,6 +107,7 @@ const UserMutation = {
 
             return payload;
         }),
+
     userRemoveOne: UserTC.getResolver("removeOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {

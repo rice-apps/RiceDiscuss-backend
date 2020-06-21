@@ -103,6 +103,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     eventCreateOne: EventTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -114,6 +115,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     noticeCreateOne: NoticeTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -124,6 +126,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     jobCreateOne: JobTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -145,6 +148,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     eventUpdateById: EventTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -156,6 +160,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     noticeUpdateById: NoticeTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -167,6 +172,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     jobUpdateById: JobTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -190,6 +196,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     eventUpdateOne: EventTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -201,6 +208,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     noticeUpdateOne: NoticeTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -212,6 +220,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     jobUpdateOne: JobTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -233,6 +242,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     postRemoveOne: PostDTC.getResolver("removeOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
@@ -242,6 +252,7 @@ const PostMutation = {
 
             return payload;
         }),
+
     postRemoveMany: PostDTC.getResolver("removeMany")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
