@@ -13,6 +13,8 @@ import { CLIENT_TOKEN_SECRET, DEV_PORT, ALLOWED_ORIGINS } from "./config";
 
 const server = new ApolloServer({
     schema: Schema,
+    introspection: true,
+    playground: false,
     context: ({ req }) => {
         if (req) {
             try {
