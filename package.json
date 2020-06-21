@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint ./",
+    "lint": "eslint ./src --fix",
     "start": "nodemon --exec babel-node src/index.js",
     "test": "jest -i --verbose --coverage --runInBand",
     "dboff": "killall mongod",
