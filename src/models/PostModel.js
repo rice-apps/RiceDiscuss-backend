@@ -165,7 +165,7 @@ const PostDTCDL = composeDataloader(
 
 const DiscussionTCDL = composeDataloader(
     DiscussionTC,
-    resolverList,
+    DATALOADER_RESOLVERS,
     DATALOADER_OPTIONS,
 );
 
