@@ -32,7 +32,7 @@ CommentTC.addRelation("post", {
     },
 
     projection: {
-        post_id: 1,
+        post: 1,
     },
 });
 
@@ -44,7 +44,7 @@ CommentTC.addRelation("parent", {
     },
 
     projection: {
-        parent_id: 1,
+        parent: 1,
     },
 });
 
@@ -92,7 +92,7 @@ CommentTC.addRelation("children", {
     resolver: () => CommentTC.getResolver("findManyByParentID"),
 
     prepareArgs: {
-        parent_id: (source) => source._id,
+        parent: (source) => source._id,
     },
 
     projection: {

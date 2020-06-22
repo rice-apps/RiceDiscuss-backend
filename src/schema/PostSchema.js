@@ -20,7 +20,7 @@ PostDTC.addRelation("comments", {
     resolver: CommentTC.getResolver("findManyByPostID"),
 
     prepareArgs: {
-        post_id: (source) => source._id,
+        post: (source) => source._id,
     },
 
     projection: {

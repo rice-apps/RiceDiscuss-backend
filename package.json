@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint ./src --fix",
-    "start": "nodemon --exec babel-node src/index.js",
+    "start": "NODE_NO_WARNINGS=1 nodemon --exec babel-node src/index.js",
     "test": "jest -i --verbose --coverage --runInBand",
     "dboff": "killall mongod",
     "watch": "nodemon src/index.js",
