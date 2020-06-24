@@ -30,7 +30,7 @@ async function userCheckComment(resolve, source, args, context, info) {
 }
 
 async function userCheckPost(resolve, source, args, context, info) {
-    const post = await Post.findById(args._id);
+    const post = await Post.findById(args.record._id);
 
     if (post.creator == context.netID) {
         return await resolve(source, args, context, info);

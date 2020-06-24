@@ -27,19 +27,14 @@ const DATALOADER_OPTIONS = {
 
 const DATALOADER_RESOLVERS = [
     "findById",
-    "findByIds",
     "findOne",
-    "findMany",
     "count",
     "pagination",
     "createOne",
-    "createMany",
     "updateById",
     "updateOne",
-    "updateMany",
     "removeById",
     "removeOne",
-    "removeMany",
 ];
 
 const CHECK_HTML_CONFIG = {
