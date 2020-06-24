@@ -34,6 +34,7 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         required: false,
         default: new Date().getTime(),
+        index: true,
     },
 
     college: {
