@@ -32,4 +32,14 @@ Finally, create a remote for your branch on github by running
 $ git push -u origin <your branch name>
 ```
 
-Happy coding!
+## Setting up your environment variables
+
+Create a copy of the `.env.example` file located at the root of the project directory and rename the copy `.env`
+
+Ask a current developer for the appropriate information to fill into the example.
+
+## Submitting changes
+
+Once you're done with your feature, create a pull request on GitHub with an informative title and description.
+
+After a team lead merges your branch, delete both your remote and local copy.
