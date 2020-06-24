@@ -1,10 +1,8 @@
-import { UserTC, PostDTC, CommentTC } from "../models";
+import { UserTC, PostDTC, CommentTC, User } from "../models";
 
-import {
-    checkLoggedIn,
-    userCheckUserFilter,
-    userCheckUserId,
-} from "../utils/middlewares";
+import { checkWithCAS, createToken, isTokenExpired } from "../utils/auth";
+
+import { checkLoggedIn, userCheckUserFilter } from "../utils/middlewares";
 
 import pubsub from "../pubsub";
 
@@ -37,21 +35,54 @@ UserTC.addRelation("comments", {
     },
 });
 
-const UserQuery = {
-    userById: UserTC.getResolver("findById")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => (rp) => {
-            const resPromise = next(rp);
+UserTC.addResolver({
+    name: "authenticate",
+    type: UserTC,
+    args: { ticket: `String!` },
+    resolve: async ({ args }) => {
+        const payload = {
+            success: false,
+        };
 
-            resPromise.then((payload) => {
-                if (payload.netID != rp.context.netID) {
-                    payload.token = null;
+        const res = await checkWithCAS(args.ticket);
+
+        if (res.success) {
+            let user;
+            payload.isNewUser = !(await User.exists({ netID: res.netID }));
+
+            if (payload.isNewUser) {
+                user = await User.create({
+                    netID: res.netID,
+                    username: res.netID,
+                });
+
+                user.token = createToken(user);
+
+                await user.save();
+            } else {
+                user = await User.findOne({ netID: res.netID });
+
+                if (isTokenExpired(user)) {
+                    user.token = createToken(user);
+
+                    await user.save();
                 }
-            });
+            }
 
-            return resPromise;
-        }),
+            payload.success = true;
 
+            payload.user = {
+                _id: user._id,
+                netID: user.netID,
+                token: user.token,
+            };
+        }
+
+        return payload;
+    },
+});
+
+const UserQuery = {
     userOne: UserTC.getResolver("findOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => (rp) => {
@@ -65,8 +96,6 @@ const UserQuery = {
 
             return resPromise;
         }),
-
-    userCount: UserTC.getResolver("count").withMiddlewares([checkLoggedIn]),
 
     userPagination: UserTC.getResolver("pagination")
         .withMiddlewares([checkLoggedIn])
@@ -86,18 +115,6 @@ const UserQuery = {
 };
 
 const UserMutation = {
-    userUpdateById: UserTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn, userCheckUserId])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("profileUpdated", {
-                profileUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
     userUpdateOne: UserTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn, userCheckUserFilter])
         .wrapResolve((next) => async (rp) => {
@@ -105,18 +122,6 @@ const UserMutation = {
 
             await pubsub.publish("profileUpdated", {
                 profileUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    userRemoveById: UserTC.getResolver("removeById")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("profileRemoved", {
-                profileRemoved: payload.record,
             });
 
             return payload;
