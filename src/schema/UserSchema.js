@@ -66,8 +66,7 @@ const UserQuery = {
             return resPromise;
         }),
 
-    userCount: UserTC.getResolver("count")
-        .withMiddlewares([checkLoggedIn]),
+    userCount: UserTC.getResolver("count").withMiddlewares([checkLoggedIn]),
 
     userPagination: UserTC.getResolver("pagination")
         .withMiddlewares([checkLoggedIn])

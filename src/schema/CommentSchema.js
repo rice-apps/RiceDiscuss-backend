@@ -117,14 +117,6 @@ const CommentQuery = {
         checkLoggedIn,
     ]),
 
-    commentOne: CommentTC.getResolver("findOne").withMiddlewares([
-        checkLoggedIn,
-    ]),
-
-    commentMany: CommentTC.getResolver("findMany").withMiddlewares([
-        checkLoggedIn,
-    ]),
-
     commentCount: CommentTC.getResolver("count").withMiddlewares([
         checkLoggedIn,
     ]),

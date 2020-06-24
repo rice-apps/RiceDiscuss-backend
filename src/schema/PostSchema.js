@@ -95,8 +95,6 @@ const PostQuery = {
 
     postOne: PostDTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
 
-    postMany: PostDTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
-
     postCount: PostDTC.getResolver("count").withMiddlewares([checkLoggedIn]),
 
     postPagination: PostDTC.getResolver("pagination").withMiddlewares([
@@ -204,28 +202,6 @@ const PostMutation = {
             const payload = await next(rp);
 
             await pubsub.publish("postRemoved", {
-                postRemoved: payload.record,
-            });
-
-            return payload;
-        }),
-
-    postRemoveOne: PostDTC.getResolver("removeOne")
-        .withMiddlewares([checkLoggedIn, userCheckPost])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            pubsub.publish("postRemoved", { postRemoved: payload.record });
-
-            return payload;
-        }),
-
-    postRemoveMany: PostDTC.getResolver("removeMany")
-        .withMiddlewares([checkLoggedIn, userCheckPost])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            pubsub.publish("postRemoved", {
                 postRemoved: payload.record,
             });
 

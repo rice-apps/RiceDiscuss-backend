@@ -48,11 +48,7 @@ async function userCheckUserFilter(resolve, source, args, context, info) {
 }
 
 async function userCheckUserId(resolve, source, args, context, info) {
-    console.log(args)
     const user = await User.findById(args._id);
-
-    console.log(user.netID)
-    console.log(context.netID)
 
     if (user.netID == context.netID) {
         return await resolve(source, args, context, info);
