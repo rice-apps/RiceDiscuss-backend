@@ -40,17 +40,13 @@ UserTC.addResolver({
     type: UserTC,
     args: { ticket: `String!` },
     resolve: async ({ args }) => {
-        const payload = {
-            success: false,
-        };
-
         const res = await checkWithCAS(args.ticket);
 
         if (res.success) {
             let user;
-            payload.isNewUser = !(await User.exists({ netID: res.netID }));
+            const isNewUser = !(await User.exists({ netID: res.netID }));
 
-            if (payload.isNewUser) {
+            if (isNewUser) {
                 user = await User.create({
                     netID: res.netID,
                     username: res.netID,
@@ -69,16 +65,8 @@ UserTC.addResolver({
                 }
             }
 
-            payload.success = true;
-
-            payload.user = {
-                _id: user._id,
-                netID: user.netID,
-                token: user.token,
-            };
+            return user;
         }
-
-        return payload;
     },
 });
 
@@ -115,6 +103,7 @@ const UserQuery = {
 };
 
 const UserMutation = {
+    userAuthentication: UserTC.getResolver("authenticate"),
     userUpdateOne: UserTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn, userCheckUserFilter])
         .wrapResolve((next) => async (rp) => {
