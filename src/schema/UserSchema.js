@@ -1,6 +1,10 @@
 import { UserTC, PostDTC, CommentTC } from "../models";
 
-import { checkLoggedIn } from "../utils/middlewares";
+import {
+    checkLoggedIn,
+    userCheckUserFilter,
+    userCheckUserId,
+} from "../utils/middlewares";
 
 import pubsub from "../pubsub";
 
@@ -34,34 +38,57 @@ UserTC.addRelation("comments", {
 });
 
 const UserQuery = {
-    userById: UserTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
+    userById: UserTC.getResolver("findById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => (rp) => {
+            const resPromise = next(rp);
 
-    userOne: UserTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
+            resPromise.then((payload) => {
+                if (payload.netID != rp.context.netID) {
+                    payload.token = null;
+                }
+            });
 
-    userMany: UserTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
+            return resPromise;
+        }),
 
-    userCount: UserTC.getResolver("count").withMiddlewares([checkLoggedIn]),
+    userOne: UserTC.getResolver("findOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => (rp) => {
+            const resPromise = next(rp);
 
-    userPagination: UserTC.getResolver("pagination").withMiddlewares([
-        checkLoggedIn,
-    ]),
+            resPromise.then((payload) => {
+                if (payload.netID != rp.context.netID) {
+                    payload.token = null;
+                }
+            });
+
+            return resPromise;
+        }),
+
+    userCount: UserTC.getResolver("count")
+        .withMiddlewares([checkLoggedIn]),
+
+    userPagination: UserTC.getResolver("pagination")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => (rp) => {
+            const resPromise = next(rp);
+
+            resPromise.then((payload) => {
+                for (let i = 0; i < payload.items.length; i++) {
+                    if (payload.items[i].netID != rp.context.netID) {
+                        payload.items[i].token = null;
+                    }
+                }
+            });
+
+            return resPromise;
+        }),
 };
 
 const UserMutation = {
-    userCreateOne: UserTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("profileCreated", {
-                profileCreated: payload.record,
-            });
-
-            return payload;
-        }),
-
     userUpdateById: UserTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckUserId])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -73,19 +100,7 @@ const UserMutation = {
         }),
 
     userUpdateOne: UserTC.getResolver("updateOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("profileUpdated", {
-                profileUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    userUpdateMany: UserTC.getResolver("updateMany")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckUserFilter])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 

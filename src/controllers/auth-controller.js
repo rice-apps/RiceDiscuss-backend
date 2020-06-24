@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { Parser, processors } from "xml2js";
 
 import { User } from "../models";
+import pubsub from "../pubsub";
 
 import {
     CAS_VALIDATE_URL,
@@ -85,6 +86,13 @@ async function createNewUserFromCAS(casRes) {
     }).catch(() => null);
 
     if (newUser) {
+        await pubsub.publish("profileCreated", {
+            profileCreated: {
+                _id: newUser._id,
+                netID: newUser.netID,
+            },
+        });
+
         newUser.token = createTokenFromUser(newUser);
         saved = await newUser.save().catch(() => null);
 

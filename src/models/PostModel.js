@@ -58,6 +58,18 @@ const PostSchema = new mongoose.Schema({
         required: true,
     },
 
+    upvotes: [
+        {
+            type: String,
+        },
+    ],
+
+    downvotes: [
+        {
+            type: String,
+        },
+    ],
+
     reports: {
         type: Number,
         required: false,

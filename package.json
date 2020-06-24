@@ -57,6 +57,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.5",
     "mongoose": "^5.9.5",
+    "sanitize-html": "^1.27.0",
     "xml2js": "^0.4.23"
   }
 }

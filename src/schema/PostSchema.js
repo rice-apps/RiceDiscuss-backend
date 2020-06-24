@@ -8,7 +8,12 @@ import {
     UserTC,
 } from "../models";
 
-import { checkLoggedIn } from "../utils/middlewares";
+import {
+    checkLoggedIn,
+    userCheckPost,
+    userCheckCreate,
+    checkHTML,
+} from "../utils/middlewares";
 
 import pubsub from "../pubsub";
 
@@ -45,6 +50,46 @@ PostDTC.addRelation("creator", {
     },
 });
 
+PostDTC.addRelation("upvotes", {
+    resolver: () => UserTC.getResolver("findMany"),
+
+    prepareArgs: {
+        filter: (source) => {
+            return {
+                _operators: {
+                    netID: {
+                        in: source.upvotes,
+                    },
+                },
+            };
+        },
+    },
+
+    projection: {
+        upvotes: 1,
+    },
+});
+
+PostDTC.addRelation("downvotes", {
+    resolver: () => UserTC.getResolver("findMany"),
+
+    prepareArgs: {
+        filter: (source) => {
+            return {
+                _operators: {
+                    netID: {
+                        in: source.downvotes,
+                    },
+                },
+            };
+        },
+    },
+
+    projection: {
+        downvotes: 1,
+    },
+});
+
 const PostQuery = {
     postById: PostDTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
 
@@ -61,7 +106,7 @@ const PostQuery = {
 
 const PostMutation = {
     discussionCreateOne: DiscussionTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -73,7 +118,7 @@ const PostMutation = {
         }),
 
     eventCreateOne: EventTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -85,7 +130,7 @@ const PostMutation = {
         }),
 
     noticeCreateOne: NoticeTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
             await pubsub.publish("noticeCreated", {
@@ -96,7 +141,7 @@ const PostMutation = {
         }),
 
     jobCreateOne: JobTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -106,7 +151,7 @@ const PostMutation = {
         }),
 
     discussionUpdateById: DiscussionTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -118,7 +163,7 @@ const PostMutation = {
         }),
 
     eventUpdateById: EventTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -130,7 +175,7 @@ const PostMutation = {
         }),
 
     noticeUpdateById: NoticeTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -142,7 +187,7 @@ const PostMutation = {
         }),
 
     jobUpdateById: JobTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -153,54 +198,8 @@ const PostMutation = {
             return payload;
         }),
 
-    discussionUpdateOne: DiscussionTC.getResolver("updateOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("discussionUpdated", {
-                discussionUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    eventUpdateOne: EventTC.getResolver("updateOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("eventUpdated", {
-                eventUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    noticeUpdateOne: NoticeTC.getResolver("updateOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("noticeUpdated", {
-                noticeUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    jobUpdateOne: JobTC.getResolver("updateOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("jobUpdated", { jobUpdated: payload.record });
-
-            return payload;
-        }),
-
     postRemoveById: PostDTC.getResolver("removeById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -212,7 +211,7 @@ const PostMutation = {
         }),
 
     postRemoveOne: PostDTC.getResolver("removeOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -222,7 +221,7 @@ const PostMutation = {
         }),
 
     postRemoveMany: PostDTC.getResolver("removeMany")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 

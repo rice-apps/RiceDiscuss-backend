@@ -1,4 +1,5 @@
 import "dotenv/config";
+import sanitizeHtml from "sanitize-html";
 
 const CLIENT_TOKEN_SECRET = process.env.CLIENT_TOKEN_SECRET;
 const TOKEN_EXPIRE_TIME = parseInt(process.env.TOKEN_EXPIRE_TIME);
@@ -41,6 +42,14 @@ const DATALOADER_RESOLVERS = [
     "removeMany",
 ];
 
+const CHECK_HTML_CONFIG = {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+    allowedAttributes: {
+        a: ["href"],
+        img: ["src"],
+    },
+};
+
 export {
     CLIENT_TOKEN_SECRET,
     TOKEN_EXPIRE_TIME,
@@ -55,4 +64,5 @@ export {
     PAGINATION_OPTIONS,
     DATALOADER_OPTIONS,
     DATALOADER_RESOLVERS,
+    CHECK_HTML_CONFIG,
 };

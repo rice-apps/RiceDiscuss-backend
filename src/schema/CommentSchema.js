@@ -1,6 +1,10 @@
 import { CommentTC, PostDTC, UserTC } from "../models";
 
-import { checkLoggedIn } from "../utils/middlewares";
+import {
+    checkLoggedIn,
+    userCheckComment,
+    userCheckCreate,
+} from "../utils/middlewares";
 
 import pubsub from "../pubsub";
 
@@ -132,7 +136,7 @@ const CommentQuery = {
 
 const CommentMutation = {
     commentCreateOne: CommentTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckCreate])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
             await pubsub.publish("commentCreated", {
@@ -143,7 +147,7 @@ const CommentMutation = {
         }),
 
     commentUpdateById: CommentTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckComment])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
             await pubsub.publish("commentUpdated", {
@@ -153,46 +157,12 @@ const CommentMutation = {
             return payload;
         }),
 
-    commentUpdateOne: CommentTC.getResolver("updateOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-            await pubsub.publish("commentUpdated", {
-                commentUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    commentUpdateMany: CommentTC.getResolver("updateMany")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-            await pubsub.publish("commentUpdated", {
-                commentUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
     commentRemoveById: CommentTC.getResolver("removeById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckComment])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
             await pubsub.publish("commentRemoved", {
                 commentUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    commentRemoveOne: CommentTC.getResolver("removeOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("commentRemoved", {
-                commentRemoved: payload.record,
             });
 
             return payload;
