@@ -100,7 +100,7 @@ CommentTC.addRelation("children", {
     },
 
     projection: {
-        children: 1,
+        _id: 1,
     },
 });
 

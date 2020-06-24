@@ -12,26 +12,26 @@ UserTC.addFields({
 });
 
 UserTC.addRelation("posts", {
-    resolver: PostDTC.getResolver("findManyByCreator"),
+    resolver: () => PostDTC.getResolver("findManyByCreator"),
 
     prepareArgs: {
         creator: (source) => source.netID,
     },
 
     projection: {
-        posts: 1,
+        netID: 1,
     },
 });
 
 UserTC.addRelation("comments", {
-    resolver: CommentTC.getResolver("findManyByCreator"),
+    resolver: () => CommentTC.getResolver("findManyByCreator"),
 
     prepareArgs: {
         creator: (source) => source.netID,
     },
 
     projection: {
-        comments: 1,
+        netID: 1,
     },
 });
 
