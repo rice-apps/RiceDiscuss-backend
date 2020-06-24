@@ -47,11 +47,7 @@ async function verifyTicket(request, response) {
 
                     const cas = result.serviceResponse.authenticationSuccess;
 
-                    const user = await User.findOne({
-                        netID: cas.user,
-                    }).catch(() => null);
-
-                    payload.isNewUser = user === null;
+                    payload.isNewUser = !await User.exists({ netID: cas.user });
 
                     if (payload.isNewUser) {
                         payload.user = await createNewUserFromCAS(cas);
@@ -61,6 +57,7 @@ async function verifyTicket(request, response) {
                             payload.success = true;
                         }
                     } else {
+                        const user = await User.findOne({ netID: cas.user });
                         payload.user = await tryTokenReissue(user);
 
                         if (payload.user) {
