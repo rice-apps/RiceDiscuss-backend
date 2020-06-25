@@ -64,11 +64,42 @@ const UserSchema = new mongoose.Schema({
         },
         required: false,
     },
+
+    isNewUser: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const User = mongoose.model("User", UserSchema);
 
 const UserTC = composeWithMongoose(User, PAGINATION_OPTIONS);
+
+UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
+    const resPromise = next(rp);
+
+    resPromise.then((payload) => {
+        if (payload.netID != rp.context.netID) {
+            payload.token = null;
+        }
+    });
+
+    return resPromise;
+});
+
+UserTC.wrapResolverResolve("pagination", (next) => async (rp) => {
+    const resPromise = next(rp);
+
+    resPromise.then((payload) => {
+        for (let i = 0; i < payload.items.length; i++) {
+            if (payload.items[i].netID != rp.context.netID) {
+                payload.items[i].token = null;
+            }
+        }
+    });
+
+    return resPromise;
+});
 
 const UserTCDL = composeDataloader(
     UserTC,

@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import cors from "cors";
 
 import Schema from "./schema";
-import { verifyTicket } from "./controllers/auth-controller";
 
 import "./db";
 
@@ -43,7 +42,7 @@ const server = new ApolloServer({
                     console.log("Websocket connected");
 
                     return {
-                        user: decoded.netID,
+                        netID: decoded.netID,
                     };
                 } catch (err) {
                     throw new Error("WebSocket authentication failed");
@@ -67,8 +66,6 @@ app.use(
         credentials: true,
     }),
 );
-
-app.use("/login", express.json(), verifyTicket);
 
 const httpServer = http.createServer(app);
 
