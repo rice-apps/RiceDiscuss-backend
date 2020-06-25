@@ -64,6 +64,11 @@ const UserSchema = new mongoose.Schema({
         },
         required: false,
     },
+
+    isNewUser: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const User = mongoose.model("User", UserSchema);
