@@ -6,6 +6,7 @@ import {
     NoticeTC,
     JobTC,
     UserTC,
+    Post,
 } from "../models";
 
 import {
@@ -87,6 +88,66 @@ PostDTC.addRelation("downvotes", {
 
     projection: {
         downvotes: 1,
+    },
+});
+
+PostDTC.addResolver({
+    name: "upvotePost",
+    type: PostDTC,
+    args: { _id: `ID!`, netID: `String!` },
+    resolve: async ({ args, context }) => {
+        if (args.netID != context.netID) {
+            throw new Error("cannot upvote as someone else");
+        }
+
+        const post = await Post.findById(args._id);
+
+        if (post.upvotes.includes(args.netID)) {
+            post.upvotes = post.upvotes.filter(
+                (upvoter) => upvoter != args.netID,
+            );
+        } else if (post.downvotes.includes(args.netID)) {
+            post.downvotes = post.downvotes.filter(
+                (downvoter) => downvoter != args.netID,
+            );
+            post.upvotes.push(args.netID);
+        } else {
+            post.upvotes.push(args.netID);
+        }
+
+        await post.save();
+
+        return post;
+    },
+});
+
+PostDTC.addResolver({
+    name: "downvotePost",
+    type: PostDTC,
+    args: { _id: `ID!`, netID: `String!` },
+    resolve: async ({ args, context }) => {
+        if (args.netID != context.netID) {
+            throw new Error("cannot downvote as someone else");
+        }
+
+        const post = await Post.findById(args._id);
+
+        if (post.downvotes.includes(args.netID)) {
+            post.downvotes = post.downvotes.filter(
+                (downvoter) => downvoter != args.netID,
+            );
+        } else if (post.upvotes.includes(args.netID)) {
+            post.upvotes = post.upvotes.filter(
+                (upvoter) => upvoter != args.netID,
+            );
+            post.downvotes.push(args.netID);
+        } else {
+            post.downvotes.push(args.netID);
+        }
+
+        await post.save();
+
+        return post;
     },
 });
 
@@ -196,6 +257,30 @@ const PostMutation = {
             return payload;
         }),
 
+    upvotePostById: PostDTC.getResolver("upvotePost")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("postUpvoted", {
+                postUpvoted: payload,
+            });
+
+            return payload;
+        }),
+
+    downvotePostById: PostDTC.getResolver("downvotePost")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("postDownvoted", {
+                postDownvoted: payload,
+            });
+
+            return payload;
+        }),
+
     postRemoveById: PostDTC.getResolver("removeById")
         .withMiddlewares([checkLoggedIn, userCheckPost])
         .wrapResolve((next) => async (rp) => {
@@ -252,6 +337,16 @@ const PostSubscription = {
     jobCreated: {
         type: JobTC,
         subscribe: () => pubsub.asyncIterator("jobCreated"),
+    },
+
+    postUpvoted: {
+        type: PostDTC,
+        subscribe: () => pubsub.asyncIterator("postUpvoted"),
+    },
+
+    postDownvoted: {
+        type: PostDTC,
+        subscribe: () => pubsub.asyncIterator("postDownvoted"),
     },
 
     postRemoved: {

@@ -1,4 +1,4 @@
-import { CommentTC, PostDTC, UserTC } from "../models";
+import { CommentTC, PostDTC, UserTC, Comment } from "../models";
 
 import {
     checkLoggedIn,
@@ -104,6 +104,66 @@ CommentTC.addRelation("children", {
     },
 });
 
+CommentTC.addResolver({
+    name: "upvoteComment",
+    type: CommentTC,
+    args: { _id: `ID!`, netID: `String!` },
+    resolve: async ({ args, context }) => {
+        if (args.netID != context.netID) {
+            throw new Error("cannot upvote as someone else");
+        }
+
+        const comment = await Comment.findById(args._id);
+
+        if (comment.upvotes.includes(args.netID)) {
+            comment.upvotes = comment.upvotes.filter(
+                (upvoter) => upvoter != args.netID,
+            );
+        } else if (comment.downvotes.includes(args.netID)) {
+            comment.downvotes = comment.downvotes.filter(
+                (downvoter) => downvoter != args.netID,
+            );
+            comment.upvotes.push(args.netID);
+        } else {
+            comment.upvotes.push(args.netID);
+        }
+
+        await comment.save();
+
+        return comment;
+    },
+});
+
+CommentTC.addResolver({
+    name: "downvoteComment",
+    type: CommentTC,
+    args: { _id: `ID!`, netID: `String!` },
+    resolve: async ({ args, context }) => {
+        if (args.netID != context.netID) {
+            throw new Error("cannot downvote as someone else");
+        }
+
+        const comment = await Comment.findById(args._id);
+
+        if (comment.downvotes.includes(args.netID)) {
+            comment.downvotes = comment.downvotes.filter(
+                (downvoter) => downvoter != args.netID,
+            );
+        } else if (comment.upvotes.includes(args.netID)) {
+            comment.upvotes = comment.upvotes.filter(
+                (upvoter) => upvoter != args.netID,
+            );
+            comment.downvotes.push(args.netID);
+        } else {
+            comment.downvotes.push(args.netID);
+        }
+
+        await comment.save();
+
+        return comment;
+    },
+});
+
 const CommentQuery = {
     commentById: CommentTC.getResolver("findById").withMiddlewares([
         checkLoggedIn,
@@ -155,6 +215,28 @@ const CommentMutation = {
             const payload = await next(rp);
             await pubsub.publish("commentRemoved", {
                 commentUpdated: payload.record,
+            });
+
+            return payload;
+        }),
+
+    upvoteCommentById: CommentTC.getResolver("upvoteComment")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+            await pubsub.publish("commentUpvoted", {
+                commentUpvoted: payload,
+            });
+
+            return payload;
+        }),
+
+    downvoteCommentById: CommentTC.getResolver("downvoteComment")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+            await pubsub.publish("commentDownvoted", {
+                commentDownvoted: payload,
             });
 
             return payload;
