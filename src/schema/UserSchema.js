@@ -71,35 +71,11 @@ UserTC.addResolver({
 });
 
 const UserQuery = {
-    userOne: UserTC.getResolver("findOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => (rp) => {
-            const resPromise = next(rp);
+    userOne: UserTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
 
-            resPromise.then((payload) => {
-                if (payload.netID != rp.context.netID) {
-                    payload.token = null;
-                }
-            });
-
-            return resPromise;
-        }),
-
-    userPagination: UserTC.getResolver("pagination")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => (rp) => {
-            const resPromise = next(rp);
-
-            resPromise.then((payload) => {
-                for (let i = 0; i < payload.items.length; i++) {
-                    if (payload.items[i].netID != rp.context.netID) {
-                        payload.items[i].token = null;
-                    }
-                }
-            });
-
-            return resPromise;
-        }),
+    userPagination: UserTC.getResolver("pagination").withMiddlewares([
+        checkLoggedIn,
+    ]),
 };
 
 const UserMutation = {
