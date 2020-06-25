@@ -56,6 +56,11 @@ const CommentSchema = new mongoose.Schema({
             type: String,
         },
     ],
+
+    reports: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const Comment = mongoose.model("Comment", CommentSchema);

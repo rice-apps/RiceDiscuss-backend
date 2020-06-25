@@ -72,7 +72,6 @@ const PostSchema = new mongoose.Schema({
 
     reports: {
         type: Number,
-        required: false,
         default: 0,
     },
 });
