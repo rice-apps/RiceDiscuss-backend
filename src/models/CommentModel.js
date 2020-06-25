@@ -109,6 +109,27 @@ CommentTC.addResolver({
     },
 });
 
+CommentTC.wrapResolverResolve(
+    "updateById",
+    (next) => async ({ source, args, context, info }) => {
+        return next({
+            source: source,
+            args: {
+                ...args,
+                record: {
+                    ...args.record,
+                    body:
+                        args.record.report > 10
+                            ? "[deleted]"
+                            : args.record.body,
+                },
+            },
+            context: context,
+            info: info,
+        });
+    },
+);
+
 const CommentTCDL = composeDataloader(
     CommentTC,
     DATALOADER_RESOLVERS,
