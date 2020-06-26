@@ -1,6 +1,8 @@
-import { UserTC, PostDTC, CommentTC } from "../models";
+import { UserTC, PostDTC, CommentTC, User } from "../models";
 
-import { checkLoggedIn } from "../utils/middlewares";
+import { checkWithCAS, createToken, isTokenExpired } from "../utils/auth";
+
+import { checkLoggedIn, userCheckUserFilter } from "../utils/middlewares";
 
 import pubsub from "../pubsub";
 
@@ -10,37 +12,66 @@ UserTC.addFields({
 });
 
 UserTC.addRelation("posts", {
-    resolver: PostDTC.getResolver("findManyByCreator"),
+    resolver: () => PostDTC.getResolver("findManyByCreator"),
 
     prepareArgs: {
         creator: (source) => source.netID,
     },
 
     projection: {
-        posts: 1,
+        netID: 1,
     },
 });
 
 UserTC.addRelation("comments", {
-    resolver: CommentTC.getResolver("findManyByCreator"),
+    resolver: () => CommentTC.getResolver("findManyByCreator"),
 
     prepareArgs: {
         creator: (source) => source.netID,
     },
 
     projection: {
-        comments: 1,
+        netID: 1,
+    },
+});
+
+UserTC.addResolver({
+    name: "authenticate",
+    type: UserTC,
+    args: { ticket: `String!` },
+    resolve: async ({ args }) => {
+        const res = await checkWithCAS(args.ticket);
+
+        if (res.success) {
+            let user;
+            const isNewUser = !(await User.exists({ netID: res.netID }));
+
+            if (isNewUser) {
+                user = await User.create({
+                    netID: res.netID,
+                    username: res.netID,
+                });
+
+                user.token = createToken(user);
+
+                await user.save();
+            } else {
+                user = await User.findOne({ netID: res.netID });
+
+                if (isTokenExpired(user)) {
+                    user.token = createToken(user);
+
+                    await user.save();
+                }
+            }
+
+            return user;
+        }
     },
 });
 
 const UserQuery = {
-    userById: UserTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
-
     userOne: UserTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
-
-    userMany: UserTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
-
-    userCount: UserTC.getResolver("count").withMiddlewares([checkLoggedIn]),
 
     userPagination: UserTC.getResolver("pagination").withMiddlewares([
         checkLoggedIn,
@@ -48,61 +79,14 @@ const UserQuery = {
 };
 
 const UserMutation = {
-    userCreateOne: UserTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("profileCreated", {
-                profileCreated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    userUpdateById: UserTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("profileUpdated", {
-                profileUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
+    userAuthentication: UserTC.getResolver("authenticate"),
     userUpdateOne: UserTC.getResolver("updateOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckUserFilter])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("profileUpdated", {
                 profileUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    userUpdateMany: UserTC.getResolver("updateMany")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("profileUpdated", {
-                profileUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    userRemoveById: UserTC.getResolver("removeById")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("profileRemoved", {
-                profileRemoved: payload.record,
             });
 
             return payload;

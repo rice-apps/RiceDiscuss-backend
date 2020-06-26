@@ -1,4 +1,5 @@
 import "dotenv/config";
+import sanitizeHtml from "sanitize-html";
 
 const CLIENT_TOKEN_SECRET = process.env.CLIENT_TOKEN_SECRET;
 const TOKEN_EXPIRE_TIME = parseInt(process.env.TOKEN_EXPIRE_TIME);
@@ -7,9 +8,9 @@ const SERVICE_URL = process.env.SERVICE_URL;
 const DEV_PORT = parseInt(process.env.DEV_PORT);
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS.split(",");
 const CAS_VALIDATE_URL = process.env.CAS_VALIDATE_URL;
-const COLLEGES = process.env.COLLEGES.split(",");
-const MAJORS = process.env.MAJORS.split(",");
-const MINORS = process.env.MINORS.split(",");
+const COLLEGES = process.env.COLLEGES.split(";");
+const MAJORS = process.env.MAJORS.split(";");
+const MINORS = process.env.MINORS.split(";");
 
 const PAGINATION_OPTIONS = {
     paginationResolverName: "pagination", // Default
@@ -26,20 +27,23 @@ const DATALOADER_OPTIONS = {
 
 const DATALOADER_RESOLVERS = [
     "findById",
-    "findByIds",
     "findOne",
-    "findMany",
     "count",
     "pagination",
     "createOne",
-    "createMany",
     "updateById",
     "updateOne",
-    "updateMany",
     "removeById",
     "removeOne",
-    "removeMany",
 ];
+
+const CHECK_HTML_CONFIG = {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+    allowedAttributes: {
+        a: ["href"],
+        img: ["src"],
+    },
+};
 
 export {
     CLIENT_TOKEN_SECRET,
@@ -55,4 +59,5 @@ export {
     PAGINATION_OPTIONS,
     DATALOADER_OPTIONS,
     DATALOADER_RESOLVERS,
+    CHECK_HTML_CONFIG,
 };

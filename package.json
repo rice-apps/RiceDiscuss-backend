@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint ./src --fix",
-    "start": "nodemon --exec babel-node src/index.js",
+    "start": "NODE_NO_WARNINGS=1 nodemon --exec babel-node src/index.js",
     "test": "jest -i --verbose --coverage --runInBand",
     "dboff": "killall mongod",
     "watch": "nodemon src/index.js",
@@ -44,7 +44,6 @@
     "apollo-server": "^2.14.2",
     "apollo-server-express": "^2.14.2",
     "bent": "^7.3.1",
-    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dataloader": "^2.0.0",
     "dotenv": "^8.2.0",
@@ -57,6 +56,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.5",
     "mongoose": "^5.9.5",
+    "sanitize-html": "^1.27.0",
     "xml2js": "^0.4.23"
   }
 }

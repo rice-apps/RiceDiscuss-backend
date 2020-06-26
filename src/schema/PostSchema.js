@@ -6,9 +6,15 @@ import {
     NoticeTC,
     JobTC,
     UserTC,
+    Post,
 } from "../models";
 
-import { checkLoggedIn } from "../utils/middlewares";
+import {
+    checkLoggedIn,
+    userCheckPost,
+    userCheckCreate,
+    checkHTML,
+} from "../utils/middlewares";
 
 import pubsub from "../pubsub";
 
@@ -17,14 +23,14 @@ PostDTC.addFields({
 });
 
 PostDTC.addRelation("comments", {
-    resolver: CommentTC.getResolver("findManyByPostID"),
+    resolver: () => CommentTC.getResolver("findManyByPostID"),
 
     prepareArgs: {
-        post_id: (source) => source._id,
+        post: (source) => source._id,
     },
 
     projection: {
-        comments: 1,
+        _id: 1,
     },
 });
 
@@ -45,12 +51,110 @@ PostDTC.addRelation("creator", {
     },
 });
 
+PostDTC.addRelation("upvotes", {
+    resolver: () => UserTC.getResolver("findMany"),
+
+    prepareArgs: {
+        filter: (source) => {
+            return {
+                _operators: {
+                    netID: {
+                        in: source.upvotes,
+                    },
+                },
+            };
+        },
+    },
+
+    projection: {
+        upvotes: 1,
+    },
+});
+
+PostDTC.addRelation("downvotes", {
+    resolver: () => UserTC.getResolver("findMany"),
+
+    prepareArgs: {
+        filter: (source) => {
+            return {
+                _operators: {
+                    netID: {
+                        in: source.downvotes,
+                    },
+                },
+            };
+        },
+    },
+
+    projection: {
+        downvotes: 1,
+    },
+});
+
+PostDTC.addResolver({
+    name: "upvotePost",
+    type: PostDTC,
+    args: { _id: `ID!`, netID: `String!` },
+    resolve: async ({ args, context }) => {
+        if (args.netID != context.netID) {
+            throw new Error("cannot upvote as someone else");
+        }
+
+        const post = await Post.findById(args._id);
+
+        if (post.upvotes.includes(args.netID)) {
+            post.upvotes = post.upvotes.filter(
+                (upvoter) => upvoter != args.netID,
+            );
+        } else if (post.downvotes.includes(args.netID)) {
+            post.downvotes = post.downvotes.filter(
+                (downvoter) => downvoter != args.netID,
+            );
+            post.upvotes.push(args.netID);
+        } else {
+            post.upvotes.push(args.netID);
+        }
+
+        await post.save();
+
+        return post;
+    },
+});
+
+PostDTC.addResolver({
+    name: "downvotePost",
+    type: PostDTC,
+    args: { _id: `ID!`, netID: `String!` },
+    resolve: async ({ args, context }) => {
+        if (args.netID != context.netID) {
+            throw new Error("cannot downvote as someone else");
+        }
+
+        const post = await Post.findById(args._id);
+
+        if (post.downvotes.includes(args.netID)) {
+            post.downvotes = post.downvotes.filter(
+                (downvoter) => downvoter != args.netID,
+            );
+        } else if (post.upvotes.includes(args.netID)) {
+            post.upvotes = post.upvotes.filter(
+                (upvoter) => upvoter != args.netID,
+            );
+            post.downvotes.push(args.netID);
+        } else {
+            post.downvotes.push(args.netID);
+        }
+
+        await post.save();
+
+        return post;
+    },
+});
+
 const PostQuery = {
     postById: PostDTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
 
     postOne: PostDTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
-
-    postMany: PostDTC.getResolver("findMany").withMiddlewares([checkLoggedIn]),
 
     postCount: PostDTC.getResolver("count").withMiddlewares([checkLoggedIn]),
 
@@ -61,7 +165,7 @@ const PostQuery = {
 
 const PostMutation = {
     discussionCreateOne: DiscussionTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -73,7 +177,7 @@ const PostMutation = {
         }),
 
     eventCreateOne: EventTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -85,7 +189,7 @@ const PostMutation = {
         }),
 
     noticeCreateOne: NoticeTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
             await pubsub.publish("noticeCreated", {
@@ -96,7 +200,7 @@ const PostMutation = {
         }),
 
     jobCreateOne: JobTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -106,7 +210,7 @@ const PostMutation = {
         }),
 
     discussionUpdateById: DiscussionTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -118,7 +222,7 @@ const PostMutation = {
         }),
 
     eventUpdateById: EventTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -130,7 +234,7 @@ const PostMutation = {
         }),
 
     noticeUpdateById: NoticeTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -142,7 +246,7 @@ const PostMutation = {
         }),
 
     jobUpdateById: JobTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
@@ -153,80 +257,36 @@ const PostMutation = {
             return payload;
         }),
 
-    discussionUpdateOne: DiscussionTC.getResolver("updateOne")
+    upvotePostById: PostDTC.getResolver("upvotePost")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("discussionUpdated", {
-                discussionUpdated: payload.record,
+            await pubsub.publish("postUpvoted", {
+                postUpvoted: payload,
             });
 
             return payload;
         }),
 
-    eventUpdateOne: EventTC.getResolver("updateOne")
+    downvotePostById: PostDTC.getResolver("downvotePost")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("eventUpdated", {
-                eventUpdated: payload.record,
+            await pubsub.publish("postDownvoted", {
+                postDownvoted: payload,
             });
-
-            return payload;
-        }),
-
-    noticeUpdateOne: NoticeTC.getResolver("updateOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("noticeUpdated", {
-                noticeUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
-    jobUpdateOne: JobTC.getResolver("updateOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("jobUpdated", { jobUpdated: payload.record });
 
             return payload;
         }),
 
     postRemoveById: PostDTC.getResolver("removeById")
-        .withMiddlewares([checkLoggedIn])
+        .withMiddlewares([checkLoggedIn, userCheckPost])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
             await pubsub.publish("postRemoved", {
-                postRemoved: payload.record,
-            });
-
-            return payload;
-        }),
-
-    postRemoveOne: PostDTC.getResolver("removeOne")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            pubsub.publish("postRemoved", { postRemoved: payload.record });
-
-            return payload;
-        }),
-
-    postRemoveMany: PostDTC.getResolver("removeMany")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            pubsub.publish("postRemoved", {
                 postRemoved: payload.record,
             });
 
@@ -277,6 +337,16 @@ const PostSubscription = {
     jobCreated: {
         type: JobTC,
         subscribe: () => pubsub.asyncIterator("jobCreated"),
+    },
+
+    postUpvoted: {
+        type: PostDTC,
+        subscribe: () => pubsub.asyncIterator("postUpvoted"),
+    },
+
+    postDownvoted: {
+        type: PostDTC,
+        subscribe: () => pubsub.asyncIterator("postDownvoted"),
     },
 
     postRemoved: {
