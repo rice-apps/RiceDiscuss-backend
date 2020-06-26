@@ -168,6 +168,27 @@ PostDTC.addResolver({
     },
 });
 
+PostDTC.wrapResolverResolve(
+    "updateById",
+    (next) => async ({ source, args, context, info }) => {
+        return next({
+            source: source,
+            args: {
+                ...args,
+                record: {
+                    ...args.record,
+                    body:
+                        args.record.report > 10
+                            ? "[deleted]"
+                            : args.record.body,
+                },
+            },
+            context: context,
+            info: info,
+        });
+    },
+);
+
 const PostDTCDL = composeDataloader(
     PostDTC,
     [...DATALOADER_RESOLVERS, ...["findManyByCreator"]],

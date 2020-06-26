@@ -26,7 +26,9 @@ const server = new ApolloServer({
                     netID: decoded.netID,
                 };
             } catch (err) {
-                throw new Error("User authentication failed");
+                return {
+                    netID: null,
+                };
             }
         }
     },
