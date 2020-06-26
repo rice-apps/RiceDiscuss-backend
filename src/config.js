@@ -12,13 +12,6 @@ const COLLEGES = process.env.COLLEGES.split(";");
 const MAJORS = process.env.MAJORS.split(";");
 const MINORS = process.env.MINORS.split(";");
 
-const PAGINATION_OPTIONS = {
-    paginationResolverName: "pagination", // Default
-    findResolverName: "findMany",
-    countResolverName: "count",
-    perPage: 20, // Default
-};
-
 const DATALOADER_OPTIONS = {
     cacheExpiration: 3000,
     removeProjection: true,
