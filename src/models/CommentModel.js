@@ -3,11 +3,7 @@ import { composeWithMongoose } from "graphql-compose-mongoose";
 
 import composeDataloader from "../utils/dataloader";
 
-import {
-    PAGINATION_OPTIONS,
-    DATALOADER_OPTIONS,
-    DATALOADER_RESOLVERS,
-} from "../config";
+import { DATALOADER_OPTIONS, DATALOADER_RESOLVERS } from "../config";
 
 const CommentSchema = new mongoose.Schema({
     creator: {
@@ -65,7 +61,7 @@ const CommentSchema = new mongoose.Schema({
 
 const Comment = mongoose.model("Comment", CommentSchema);
 
-const CommentTC = composeWithMongoose(Comment, PAGINATION_OPTIONS);
+const CommentTC = composeWithMongoose(Comment);
 
 CommentTC.addResolver({
     name: "findManyByParentID",
@@ -111,7 +107,7 @@ CommentTC.addResolver({
 
 CommentTC.wrapResolverResolve(
     "updateById",
-    (next) => async ({ source, args, context, info }) => {
+    (next) => async ({ source, args, context, info, projection }) => {
         return next({
             source: source,
             args: {
@@ -126,6 +122,7 @@ CommentTC.wrapResolverResolve(
             },
             context: context,
             info: info,
+            projection: projection,
         });
     },
 );

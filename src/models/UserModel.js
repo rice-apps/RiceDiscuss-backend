@@ -5,11 +5,7 @@ import composeDataloader from "../utils/dataloader";
 
 import { COLLEGES, MAJORS, MINORS } from "../config";
 
-import {
-    PAGINATION_OPTIONS,
-    DATALOADER_OPTIONS,
-    DATALOADER_RESOLVERS,
-} from "../config";
+import { DATALOADER_OPTIONS, DATALOADER_RESOLVERS } from "../config";
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -73,7 +69,7 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", UserSchema);
 
-const UserTC = composeWithMongoose(User, PAGINATION_OPTIONS);
+const UserTC = composeWithMongoose(User);
 
 UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
     const resPromise = next(rp);

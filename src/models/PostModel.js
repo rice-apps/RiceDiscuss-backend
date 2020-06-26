@@ -3,11 +3,7 @@ import { composeWithMongooseDiscriminators } from "graphql-compose-mongoose";
 
 import composeDataloader from "../utils/dataloader";
 
-import {
-    PAGINATION_OPTIONS,
-    DATALOADER_OPTIONS,
-    DATALOADER_RESOLVERS,
-} from "../config";
+import { DATALOADER_OPTIONS, DATALOADER_RESOLVERS } from "../config";
 
 // Create discriminator key
 const DKey = "kind";
@@ -147,12 +143,12 @@ const Job = Post.discriminator(enumPostType.Job, JobSchema);
 // TODO: add base options (https://graphql-compose.github.io/docs/plugins/plugin-mongoose.html#working-with-mongoose-collection-level-discriminators)
 // for Discriminator models and possible for base model
 
-const PostDTC = composeWithMongooseDiscriminators(Post, PAGINATION_OPTIONS);
+const PostDTC = composeWithMongooseDiscriminators(Post);
 
-const DiscussionTC = PostDTC.discriminator(Discussion, PAGINATION_OPTIONS);
-const NoticeTC = PostDTC.discriminator(Notice, PAGINATION_OPTIONS);
-const EventTC = PostDTC.discriminator(Event, PAGINATION_OPTIONS);
-const JobTC = PostDTC.discriminator(Job, PAGINATION_OPTIONS);
+const DiscussionTC = PostDTC.discriminator(Discussion);
+const NoticeTC = PostDTC.discriminator(Notice);
+const EventTC = PostDTC.discriminator(Event);
+const JobTC = PostDTC.discriminator(Job);
 
 PostDTC.addResolver({
     name: "findManyByCreator",
@@ -170,7 +166,7 @@ PostDTC.addResolver({
 
 PostDTC.wrapResolverResolve(
     "updateById",
-    (next) => async ({ source, args, context, info }) => {
+    (next) => async ({ source, args, context, info, projection }) => {
         return next({
             source: source,
             args: {
@@ -185,6 +181,7 @@ PostDTC.wrapResolverResolve(
             },
             context: context,
             info: info,
+            projection: projection,
         });
     },
 );
