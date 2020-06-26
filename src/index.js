@@ -28,7 +28,7 @@ const server = new ApolloServer({
             } catch (err) {
                 return {
                     netID: null,
-                }
+                };
             }
         }
     },
