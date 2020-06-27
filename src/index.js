@@ -3,12 +3,27 @@ import { ApolloServer } from "apollo-server-express";
 import http from "http";
 import jwt from "jsonwebtoken";
 import cors from "cors";
+import formidable from "formidable";
+import S3 from "aws-sdk/clients/s3";
 
 import Schema from "./schema";
 
 import "./db";
 
-import { CLIENT_TOKEN_SECRET, DEV_PORT, ALLOWED_ORIGINS } from "./config";
+import {
+    CLIENT_TOKEN_SECRET,
+    DEV_PORT,
+    ALLOWED_ORIGINS,
+    AWS_IDENTITY,
+} from "./config";
+
+const s3 = new S3({
+    apiVersion: "2006-03-01",
+    region: "us-west-2",
+    credentials: {
+        IdentityPoolId: AWS_IDENTITY,
+    }
+});
 
 const server = new ApolloServer({
     schema: Schema,
@@ -68,6 +83,34 @@ app.use(
         credentials: true,
     }),
 );
+
+app.use("/images", function (req, res) {
+    const form = formidable({
+        maxFileSize: 50 * 1024 * 1024,
+        multiples: true,
+    });
+
+    form.parse(req, (err, fields, files) => {
+        if (err) {
+            throw new Error("Files parsing failed")
+        }
+
+        const Bucket = new Date().getTime().toString() + Math.random();
+
+        s3.createBucket({
+            Bucket: Bucket,
+            ACL : 'public-read',
+        }, (err, data) => {
+            if (err) {
+                throw new Error("Bucket creation failed!");
+            }
+
+            s3.putObject({
+                Bucket: Bucket,
+            })
+        })
+    });
+});
 
 const httpServer = http.createServer(app);
 

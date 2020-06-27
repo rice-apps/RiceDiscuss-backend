@@ -11,6 +11,7 @@ const CAS_VALIDATE_URL = process.env.CAS_VALIDATE_URL;
 const COLLEGES = process.env.COLLEGES.split(";");
 const MAJORS = process.env.MAJORS.split(";");
 const MINORS = process.env.MINORS.split(";");
+const AWS_IDENTITY = process.env.AWS_IDENTITY;
 
 const DATALOADER_OPTIONS = {
     cacheExpiration: 3000,
@@ -49,8 +50,8 @@ export {
     COLLEGES,
     MAJORS,
     MINORS,
-    PAGINATION_OPTIONS,
     DATALOADER_OPTIONS,
     DATALOADER_RESOLVERS,
     CHECK_HTML_CONFIG,
+    AWS_IDENTITY,
 };
