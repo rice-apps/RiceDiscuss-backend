@@ -50,19 +50,19 @@ UserTC.addResolver({
                 user = await User.create({
                     netID: res.netID,
                     username: res.netID,
+                }).then((doc) => {
+                    doc.token = createToken(doc);
+
+                    return doc.save();
                 });
-
-                user.token = createToken(user);
-
-                await user.save();
             } else {
-                user = await User.findOne({ netID: res.netID });
+                user = await User.findOne({ netID: res.netID }).then((doc) => {
+                    if (isTokenExpired(doc)) {
+                        doc.token = createToken(doc);
+                    }
 
-                if (isTokenExpired(user)) {
-                    user.token = createToken(user);
-
-                    await user.save();
-                }
+                    return doc.save();
+                });
             }
 
             return user;
