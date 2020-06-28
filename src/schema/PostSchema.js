@@ -262,8 +262,8 @@ const PostMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("postUpvoted", {
-                postUpvoted: payload,
+            await pubsub.publish("postVoteChanged", {
+                postVoteChanged: payload,
             });
 
             return payload;
@@ -274,8 +274,8 @@ const PostMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("postDownvoted", {
-                postDownvoted: payload,
+            await pubsub.publish("postVoteChanged", {
+                postVoteChanged: payload,
             });
 
             return payload;
@@ -339,14 +339,9 @@ const PostSubscription = {
         subscribe: () => pubsub.asyncIterator("jobCreated"),
     },
 
-    postUpvoted: {
+    postVoteChanged: {
         type: PostDTC,
-        subscribe: () => pubsub.asyncIterator("postUpvoted"),
-    },
-
-    postDownvoted: {
-        type: PostDTC,
-        subscribe: () => pubsub.asyncIterator("postDownvoted"),
+        subscribe: () => pubsub.asyncIterator("postVoteChanged"),
     },
 
     postRemoved: {
