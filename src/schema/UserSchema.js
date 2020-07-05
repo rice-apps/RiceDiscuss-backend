@@ -7,7 +7,7 @@ import { checkLoggedIn, userCheckUserFilter } from "../utils/middlewares";
 import pubsub from "../pubsub";
 
 UserTC.addFields({
-    posts: [PostDTC],
+    posts: [PostDTC.getDInterface()],
     comments: [CommentTC],
 });
 

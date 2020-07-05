@@ -4,6 +4,7 @@ import { MONGODB_CONNECTION_URL } from "./config";
 mongoose.connect(MONGODB_CONNECTION_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
 });
 
 mongoose.connection.on("connected", () => {

@@ -157,10 +157,12 @@ PostDTC.addResolver({
         creator: `String`,
     },
 
-    type: [PostDTC],
+    type: [PostDTC.getDInterface()],
 
     resolve: async ({ args }) => {
-        return Post.find({ creator: args.creator });
+        return Post.find({ creator: args.creator }).catch((err) =>
+            console.log(err),
+        );
     },
 });
 

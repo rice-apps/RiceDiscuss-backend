@@ -73,7 +73,9 @@ CommentTC.addResolver({
     type: [CommentTC],
 
     resolve: async ({ args }) => {
-        return Comment.find({ parent: args.parent });
+        return Comment.find({ parent: args.parent }).catch((err) =>
+            console.log(err),
+        );
     },
 });
 
@@ -87,7 +89,9 @@ CommentTC.addResolver({
     type: [CommentTC],
 
     resolve: async ({ args }) => {
-        return Comment.find({ post: args.post });
+        return Comment.find({ post: args.post }).catch((err) =>
+            console.log(err),
+        );
     },
 });
 
@@ -101,7 +105,9 @@ CommentTC.addResolver({
     type: [CommentTC],
 
     resolve: async ({ args }) => {
-        return Comment.find({ creator: args.creator });
+        return Comment.find({ creator: args.creator }).catch((err) =>
+            console.log(err),
+        );
     },
 });
 

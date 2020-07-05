@@ -151,6 +151,46 @@ PostDTC.addResolver({
     },
 });
 
+const postCreatedSub = (next) => async (rp) => {
+    const payload = await next(rp);
+
+    await pubsub.publish("postCreated", {
+        postCreated: payload.record,
+    });
+
+    return payload;
+};
+
+const postUpdatedSub = (next) => async (rp) => {
+    const payload = await next(rp);
+
+    await pubsub.publish("postUpdated", {
+        postUpdated: payload.record,
+    });
+
+    return payload;
+};
+
+const postRemovedSub = (next) => async (rp) => {
+    const payload = await next(rp);
+
+    await pubsub.publish("postRemoved", {
+        postRemoved: payload.record,
+    });
+
+    return payload;
+};
+
+const postVoteChangedSub = (next) => async (rp) => {
+    const payload = await next(rp);
+
+    await pubsub.publish("postVoteChanged", {
+        postVoteChanged: payload.record,
+    });
+
+    return payload;
+};
+
 const PostQuery = {
     postById: PostDTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
 
@@ -164,188 +204,72 @@ const PostQuery = {
 };
 
 const PostMutation = {
+    postCreateOne: PostDTC.getResolver("createOne"),
     discussionCreateOne: DiscussionTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("discussionCreated", {
-                discussionCreated: payload.record,
-            });
-
-            return payload;
-        }),
+        .wrapResolve(postCreatedSub),
 
     eventCreateOne: EventTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("eventCreated", {
-                eventCreated: payload.record,
-            });
-
-            return payload;
-        }),
+        .wrapResolve(postCreatedSub),
 
     noticeCreateOne: NoticeTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-            await pubsub.publish("noticeCreated", {
-                noticeCreated: payload.record,
-            });
-
-            return payload;
-        }),
+        .wrapResolve(postCreatedSub),
 
     jobCreateOne: JobTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("jobCreated", { jobCreated: payload.record });
-
-            return payload;
-        }),
+        .wrapResolve(postCreatedSub),
 
     discussionUpdateById: DiscussionTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("discussionUpdated", {
-                discussionUpdated: payload.record,
-            });
-
-            return payload;
-        }),
+        .wrapResolve(postUpdatedSub),
 
     eventUpdateById: EventTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("eventUpdated", {
-                eventUpdated: payload.record,
-            });
-
-            return payload;
-        }),
+        .wrapResolve(postUpdatedSub),
 
     noticeUpdateById: NoticeTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("noticeUpdated", {
-                noticeUpdated: payload.record,
-            });
-
-            return payload;
-        }),
+        .wrapResolve(postUpdatedSub),
 
     jobUpdateById: JobTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("jobUpdated", {
-                jobUpdated: payload.record,
-            });
-
-            return payload;
-        }),
+        .wrapResolve(postUpdatedSub),
 
     upvotePostById: PostDTC.getResolver("upvotePost")
         .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("postVoteChanged", {
-                postVoteChanged: payload,
-            });
-
-            return payload;
-        }),
+        .wrapResolve(postVoteChangedSub),
 
     downvotePostById: PostDTC.getResolver("downvotePost")
         .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("postVoteChanged", {
-                postVoteChanged: payload,
-            });
-
-            return payload;
-        }),
+        .wrapResolve(postVoteChangedSub),
 
     postRemoveById: PostDTC.getResolver("removeById")
         .withMiddlewares([checkLoggedIn, userCheckPost])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            await pubsub.publish("postRemoved", {
-                postRemoved: payload.record,
-            });
-
-            return payload;
-        }),
+        .wrapResolve(postRemovedSub),
 };
 
 const PostSubscription = {
-    discussionUpdated: {
-        type: DiscussionTC,
+    postCreated: {
+        type: PostDTC.getDInterface(),
 
-        subscribe: () => pubsub.asyncIterator("discussionUpdated"),
+        subscribe: () => pubsub.asyncIterator("postCreated"),
     },
 
-    noticeUpdated: {
-        type: NoticeTC,
+    postUpdated: {
+        type: PostDTC.getDInterface(),
 
-        subscribe: () => pubsub.asyncIterator("noticeUpdated"),
-    },
-
-    eventUpdated: {
-        type: EventTC,
-        subscribe: () => pubsub.asyncIterator("eventUpdated"),
-    },
-
-    jobUpdated: {
-        type: JobTC,
-        subscribe: () => pubsub.asyncIterator("jobUpdated"),
-    },
-
-    discussionCreated: {
-        type: DiscussionTC,
-
-        subscribe: () => pubsub.asyncIterator("discussionCreated"),
-    },
-
-    noticeCreated: {
-        type: NoticeTC,
-
-        subscribe: () => pubsub.asyncIterator("noticeCreated"),
-    },
-
-    eventCreated: {
-        type: EventTC,
-        subscribe: () => pubsub.asyncIterator("eventCreated"),
-    },
-
-    jobCreated: {
-        type: JobTC,
-        subscribe: () => pubsub.asyncIterator("jobCreated"),
+        subscribe: () => pubsub.asyncIterator("postUpdated"),
     },
 
     postVoteChanged: {
-        type: PostDTC,
+        type: PostDTC.getDInterface(),
         subscribe: () => pubsub.asyncIterator("postVoteChanged"),
     },
 
     postRemoved: {
-        type: PostDTC,
+        type: PostDTC.getDInterface(),
         subscribe: () => pubsub.asyncIterator("postRemoved"),
     },
 };
