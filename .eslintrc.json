@@ -3,7 +3,7 @@
         "browser": false,
         "es6": true
     },
-    "extends": ["google", "plugin:prettier/recommended"],
+    "extends": ["google", "prettier", "plugin:prettier/recommended"],
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly"
