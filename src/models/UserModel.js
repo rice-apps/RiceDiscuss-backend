@@ -71,10 +71,11 @@ UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
     const resPromise = next(rp);
 
     resPromise.then((payload) => {
-        if (typeof payload.netID !== "undefined") {
-            if (payload.netID !== rp.context.netID) {
-                payload.token = null;
-            }
+        if (
+            typeof payload.netID !== "undefined" ||
+            payload.netID !== rp.context.netID
+        ) {
+            payload.token = null;
         }
     });
 
@@ -84,10 +85,11 @@ UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
 
     resPromise.then((payload) => {
         for (let i = 0; i < payload.items.length; i++) {
-            if (typeof payload.items[i].netID !== "undefined") {
-                if (payload.items[i].netID !== rp.context.netID) {
-                    payload.items[i].token = null;
-                }
+            if (
+                typeof payload.items[i].netID !== "undefined" ||
+                payload.netID !== rp.context.netID
+            ) {
+                payload.items[i].token = null;
             }
         }
     });
