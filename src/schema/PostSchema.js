@@ -156,46 +156,6 @@ PostDTC.addResolver({
     },
 });
 
-const postCreatedSub = (next) => async (rp) => {
-    const payload = await next(rp);
-
-    await pubsub.publish("postCreated", {
-        postCreated: payload.record,
-    });
-
-    return payload;
-};
-
-const postUpdatedSub = (next) => async (rp) => {
-    const payload = await next(rp);
-
-    await pubsub.publish("postUpdated", {
-        postUpdated: payload.record,
-    });
-
-    return payload;
-};
-
-const postRemovedSub = (next) => async (rp) => {
-    const payload = await next(rp);
-
-    await pubsub.publish("postRemoved", {
-        postRemoved: payload.record,
-    });
-
-    return payload;
-};
-
-const postVoteChangedSub = (next) => async (rp) => {
-    const payload = await next(rp);
-
-    await pubsub.publish("postVoteChanged", {
-        postVoteChanged: payload.record,
-    });
-
-    return payload;
-};
-
 const PostQuery = {
     postById: PostDTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
 
@@ -211,23 +171,63 @@ const PostQuery = {
 const PostMutation = {
     postCreateOne: PostDTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
-        .wrapResolve(postCreatedSub),
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("postCreated", {
+                postCreated: payload.record,
+            });
+
+            return payload;
+        }),
 
     postUpdateById: PostDTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
-        .wrapResolve(postUpdatedSub),
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("postUpdated", {
+                postUpdated: payload.record,
+            });
+
+            return payload;
+        }),
 
     upvotePostById: PostDTC.getResolver("upvotePost")
         .withMiddlewares([checkLoggedIn])
-        .wrapResolve(postVoteChangedSub),
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("postVoteChanged", {
+                postVoteChanged: payload.record,
+            });
+
+            return payload;
+        }),
 
     downvotePostById: PostDTC.getResolver("downvotePost")
         .withMiddlewares([checkLoggedIn])
-        .wrapResolve(postVoteChangedSub),
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("postVoteChanged", {
+                postVoteChanged: payload.record,
+            });
+
+            return payload;
+        }),
 
     postRemoveById: PostDTC.getResolver("removeById")
         .withMiddlewares([checkLoggedIn, userCheckPost])
-        .wrapResolve(postRemovedSub),
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            await pubsub.publish("postRemoved", {
+                postRemoved: payload.record,
+            });
+
+            return payload;
+        }),
 };
 
 const PostSubscription = {
