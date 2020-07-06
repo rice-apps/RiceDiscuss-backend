@@ -12,30 +12,18 @@ const COLLEGES = process.env.COLLEGES.split(";");
 const MAJORS = process.env.MAJORS.split(";");
 const MINORS = process.env.MINORS.split(";");
 
-const DATALOADER_OPTIONS = {
-    cacheExpiration: 3000,
-    removeProjection: true,
-    debug: false,
-};
-
-const DATALOADER_RESOLVERS = [
-    "findById",
-    "findOne",
-    "count",
-    "pagination",
-    "createOne",
-    "updateById",
-    "updateOne",
-    "removeById",
-    "removeOne",
-];
-
 const CHECK_HTML_CONFIG = {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
     allowedAttributes: {
         a: ["href"],
         img: ["src"],
     },
+};
+
+const MONGOOSE_CONFIG = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
 };
 
 export {
@@ -49,7 +37,6 @@ export {
     COLLEGES,
     MAJORS,
     MINORS,
-    DATALOADER_OPTIONS,
-    DATALOADER_RESOLVERS,
     CHECK_HTML_CONFIG,
+    MONGOOSE_CONFIG,
 };

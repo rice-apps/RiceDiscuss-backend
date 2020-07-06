@@ -4,9 +4,8 @@ import {
     checkLoggedIn,
     userCheckComment,
     userCheckCreate,
-} from "../utils/middlewares";
-
-import pubsub from "../pubsub";
+    pubsub,
+} from "../utils";
 
 CommentTC.addFields({
     children: [CommentTC],
@@ -113,7 +112,15 @@ CommentTC.addResolver({
             throw new Error("cannot upvote as someone else");
         }
 
-        const comment = await Comment.findById(args._id);
+        const comment = await Comment.findById(args._id)
+            .then((res) => {
+                return res;
+            })
+            .catch((err) => console.log(err));
+
+        if (comment == null) {
+            throw new Error("trying to upvote nonexistent post");
+        }
 
         if (comment.upvotes.includes(args.netID)) {
             comment.upvotes = comment.upvotes.filter(
@@ -128,7 +135,7 @@ CommentTC.addResolver({
             comment.upvotes.push(args.netID);
         }
 
-        await comment.save();
+        await comment.save().catch((err) => console.log(err));
 
         return comment;
     },
@@ -143,7 +150,15 @@ CommentTC.addResolver({
             throw new Error("cannot downvote as someone else");
         }
 
-        const comment = await Comment.findById(args._id);
+        const comment = await Comment.findById(args._id)
+            .then((res) => {
+                return res;
+            })
+            .catch((err) => console.log(err));
+
+        if (comment == null) {
+            throw new Error("trying to upvote nonexistent post");
+        }
 
         if (comment.downvotes.includes(args.netID)) {
             comment.downvotes = comment.downvotes.filter(
@@ -158,7 +173,7 @@ CommentTC.addResolver({
             comment.downvotes.push(args.netID);
         }
 
-        await comment.save();
+        await comment.save().catch((err) => console.log(err));
 
         return comment;
     },
@@ -209,23 +224,12 @@ const CommentMutation = {
             return payload;
         }),
 
-    commentRemoveById: CommentTC.getResolver("removeById")
-        .withMiddlewares([checkLoggedIn, userCheckComment])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-            await pubsub.publish("commentRemoved", {
-                commentUpdated: payload.record,
-            });
-
-            return payload;
-        }),
-
     upvoteCommentById: CommentTC.getResolver("upvoteComment")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
-            await pubsub.publish("commentUpvoted", {
-                commentUpvoted: payload,
+            await pubsub.publish("commentVoteChanged", {
+                commentVoteChanged: payload,
             });
 
             return payload;
@@ -235,8 +239,19 @@ const CommentMutation = {
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
-            await pubsub.publish("commentDownvoted", {
-                commentDownvoted: payload,
+            await pubsub.publish("commentVoteChanged", {
+                commentVoteChanged: payload,
+            });
+
+            return payload;
+        }),
+
+    commentRemoveById: CommentTC.getResolver("removeById")
+        .withMiddlewares([checkLoggedIn, userCheckComment])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+            await pubsub.publish("commentRemoved", {
+                commentUpdated: payload.record,
             });
 
             return payload;
@@ -254,6 +269,12 @@ const CommentSubscription = {
         type: CommentTC,
 
         subscribe: () => pubsub.asyncIterator("commentUpdated"),
+    },
+
+    commentVoteChanged: {
+        type: CommentTC,
+
+        subscribe: () => pubsub.asyncIterator("commentVotedChanged"),
     },
 
     commentRemoved: {

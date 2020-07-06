@@ -1,11 +1,7 @@
 import mongoose from "mongoose";
 import { composeWithMongoose } from "graphql-compose-mongoose";
 
-import composeDataloader from "../utils/dataloader";
-
 import { COLLEGES, MAJORS, MINORS } from "../config";
-
-import { DATALOADER_OPTIONS, DATALOADER_RESOLVERS } from "../config";
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -75,21 +71,23 @@ UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
     const resPromise = next(rp);
 
     resPromise.then((payload) => {
-        if (payload.netID != rp.context.netID) {
-            payload.token = null;
+        if (typeof payload.netID !== undefined) {
+            if (payload.netID != rp.context.netID) {
+                payload.token = null;
+            }
         }
     });
 
     return resPromise;
-});
-
-UserTC.wrapResolverResolve("pagination", (next) => async (rp) => {
+}).wrapResolverResolve("pagination", (next) => async (rp) => {
     const resPromise = next(rp);
 
     resPromise.then((payload) => {
         for (let i = 0; i < payload.items.length; i++) {
-            if (payload.items[i].netID != rp.context.netID) {
-                payload.items[i].token = null;
+            if (typeof payload.items[i].netID !== undefined) {
+                if (payload.items[i].netID != rp.context.netID) {
+                    payload.items[i].token = null;
+                }
             }
         }
     });
@@ -97,10 +95,4 @@ UserTC.wrapResolverResolve("pagination", (next) => async (rp) => {
     return resPromise;
 });
 
-const UserTCDL = composeDataloader(
-    UserTC,
-    DATALOADER_RESOLVERS,
-    DATALOADER_OPTIONS,
-);
-
-export { User, UserTCDL as UserTC };
+export { User, UserTC };

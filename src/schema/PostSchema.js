@@ -1,22 +1,12 @@
-import {
-    CommentTC,
-    PostDTC,
-    DiscussionTC,
-    EventTC,
-    NoticeTC,
-    JobTC,
-    UserTC,
-    Post,
-} from "../models";
+import { CommentTC, PostDTC, UserTC, Post } from "../models";
 
 import {
     checkLoggedIn,
     userCheckPost,
     userCheckCreate,
     checkHTML,
-} from "../utils/middlewares";
-
-import pubsub from "../pubsub";
+    pubsub,
+} from "../utils";
 
 PostDTC.addFields({
     comments: [CommentTC],
@@ -40,10 +30,9 @@ PostDTC.addRelation("creator", {
     prepareArgs: {
         filter: (source) => {
             return {
-                netID: source.creator,
+                netID: source["creator"],
             };
         },
-        required: true,
     },
 
     projection: {
@@ -93,14 +82,22 @@ PostDTC.addRelation("downvotes", {
 
 PostDTC.addResolver({
     name: "upvotePost",
-    type: PostDTC,
+    type: PostDTC.getDInterface(),
     args: { _id: `ID!`, netID: `String!` },
     resolve: async ({ args, context }) => {
         if (args.netID != context.netID) {
             throw new Error("cannot upvote as someone else");
         }
 
-        const post = await Post.findById(args._id);
+        const post = await Post.findById(args._id)
+            .then((res) => {
+                return res;
+            })
+            .catch((err) => console.log(err));
+
+        if (post == null) {
+            throw new Error("trying to upvote nonexistent post");
+        }
 
         if (post.upvotes.includes(args.netID)) {
             post.upvotes = post.upvotes.filter(
@@ -115,7 +112,7 @@ PostDTC.addResolver({
             post.upvotes.push(args.netID);
         }
 
-        await post.save();
+        await post.save().catch((err) => console.log(err));
 
         return post;
     },
@@ -123,14 +120,22 @@ PostDTC.addResolver({
 
 PostDTC.addResolver({
     name: "downvotePost",
-    type: PostDTC,
+    type: PostDTC.getDInterface(),
     args: { _id: `ID!`, netID: `String!` },
     resolve: async ({ args, context }) => {
         if (args.netID != context.netID) {
             throw new Error("cannot downvote as someone else");
         }
 
-        const post = await Post.findById(args._id);
+        const post = await Post.findById(args._id)
+            .then((res) => {
+                return res;
+            })
+            .catch((err) => console.log(err));
+
+        if (post == null) {
+            throw new Error("trying to upvote nonexistent post");
+        }
 
         if (post.downvotes.includes(args.netID)) {
             post.downvotes = post.downvotes.filter(
@@ -204,36 +209,11 @@ const PostQuery = {
 };
 
 const PostMutation = {
-    postCreateOne: PostDTC.getResolver("createOne"),
-    discussionCreateOne: DiscussionTC.getResolver("createOne")
+    postCreateOne: PostDTC.getResolver("createOne")
         .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
         .wrapResolve(postCreatedSub),
 
-    eventCreateOne: EventTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
-        .wrapResolve(postCreatedSub),
-
-    noticeCreateOne: NoticeTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
-        .wrapResolve(postCreatedSub),
-
-    jobCreateOne: JobTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn, userCheckCreate, checkHTML])
-        .wrapResolve(postCreatedSub),
-
-    discussionUpdateById: DiscussionTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
-        .wrapResolve(postUpdatedSub),
-
-    eventUpdateById: EventTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
-        .wrapResolve(postUpdatedSub),
-
-    noticeUpdateById: NoticeTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
-        .wrapResolve(postUpdatedSub),
-
-    jobUpdateById: JobTC.getResolver("updateById")
+    postUpdateById: PostDTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve(postUpdatedSub),
 
@@ -265,11 +245,13 @@ const PostSubscription = {
 
     postVoteChanged: {
         type: PostDTC.getDInterface(),
+
         subscribe: () => pubsub.asyncIterator("postVoteChanged"),
     },
 
     postRemoved: {
         type: PostDTC.getDInterface(),
+
         subscribe: () => pubsub.asyncIterator("postRemoved"),
     },
 };

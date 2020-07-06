@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
+
 import { composeWithMongoose } from "graphql-compose-mongoose";
-
-import composeDataloader from "../utils/dataloader";
-
-import { DATALOADER_OPTIONS, DATALOADER_RESOLVERS } from "../config";
 
 const CommentSchema = new mongoose.Schema({
     creator: {
@@ -77,66 +74,36 @@ CommentTC.addResolver({
             console.log(err),
         );
     },
-});
+})
+    .addResolver({
+        name: "findManyByPostID",
 
-CommentTC.addResolver({
-    name: "findManyByPostID",
+        args: {
+            post: `ID`,
+        },
 
-    args: {
-        post: `ID`,
-    },
+        type: [CommentTC],
 
-    type: [CommentTC],
+        resolve: async ({ args }) => {
+            return Comment.find({ post: args.post }).catch((err) =>
+                console.log(err),
+            );
+        },
+    })
+    .addResolver({
+        name: "findManyByCreator",
 
-    resolve: async ({ args }) => {
-        return Comment.find({ post: args.post }).catch((err) =>
-            console.log(err),
-        );
-    },
-});
+        args: {
+            creator: `String`,
+        },
 
-CommentTC.addResolver({
-    name: "findManyByCreator",
+        type: [CommentTC],
 
-    args: {
-        creator: `String`,
-    },
+        resolve: async ({ args }) => {
+            return Comment.find({ creator: args.creator }).catch((err) =>
+                console.log(err),
+            );
+        },
+    });
 
-    type: [CommentTC],
-
-    resolve: async ({ args }) => {
-        return Comment.find({ creator: args.creator }).catch((err) =>
-            console.log(err),
-        );
-    },
-});
-
-CommentTC.wrapResolverResolve(
-    "updateById",
-    (next) => async ({ source, args, context, info, projection }) => {
-        return next({
-            source: source,
-            args: {
-                ...args,
-                record: {
-                    ...args.record,
-                    body:
-                        args.record.report > 10
-                            ? "[deleted]"
-                            : args.record.body,
-                },
-            },
-            context: context,
-            info: info,
-            projection: projection,
-        });
-    },
-);
-
-const CommentTCDL = composeDataloader(
-    CommentTC,
-    DATALOADER_RESOLVERS,
-    DATALOADER_OPTIONS,
-);
-
-export { Comment, CommentTCDL as CommentTC };
+export { Comment, CommentTC };

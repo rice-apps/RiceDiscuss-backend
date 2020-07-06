@@ -1,14 +1,11 @@
 import mongoose from "mongoose";
+
 import { composeWithMongooseDiscriminators } from "graphql-compose-mongoose";
 
-import composeDataloader from "../utils/dataloader";
+import { toInputObjectType } from "graphql-compose";
 
-import { DATALOADER_OPTIONS, DATALOADER_RESOLVERS } from "../config";
-
-// Create discriminator key
 const DKey = "kind";
 
-// Create types of posts possible
 const enumPostType = {
     Discussion: "Discussion",
     Event: "Event",
@@ -16,7 +13,6 @@ const enumPostType = {
     Job: "Job",
 };
 
-// Define base Post schema
 const PostSchema = new mongoose.Schema({
     kind: {
         type: String,
@@ -72,7 +68,6 @@ const PostSchema = new mongoose.Schema({
     },
 });
 
-// Schema definitions for enum types
 const DiscussionSchema = new mongoose.Schema();
 
 const NoticeSchema = new mongoose.Schema({
@@ -126,12 +121,10 @@ const JobSchema = new mongoose.Schema({
     },
 });
 
-// Set discriminator key and create the base model
 PostSchema.set("discriminatorKey", DKey);
 
 const Post = mongoose.model("Post", PostSchema);
 
-// Set the discriminator for other subtypes
 const Discussion = Post.discriminator(
     enumPostType.Discussion,
     DiscussionSchema,
@@ -140,15 +133,61 @@ const Notice = Post.discriminator(enumPostType.Notice, NoticeSchema);
 const Event = Post.discriminator(enumPostType.Event, EventSchema);
 const Job = Post.discriminator(enumPostType.Job, JobSchema);
 
-// TODO: add base options (https://graphql-compose.github.io/docs/plugins/plugin-mongoose.html#working-with-mongoose-collection-level-discriminators)
-// for Discriminator models and possible for base model
-
 const PostDTC = composeWithMongooseDiscriminators(Post);
 
 const DiscussionTC = PostDTC.discriminator(Discussion);
 const NoticeTC = PostDTC.discriminator(Notice);
 const EventTC = PostDTC.discriminator(Event);
 const JobTC = PostDTC.discriminator(Job);
+
+PostDTC.getDInterface()
+    .addTypeResolver(DiscussionTC, (value) => value instanceof Discussion)
+    .addTypeResolver(EventTC, (value) => value instanceof Event)
+    .addTypeResolver(JobTC, (value) => value instanceof Job)
+    .addTypeResolver(NoticeTC, (value) => value instanceof Notice);
+
+PostDTC.getResolver("createOne")
+    .getArgITC("record")
+    .merge(toInputObjectType(DiscussionTC).removeField("kind"))
+    .merge(
+        toInputObjectType(EventTC)
+            .removeField("kind")
+            .makeOptional(["start", "end", "place"]),
+    )
+    .merge(
+        toInputObjectType(JobTC)
+            .removeField("kind")
+            .makeOptional(["start", "end", "place", "isPaid", "isClosed"]),
+    )
+    .merge(
+        toInputObjectType(NoticeTC)
+            .removeField("kind")
+            .makeOptional(["deadline"]),
+    );
+
+PostDTC.getResolver("updateById")
+    .getArgITC("record")
+    .merge(
+        toInputObjectType(DiscussionTC)
+            .removeField("kind")
+            .makeOptional(DiscussionTC.getFieldNames()),
+    )
+    .merge(
+        toInputObjectType(EventTC)
+            .removeField("kind")
+            .makeOptional(EventTC.getFieldNames()),
+    )
+    .merge(
+        toInputObjectType(JobTC)
+            .removeField("kind")
+            .makeOptional(JobTC.getFieldNames()),
+    )
+    .merge(
+        toInputObjectType(NoticeTC)
+            .removeField("kind")
+            .makeOptional(NoticeTC.getFieldNames()),
+    )
+    .makeRequired("_id");
 
 PostDTC.addResolver({
     name: "findManyByCreator",
@@ -166,67 +205,15 @@ PostDTC.addResolver({
     },
 });
 
-PostDTC.wrapResolverResolve(
-    "updateById",
-    (next) => async ({ source, args, context, info, projection }) => {
-        return next({
-            source: source,
-            args: {
-                ...args,
-                record: {
-                    ...args.record,
-                    body:
-                        args.record.report > 10
-                            ? "[deleted]"
-                            : args.record.body,
-                },
-            },
-            context: context,
-            info: info,
-            projection: projection,
-        });
-    },
-);
-
-const PostDTCDL = composeDataloader(
-    PostDTC,
-    [...DATALOADER_RESOLVERS, ...["findManyByCreator"]],
-    DATALOADER_OPTIONS,
-);
-
-const DiscussionTCDL = composeDataloader(
-    DiscussionTC,
-    DATALOADER_RESOLVERS,
-    DATALOADER_OPTIONS,
-);
-
-const NoticeTCDL = composeDataloader(
-    NoticeTC,
-    DATALOADER_RESOLVERS,
-    DATALOADER_OPTIONS,
-);
-
-const EventTCDL = composeDataloader(
-    EventTC,
-    DATALOADER_RESOLVERS,
-    DATALOADER_OPTIONS,
-);
-
-const JobTCDL = composeDataloader(
-    JobTC,
-    DATALOADER_RESOLVERS,
-    DATALOADER_OPTIONS,
-);
-
 export {
     Post,
     Discussion,
     Notice,
     Event,
     Job,
-    PostDTCDL as PostDTC,
-    DiscussionTCDL as DiscussionTC,
-    NoticeTCDL as NoticeTC,
-    EventTCDL as EventTC,
-    JobTCDL as JobTC,
+    PostDTC,
+    DiscussionTC,
+    NoticeTC,
+    EventTC,
+    JobTC,
 };

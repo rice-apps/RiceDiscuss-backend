@@ -1,10 +1,12 @@
 import { UserTC, PostDTC, CommentTC, User } from "../models";
 
-import { checkWithCAS, createToken, isTokenExpired } from "../utils/auth";
-
-import { checkLoggedIn, userCheckUserFilter } from "../utils/middlewares";
-
-import pubsub from "../pubsub";
+import {
+    checkWithCAS,
+    createToken,
+    isTokenExpired,
+    checkLoggedIn,
+    userCheckUserFilter,
+} from "../utils";
 
 UserTC.addFields({
     posts: [PostDTC.getDInterface()],
@@ -44,25 +46,35 @@ UserTC.addResolver({
 
         if (res.success) {
             let user;
-            const isNewUser = !(await User.exists({ netID: res.netID }));
+
+            const isNewUser = !(await User.exists({
+                netID: res.netID,
+            }).catch((err) => console.log(err)));
 
             if (isNewUser) {
                 user = await User.create({
                     netID: res.netID,
                     username: res.netID,
-                }).then((doc) => {
-                    doc.token = createToken(doc);
-
-                    return doc.save();
-                });
-            } else {
-                user = await User.findOne({ netID: res.netID }).then((doc) => {
-                    if (isTokenExpired(doc)) {
+                })
+                    .then((doc) => {
                         doc.token = createToken(doc);
-                    }
 
-                    return doc.save();
-                });
+                        return doc.save();
+                    })
+                    .catch((err) => console.log(err));
+            } else {
+                user = await User.findOne({ netID: res.netID })
+                    .then((doc) => {
+                        if (doc == null) {
+                            throw new Error("user lookup failed!");
+                        }
+                        if (isTokenExpired(doc)) {
+                            doc.token = createToken(doc);
+                        }
+
+                        return doc.save();
+                    })
+                    .catch((err) => console.log(err));
             }
 
             return user;
@@ -80,6 +92,7 @@ const UserQuery = {
 
 const UserMutation = {
     userAuthentication: UserTC.getResolver("authenticate"),
+
     userUpdateOne: UserTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn, userCheckUserFilter])
         .wrapResolve((next) => async (rp) => {

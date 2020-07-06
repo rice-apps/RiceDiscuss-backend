@@ -6,14 +6,14 @@ import cors from "cors";
 
 import Schema from "./schema";
 
-import "./db";
+import "./utils/db";
 
 import { CLIENT_TOKEN_SECRET, DEV_PORT, ALLOWED_ORIGINS } from "./config";
 
 const server = new ApolloServer({
     schema: Schema,
     introspection: true,
-    playground: false,
+    playground: true,
     context: ({ req }) => {
         if (req) {
             try {
