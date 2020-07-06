@@ -33,7 +33,7 @@ const server = new ApolloServer({
         }
     },
     subscriptions: {
-        onConnect: (connectionParams, _websocket, _context) => {
+        onConnect: (connectionParams, websocket, context) => {
             if (connectionParams.authToken) {
                 try {
                     const decoded = jwt.verify(
@@ -41,19 +41,26 @@ const server = new ApolloServer({
                         CLIENT_TOKEN_SECRET,
                     );
 
-                    console.log("Websocket connected");
+                    console.log(
+                        `WebSocket connected from ${context.request.headers.origin} using ${websocket.protocol}`,
+                    );
 
                     return {
                         netID: decoded.netID,
                     };
                 } catch (err) {
-                    throw new Error("WebSocket authentication failed");
+                    websocket.close();
+                    throw new Error(
+                        `WebSocket authentication failed due to ${err}`,
+                    );
                 }
             }
         },
 
-        onDisconnect: (_websocket, _context) => {
-            console.log("WebSocket disconnected");
+        onDisconnect: (websocket, context) => {
+            console.log(
+                `WebSocket disconnected from ${context.request.headers.origin} using ${websocket.protocol}`,
+            );
         },
     },
 });
