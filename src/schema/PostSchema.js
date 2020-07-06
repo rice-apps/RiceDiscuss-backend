@@ -30,7 +30,7 @@ PostDTC.addRelation("creator", {
     prepareArgs: {
         filter: (source) => {
             return {
-                netID: source["creator"],
+                netID: source.creator,
             };
         },
     },
@@ -83,9 +83,9 @@ PostDTC.addRelation("downvotes", {
 PostDTC.addResolver({
     name: "upvotePost",
     type: PostDTC.getDInterface(),
-    args: { _id: `ID!`, netID: `String!` },
+    args: { _id: "ID!", netID: "String!" },
     resolve: async ({ args, context }) => {
-        if (args.netID != context.netID) {
+        if (args.netID !== context.netID) {
             throw new Error("cannot upvote as someone else");
         }
 
@@ -101,11 +101,11 @@ PostDTC.addResolver({
 
         if (post.upvotes.includes(args.netID)) {
             post.upvotes = post.upvotes.filter(
-                (upvoter) => upvoter != args.netID,
+                (upvoter) => upvoter !== args.netID,
             );
         } else if (post.downvotes.includes(args.netID)) {
             post.downvotes = post.downvotes.filter(
-                (downvoter) => downvoter != args.netID,
+                (downvoter) => downvoter !== args.netID,
             );
             post.upvotes.push(args.netID);
         } else {
@@ -121,9 +121,9 @@ PostDTC.addResolver({
 PostDTC.addResolver({
     name: "downvotePost",
     type: PostDTC.getDInterface(),
-    args: { _id: `ID!`, netID: `String!` },
+    args: { _id: "ID!", netID: "String!" },
     resolve: async ({ args, context }) => {
-        if (args.netID != context.netID) {
+        if (args.netID !== context.netID) {
             throw new Error("cannot downvote as someone else");
         }
 
@@ -139,11 +139,11 @@ PostDTC.addResolver({
 
         if (post.downvotes.includes(args.netID)) {
             post.downvotes = post.downvotes.filter(
-                (downvoter) => downvoter != args.netID,
+                (downvoter) => downvoter !== args.netID,
             );
         } else if (post.upvotes.includes(args.netID)) {
             post.upvotes = post.upvotes.filter(
-                (upvoter) => upvoter != args.netID,
+                (upvoter) => upvoter !== args.netID,
             );
             post.downvotes.push(args.netID);
         } else {

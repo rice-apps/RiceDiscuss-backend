@@ -106,9 +106,9 @@ CommentTC.addRelation("children", {
 CommentTC.addResolver({
     name: "upvoteComment",
     type: CommentTC,
-    args: { _id: `ID!`, netID: `String!` },
+    args: { _id: "ID!", netID: "String!" },
     resolve: async ({ args, context }) => {
-        if (args.netID != context.netID) {
+        if (args.netID !== context.netID) {
             throw new Error("cannot upvote as someone else");
         }
 
@@ -124,11 +124,11 @@ CommentTC.addResolver({
 
         if (comment.upvotes.includes(args.netID)) {
             comment.upvotes = comment.upvotes.filter(
-                (upvoter) => upvoter != args.netID,
+                (upvoter) => upvoter !== args.netID,
             );
         } else if (comment.downvotes.includes(args.netID)) {
             comment.downvotes = comment.downvotes.filter(
-                (downvoter) => downvoter != args.netID,
+                (downvoter) => downvoter !== args.netID,
             );
             comment.upvotes.push(args.netID);
         } else {
@@ -144,9 +144,9 @@ CommentTC.addResolver({
 CommentTC.addResolver({
     name: "downvoteComment",
     type: CommentTC,
-    args: { _id: `ID!`, netID: `String!` },
+    args: { _id: "ID!", netID: "String!" },
     resolve: async ({ args, context }) => {
-        if (args.netID != context.netID) {
+        if (args.netID !== context.netID) {
             throw new Error("cannot downvote as someone else");
         }
 
@@ -162,11 +162,11 @@ CommentTC.addResolver({
 
         if (comment.downvotes.includes(args.netID)) {
             comment.downvotes = comment.downvotes.filter(
-                (downvoter) => downvoter != args.netID,
+                (downvoter) => downvoter !== args.netID,
             );
         } else if (comment.upvotes.includes(args.netID)) {
             comment.upvotes = comment.upvotes.filter(
-                (upvoter) => upvoter != args.netID,
+                (upvoter) => upvoter !== args.netID,
             );
             comment.downvotes.push(args.netID);
         } else {

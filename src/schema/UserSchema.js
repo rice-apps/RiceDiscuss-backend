@@ -6,6 +6,7 @@ import {
     isTokenExpired,
     checkLoggedIn,
     userCheckUserFilter,
+    pubsub,
 } from "../utils";
 
 UserTC.addFields({
@@ -40,7 +41,7 @@ UserTC.addRelation("comments", {
 UserTC.addResolver({
     name: "authenticate",
     type: UserTC,
-    args: { ticket: `String!` },
+    args: { ticket: "String!" },
     resolve: async ({ args }) => {
         const res = await checkWithCAS(args.ticket);
 

@@ -12,7 +12,7 @@ async function checkLoggedIn(resolve, source, args, context, info) {
 }
 
 async function userCheckCreate(resolve, source, args, context, info) {
-    if (context.netID == args.record.creator) {
+    if (context.netID === args.record.creator) {
         return await resolve(source, args, context, info);
     }
 
@@ -22,7 +22,7 @@ async function userCheckCreate(resolve, source, args, context, info) {
 async function userCheckComment(resolve, source, args, context, info) {
     const comment = await Comment.findById(args._id);
 
-    if (comment.creator == context.netID) {
+    if (comment.creator === context.netID) {
         return await resolve(source, args, context, info);
     }
 
@@ -32,7 +32,7 @@ async function userCheckComment(resolve, source, args, context, info) {
 async function userCheckPost(resolve, source, args, context, info) {
     const post = await Post.findById(args.record._id);
 
-    if (post.creator == context.netID) {
+    if (post.creator === context.netID) {
         return await resolve(source, args, context, info);
     }
 
@@ -40,7 +40,7 @@ async function userCheckPost(resolve, source, args, context, info) {
 }
 
 async function userCheckUserFilter(resolve, source, args, context, info) {
-    if (args.filter.netID == context.netID) {
+    if (args.filter.netID === context.netID) {
         return await resolve(source, args, context, info);
     }
 
@@ -50,7 +50,7 @@ async function userCheckUserFilter(resolve, source, args, context, info) {
 async function userCheckUserId(resolve, source, args, context, info) {
     const user = await User.findById(args._id);
 
-    if (user.netID == context.netID) {
+    if (user.netID === context.netID) {
         return await resolve(source, args, context, info);
     }
 
