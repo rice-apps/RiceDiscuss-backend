@@ -1,5 +1,5 @@
-import { CommentTC, PostDTC, UserTC, Comment } from "../models";
-
+import log from "loglevel";
+import { Comment, CommentTC, PostDTC, UserTC } from "../models";
 import {
     checkLoggedIn,
     userCheckComment,
@@ -116,7 +116,7 @@ CommentTC.addResolver({
             .then((res) => {
                 return res;
             })
-            .catch((err) => console.log(err));
+            .catch((err) => log.error(err));
 
         if (comment == null) {
             throw new Error("trying to upvote nonexistent post");
@@ -135,7 +135,7 @@ CommentTC.addResolver({
             comment.upvotes.push(args.netID);
         }
 
-        await comment.save().catch((err) => console.log(err));
+        await comment.save().catch((err) => log.error(err));
 
         return comment;
     },
@@ -154,7 +154,7 @@ CommentTC.addResolver({
             .then((res) => {
                 return res;
             })
-            .catch((err) => console.log(err));
+            .catch((err) => log.error(err));
 
         if (comment == null) {
             throw new Error("trying to upvote nonexistent post");
@@ -173,7 +173,7 @@ CommentTC.addResolver({
             comment.downvotes.push(args.netID);
         }
 
-        await comment.save().catch((err) => console.log(err));
+        await comment.save().catch((err) => log.error(err));
 
         return comment;
     },

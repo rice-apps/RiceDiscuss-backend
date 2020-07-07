@@ -3,7 +3,8 @@
         "browser": false,
         "es6": true
     },
-    "extends": ["google", "prettier", "plugin:prettier/recommended"],
+    "extends": ["airbnb-base", "plugin:prettier/recommended"],
+    "plugins": ["prettier"],
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly"
@@ -13,7 +14,7 @@
         "sourceType": "module"
     },
     "rules": {
-        "indent": ["error", 4],
-        "require-jsdoc": ["off"]
+        "no-underscore-dangle": ["off"],
+        "no-param-reassign": ["warn"]
     }
 }

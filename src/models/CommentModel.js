@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
-
 import { composeWithMongoose } from "graphql-compose-mongoose";
+import log from "loglevel";
+import mongoose from "mongoose";
 
 const CommentSchema = new mongoose.Schema({
     creator: {
@@ -71,7 +71,7 @@ CommentTC.addResolver({
 
     resolve: async ({ args }) => {
         return Comment.find({ parent: args.parent }).catch((err) =>
-            console.log(err),
+            log.error(err),
         );
     },
 })
@@ -86,7 +86,7 @@ CommentTC.addResolver({
 
         resolve: async ({ args }) => {
             return Comment.find({ post: args.post }).catch((err) =>
-                console.log(err),
+                log.err(err),
             );
         },
     })
@@ -101,7 +101,7 @@ CommentTC.addResolver({
 
         resolve: async ({ args }) => {
             return Comment.find({ creator: args.creator }).catch((err) =>
-                console.log(err),
+                log.err(err),
             );
         },
     });

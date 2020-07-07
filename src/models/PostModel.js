@@ -1,7 +1,6 @@
-import mongoose from "mongoose";
-
 import { composeWithMongooseDiscriminators } from "graphql-compose-mongoose";
-
+import log from "loglevel";
+import mongoose from "mongoose";
 import { toInputObjectType } from "graphql-compose";
 
 const DKey = "kind";
@@ -200,7 +199,7 @@ PostDTC.addResolver({
 
     resolve: async ({ args }) => {
         return Post.find({ creator: args.creator }).catch((err) =>
-            console.log(err),
+            log.error(err),
         );
     },
 });

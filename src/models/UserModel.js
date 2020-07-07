@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
 import { composeWithMongoose } from "graphql-compose-mongoose";
-
+import log from "loglevel";
+import mongoose from "mongoose";
 import { COLLEGES, MAJORS, MINORS } from "../config";
 
 const UserSchema = new mongoose.Schema({
@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema({
     major: {
         type: [String],
         validate: {
-            validator: function (majors) {
+            validator(majors) {
                 return majors.every((major) => MAJORS.includes(major));
             },
             message: (props) => `${props.value} has a major that's not valid!`,
@@ -49,7 +49,7 @@ const UserSchema = new mongoose.Schema({
     minor: {
         type: [String],
         validate: {
-            validator: function (minors) {
+            validator(minors) {
                 return minors.every((minor) => MINORS.includes(minor));
             },
             message: (props) => `${props.value} has a minor that's not valid!`,
@@ -70,29 +70,33 @@ const UserTC = composeWithMongoose(User);
 UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
     const resPromise = next(rp);
 
-    resPromise.then((payload) => {
-        if (
-            typeof payload.netID !== "undefined" ||
-            payload.netID !== rp.context.netID
-        ) {
-            payload.token = null;
-        }
-    });
+    resPromise
+        .then((payload) => {
+            if (
+                typeof payload.netID === "undefined" ||
+                payload.netID !== rp.context.netID
+            ) {
+                payload.token = null;
+            }
+        })
+        .catch((err) => log.error(err));
 
     return resPromise;
 }).wrapResolverResolve("pagination", (next) => async (rp) => {
     const resPromise = next(rp);
 
-    resPromise.then((payload) => {
-        for (let i = 0; i < payload.items.length; i++) {
-            if (
-                typeof payload.items[i].netID !== "undefined" ||
-                payload.netID !== rp.context.netID
-            ) {
-                payload.items[i].token = null;
+    resPromise
+        .then((payload) => {
+            for (let i = 0; i < payload.items.length; i += 1) {
+                if (
+                    typeof payload.items[i].netID === "undefined" ||
+                    payload.netID !== rp.context.netID
+                ) {
+                    payload.items[i].token = null;
+                }
             }
-        }
-    });
+        })
+        .catch((err) => log.error(err));
 
     return resPromise;
 });

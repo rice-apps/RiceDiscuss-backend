@@ -1,5 +1,5 @@
+import log from "loglevel";
 import { UserTC, PostDTC, CommentTC, User } from "../models";
-
 import {
     checkWithCAS,
     createToken,
@@ -46,40 +46,32 @@ UserTC.addResolver({
         const res = await checkWithCAS(args.ticket);
 
         if (res.success) {
-            let user;
-
             const isNewUser = !(await User.exists({
                 netID: res.netID,
-            }).catch((err) => console.log(err)));
+            }).catch((err) => log.error(err)));
 
-            if (isNewUser) {
-                user = await User.create({
-                    netID: res.netID,
-                    username: res.netID,
-                })
-                    .then((doc) => {
-                        doc.token = createToken(doc);
+            return isNewUser
+                ? User.create({ netID: res.netID, username: res.netID })
+                      .then((doc) => {
+                          doc.token = createToken(doc);
 
-                        return doc.save();
-                    })
-                    .catch((err) => console.log(err));
-            } else {
-                user = await User.findOne({ netID: res.netID })
-                    .then((doc) => {
-                        if (doc == null) {
-                            throw new Error("user lookup failed!");
-                        }
-                        if (isTokenExpired(doc)) {
-                            doc.token = createToken(doc);
-                        }
+                          return doc.save();
+                      })
+                      .catch((err) => new Error(`User creation failed: ${err}`))
+                : User.findOne({ netID: res.netID })
+                      .then((doc) => {
+                          if (isTokenExpired(doc)) {
+                              doc.token = createToken(doc);
+                          }
 
-                        return doc.save();
-                    })
-                    .catch((err) => console.log(err));
-            }
-
-            return user;
+                          return doc.save();
+                      })
+                      .catch(
+                          (err) => new Error(`User creation failed: ${err}`),
+                      );
         }
+
+        return null;
     },
 });
 

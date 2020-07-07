@@ -1,5 +1,5 @@
+import log from "loglevel";
 import { CommentTC, PostDTC, UserTC, Post } from "../models";
-
 import {
     checkLoggedIn,
     userCheckPost,
@@ -93,7 +93,7 @@ PostDTC.addResolver({
             .then((res) => {
                 return res;
             })
-            .catch((err) => console.log(err));
+            .catch((err) => log.error(err));
 
         if (post == null) {
             throw new Error("trying to upvote nonexistent post");
@@ -112,7 +112,7 @@ PostDTC.addResolver({
             post.upvotes.push(args.netID);
         }
 
-        await post.save().catch((err) => console.log(err));
+        await post.save().catch((err) => log.error(err));
 
         return post;
     },
@@ -131,7 +131,7 @@ PostDTC.addResolver({
             .then((res) => {
                 return res;
             })
-            .catch((err) => console.log(err));
+            .catch((err) => log.error(err));
 
         if (post == null) {
             throw new Error("trying to upvote nonexistent post");
@@ -150,7 +150,7 @@ PostDTC.addResolver({
             post.downvotes.push(args.netID);
         }
 
-        await post.save();
+        await post.save().catch((err) => log.error(err));
 
         return post;
     },

@@ -1,14 +1,19 @@
 import "dotenv/config";
+import log from "loglevel";
 import sanitizeHtml from "sanitize-html";
 
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS.split(",");
-const DEV_PORT = parseInt(process.env.DEV_PORT);
-const MONGODB_CONNECTION_URL = process.env.MONGODB_CONNECTION_URL;
+if (process.env.NODE_ENV === "development") {
+    log.setLevel("trace");
+}
 
-const CAS_VALIDATE_URL = process.env.CAS_VALIDATE_URL;
-const CLIENT_TOKEN_SECRET = process.env.CLIENT_TOKEN_SECRET;
-const SERVICE_URL = process.env.SERVICE_URL;
-const TOKEN_EXPIRE_TIME = parseInt(process.env.TOKEN_EXPIRE_TIME);
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS.split(",");
+const DEV_PORT = parseInt(process.env.DEV_PORT, 10);
+const { MONGODB_CONNECTION_URL } = process.env;
+
+const { CAS_VALIDATE_URL } = process.env;
+const { CLIENT_TOKEN_SECRET } = process.env;
+const { SERVICE_URL } = process.env;
+const TOKEN_EXPIRE_TIME = parseInt(process.env.TOKEN_EXPIRE_TIME, 10);
 
 const COLLEGES = process.env.COLLEGES.split(";");
 const MAJORS = process.env.MAJORS.split(";");
