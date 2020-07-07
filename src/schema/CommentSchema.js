@@ -106,7 +106,7 @@ CommentTC.addRelation("children", {
 CommentTC.addResolver({
     name: "upvoteComment",
     type: CommentTC,
-    args: { _id: "ID!", netID: "String!" },
+    args: { _id: `ID`, netID: `String!` },
     resolve: async ({ args, context }) => {
         if (args.netID !== context.netID) {
             throw new Error("cannot upvote as someone else");
