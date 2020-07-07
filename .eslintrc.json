@@ -15,6 +15,6 @@
     },
     "rules": {
         "no-underscore-dangle": ["off"],
-        "no-param-reassign": ["warn"]
+        "no-param-reassign": ["off"]
     }
 }

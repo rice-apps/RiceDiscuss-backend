@@ -140,7 +140,10 @@ const EventTC = PostDTC.discriminator(Event);
 const JobTC = PostDTC.discriminator(Job);
 
 PostDTC.getDInterface()
-    .addTypeResolver(DiscussionTC, (value) => value.kind === enumPostType.Discussion)
+    .addTypeResolver(
+        DiscussionTC,
+        (value) => value.kind === enumPostType.Discussion,
+    )
     .addTypeResolver(EventTC, (value) => value.kind === enumPostType.Event)
     .addTypeResolver(JobTC, (value) => value.kind === enumPostType.Job)
     .addTypeResolver(NoticeTC, (value) => value.kind === enumPostType.Notice);
