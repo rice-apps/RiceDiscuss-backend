@@ -140,10 +140,10 @@ const EventTC = PostDTC.discriminator(Event);
 const JobTC = PostDTC.discriminator(Job);
 
 PostDTC.getDInterface()
-    .addTypeResolver(DiscussionTC, (value) => value instanceof Discussion)
-    .addTypeResolver(EventTC, (value) => value instanceof Event)
-    .addTypeResolver(JobTC, (value) => value instanceof Job)
-    .addTypeResolver(NoticeTC, (value) => value instanceof Notice);
+    .addTypeResolver(DiscussionTC, (value) => value.kind === enumPostType.Discussion)
+    .addTypeResolver(EventTC, (value) => value.kind === enumPostType.Event)
+    .addTypeResolver(JobTC, (value) => value.kind === enumPostType.Job)
+    .addTypeResolver(NoticeTC, (value) => value.kind === enumPostType.Notice);
 
 PostDTC.getResolver("createOne")
     .getArgITC("record")
@@ -192,7 +192,7 @@ PostDTC.addResolver({
     name: "findManyByCreator",
 
     args: {
-        creator: "String",
+        creator: `String`,
     },
 
     type: [PostDTC.getDInterface()],
