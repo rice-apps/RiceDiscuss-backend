@@ -1,15 +1,7 @@
-import mongoose from "mongoose";
 import { composeWithMongoose } from "graphql-compose-mongoose";
-
-import composeDataloader from "../utils/dataloader";
-
+import log from "loglevel";
+import mongoose from "mongoose";
 import { COLLEGES, MAJORS, MINORS } from "../config";
-
-import {
-    PAGINATION_OPTIONS,
-    DATALOADER_OPTIONS,
-    DATALOADER_RESOLVERS,
-} from "../config";
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -46,7 +38,7 @@ const UserSchema = new mongoose.Schema({
     major: {
         type: [String],
         validate: {
-            validator: function (majors) {
+            validator(majors) {
                 return majors.every((major) => MAJORS.includes(major));
             },
             message: (props) => `${props.value} has a major that's not valid!`,
@@ -57,7 +49,7 @@ const UserSchema = new mongoose.Schema({
     minor: {
         type: [String],
         validate: {
-            validator: function (minors) {
+            validator(minors) {
                 return minors.every((minor) => MINORS.includes(minor));
             },
             message: (props) => `${props.value} has a minor that's not valid!`,
@@ -73,38 +65,40 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", UserSchema);
 
-const UserTC = composeWithMongoose(User, PAGINATION_OPTIONS);
+const UserTC = composeWithMongoose(User);
 
 UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
     const resPromise = next(rp);
 
-    resPromise.then((payload) => {
-        if (payload.netID != rp.context.netID) {
-            payload.token = null;
-        }
-    });
+    resPromise
+        .then((payload) => {
+            if (
+                typeof payload.netID === "undefined" ||
+                payload.netID !== rp.context.netID
+            ) {
+                payload.token = null;
+            }
+        })
+        .catch((err) => log.error(err));
 
     return resPromise;
-});
-
-UserTC.wrapResolverResolve("pagination", (next) => async (rp) => {
+}).wrapResolverResolve("pagination", (next) => async (rp) => {
     const resPromise = next(rp);
 
-    resPromise.then((payload) => {
-        for (let i = 0; i < payload.items.length; i++) {
-            if (payload.items[i].netID != rp.context.netID) {
-                payload.items[i].token = null;
+    resPromise
+        .then((payload) => {
+            for (let i = 0; i < payload.items.length; i += 1) {
+                if (
+                    typeof payload.items[i].netID === "undefined" ||
+                    payload.netID !== rp.context.netID
+                ) {
+                    payload.items[i].token = null;
+                }
             }
-        }
-    });
+        })
+        .catch((err) => log.error(err));
 
     return resPromise;
 });
 
-const UserTCDL = composeDataloader(
-    UserTC,
-    DATALOADER_RESOLVERS,
-    DATALOADER_OPTIONS,
-);
-
-export { User, UserTCDL as UserTC };
+export { User, UserTC };

@@ -1,13 +1,16 @@
+import log from "loglevel";
 import { UserTC, PostDTC, CommentTC, User } from "../models";
-
-import { checkWithCAS, createToken, isTokenExpired } from "../utils/auth";
-
-import { checkLoggedIn, userCheckUserFilter } from "../utils/middlewares";
-
-import pubsub from "../pubsub";
+import {
+    checkWithCAS,
+    createToken,
+    isTokenExpired,
+    checkLoggedIn,
+    userCheckUserFilter,
+    pubsub,
+} from "../utils";
 
 UserTC.addFields({
-    posts: [PostDTC],
+    posts: [PostDTC.getDInterface()],
     comments: [CommentTC],
 });
 
@@ -38,35 +41,37 @@ UserTC.addRelation("comments", {
 UserTC.addResolver({
     name: "authenticate",
     type: UserTC,
-    args: { ticket: `String!` },
+    args: { ticket: "String!" },
     resolve: async ({ args }) => {
         const res = await checkWithCAS(args.ticket);
 
         if (res.success) {
-            let user;
-            const isNewUser = !(await User.exists({ netID: res.netID }));
+            const isNewUser = !(await User.exists({
+                netID: res.netID,
+            }).catch((err) => log.error(err)));
 
-            if (isNewUser) {
-                user = await User.create({
-                    netID: res.netID,
-                    username: res.netID,
-                });
+            return isNewUser
+                ? User.create({ netID: res.netID, username: res.netID })
+                      .then((doc) => {
+                          doc.token = createToken(doc);
 
-                user.token = createToken(user);
+                          return doc.save();
+                      })
+                      .catch((err) => new Error(`User creation failed: ${err}`))
+                : User.findOne({ netID: res.netID })
+                      .then((doc) => {
+                          if (isTokenExpired(doc)) {
+                              doc.token = createToken(doc);
+                          }
 
-                await user.save();
-            } else {
-                user = await User.findOne({ netID: res.netID });
-
-                if (isTokenExpired(user)) {
-                    user.token = createToken(user);
-
-                    await user.save();
-                }
-            }
-
-            return user;
+                          return doc.save();
+                      })
+                      .catch(
+                          (err) => new Error(`User creation failed: ${err}`),
+                      );
         }
+
+        return null;
     },
 });
 
@@ -80,6 +85,7 @@ const UserQuery = {
 
 const UserMutation = {
     userAuthentication: UserTC.getResolver("authenticate"),
+
     userUpdateOne: UserTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn, userCheckUserFilter])
         .wrapResolve((next) => async (rp) => {

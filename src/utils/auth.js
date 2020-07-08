@@ -1,5 +1,6 @@
 import bent from "bent";
 import jwt from "jsonwebtoken";
+import log from "loglevel";
 import { Parser, processors } from "xml2js";
 
 import {
@@ -29,15 +30,14 @@ async function checkWithCAS(ticket) {
                     success: true,
                     netID: xml.serviceResponse.authenticationSuccess.user,
                 };
-            } else {
-                return {
-                    success: false,
-                    netID: null,
-                };
             }
+            return {
+                success: false,
+                netID: null,
+            };
         })
         .catch((err) => {
-            console.log(err);
+            log.error(err);
             return {
                 success: false,
                 netID: null,

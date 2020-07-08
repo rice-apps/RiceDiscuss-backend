@@ -1,5 +1,7 @@
 import { SchemaComposer } from "graphql-compose";
 
+import { DiscussionTC, EventTC, JobTC, NoticeTC } from "../models";
+
 import {
     CommentQuery,
     CommentMutation,
@@ -9,6 +11,11 @@ import { PostQuery, PostMutation, PostSubscription } from "./PostSchema";
 import { UserQuery, UserMutation, UserSubscription } from "./UserSchema";
 
 const sc = new SchemaComposer();
+
+sc.addSchemaMustHaveType(DiscussionTC)
+    .addSchemaMustHaveType(EventTC)
+    .addSchemaMustHaveType(JobTC)
+    .addSchemaMustHaveType(NoticeTC);
 
 sc.Query.addFields({
     ...CommentQuery,
