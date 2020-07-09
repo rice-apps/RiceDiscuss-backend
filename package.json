@@ -59,6 +59,5 @@
         "mongoose": "^5.9.5",
         "sanitize-html": "^1.27.0",
         "xml2js": "^0.4.23"
-    },
-    "targets": "> 0.25%, not dead"
+    }
 }
