@@ -8,7 +8,7 @@
         "lint": "eslint --fix .",
         "build": "rm -rf build && babel src -d build",
         "start": "nodemon",
-        "serve": "node build/index.js",
+        "serve": "node --trace-warnings build/index.js",
         "format": "prettier --write ."
     },
     "repository": {
