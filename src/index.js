@@ -21,7 +21,6 @@ const app = express().use(
 const server = new ApolloServer({
     schema: Schema,
     introspection: true,
-    playground: true,
     context: ({ req }) => {
         if (req) {
             try {

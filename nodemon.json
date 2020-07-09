@@ -1,5 +1,5 @@
 {
     "watch": ["src"],
-    "exec": "babel-node src/index.js",
+    "exec": "babel-node --trace-warnings build/index.js",
     "ext": "js"
 }
