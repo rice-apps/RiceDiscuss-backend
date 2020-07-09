@@ -109,7 +109,7 @@ CommentTC.addResolver({
     args: { _id: `ID`, netID: `String!` },
     resolve: async ({ args, context }) => {
         if (args.netID !== context.netID) {
-            throw new Error("cannot upvote as someone else");
+            return new Error("cannot upvote as someone else");
         }
 
         const comment = await Comment.findById(args._id)
@@ -119,7 +119,7 @@ CommentTC.addResolver({
             .catch((err) => log.error(err));
 
         if (comment == null) {
-            throw new Error("trying to upvote nonexistent post");
+            return new Error("trying to upvote nonexistent post");
         }
 
         if (comment.upvotes.includes(args.netID)) {
@@ -147,7 +147,7 @@ CommentTC.addResolver({
     args: { _id: "ID!", netID: "String!" },
     resolve: async ({ args, context }) => {
         if (args.netID !== context.netID) {
-            throw new Error("cannot downvote as someone else");
+            return new Error("cannot downvote as someone else");
         }
 
         const comment = await Comment.findById(args._id)
@@ -157,7 +157,7 @@ CommentTC.addResolver({
             .catch((err) => log.error(err));
 
         if (comment == null) {
-            throw new Error("trying to upvote nonexistent post");
+            return new Error("trying to upvote nonexistent post");
         }
 
         if (comment.downvotes.includes(args.netID)) {

@@ -86,7 +86,7 @@ PostDTC.addResolver({
     args: { _id: "ID!", netID: "String!" },
     resolve: async ({ args, context }) => {
         if (args.netID !== context.netID) {
-            throw new Error("cannot upvote as someone else");
+            return new Error("cannot upvote as someone else");
         }
 
         const post = await Post.findById(args._id)
@@ -96,7 +96,7 @@ PostDTC.addResolver({
             .catch((err) => log.error(err));
 
         if (post == null) {
-            throw new Error("trying to upvote nonexistent post");
+            return new Error("trying to upvote nonexistent post");
         }
 
         if (post.upvotes.includes(args.netID)) {
@@ -124,7 +124,7 @@ PostDTC.addResolver({
     args: { _id: "ID!", netID: "String!" },
     resolve: async ({ args, context }) => {
         if (args.netID !== context.netID) {
-            throw new Error("cannot downvote as someone else");
+            return new Error("cannot downvote as someone else");
         }
 
         const post = await Post.findById(args._id)
@@ -134,7 +134,7 @@ PostDTC.addResolver({
             .catch((err) => log.error(err));
 
         if (post == null) {
-            throw new Error("trying to upvote nonexistent post");
+            return new Error("trying to upvote nonexistent post");
         }
 
         if (post.downvotes.includes(args.netID)) {
