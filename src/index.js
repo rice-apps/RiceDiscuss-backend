@@ -61,7 +61,7 @@ const server = new ApolloServer({
                     };
                 } catch (err) {
                     websocket.close();
-                    throw new Error(
+                    return new Error(
                         `WebSocket authentication failed due to ${err}`,
                     );
                 }
