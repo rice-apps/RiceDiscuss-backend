@@ -6,7 +6,7 @@
     "scripts": {
         "prod": "run-s build serve",
         "lint": "eslint --fix .",
-        "build": "babel src -d build",
+        "build": "rm -rf build && babel src -d build",
         "start": "nodemon",
         "serve": "node build/index.js",
         "format": "prettier --write ."
