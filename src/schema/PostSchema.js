@@ -198,8 +198,8 @@ const PostMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            pubsub.publish("postVoteChanged", {
-                postVoteChanged: payload.record,
+            await pubsub.publish("postVoteChanged", {
+                postVoteChanged: payload,
             });
 
             return payload;
@@ -211,7 +211,7 @@ const PostMutation = {
             const payload = await next(rp);
 
             pubsub.publish("postVoteChanged", {
-                postVoteChanged: payload.record,
+                postVoteChanged: payload,
             });
 
             return payload;
