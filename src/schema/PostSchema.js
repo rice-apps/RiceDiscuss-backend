@@ -174,7 +174,7 @@ const PostMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("postCreated", {
+            pubsub.publish("postCreated", {
                 postCreated: payload.record,
             });
 
@@ -186,7 +186,7 @@ const PostMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("postUpdated", {
+            pubsub.publish("postUpdated", {
                 postUpdated: payload.record,
             });
 
@@ -198,7 +198,7 @@ const PostMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("postVoteChanged", {
+            pubsub.publish("postVoteChanged", {
                 postVoteChanged: payload.record,
             });
 
@@ -210,7 +210,7 @@ const PostMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("postVoteChanged", {
+            pubsub.publish("postVoteChanged", {
                 postVoteChanged: payload.record,
             });
 
@@ -222,7 +222,7 @@ const PostMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("postRemoved", {
+            pubsub.publish("postRemoved", {
                 postRemoved: payload.record,
             });
 

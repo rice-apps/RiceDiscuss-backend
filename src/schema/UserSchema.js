@@ -91,7 +91,7 @@ const UserMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("profileUpdated", {
+            pubsub.publish("profileUpdated", {
                 profileUpdated: payload.record,
             });
 
@@ -103,7 +103,7 @@ const UserMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("profileRemoved", {
+            pubsub.publish("profileRemoved", {
                 profileRemoved: payload.record,
             });
 

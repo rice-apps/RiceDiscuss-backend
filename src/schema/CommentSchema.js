@@ -206,7 +206,7 @@ const CommentMutation = {
         .withMiddlewares([checkLoggedIn, userCheckCreate])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
-            await pubsub.publish("commentCreated", {
+            pubsub.publish("commentCreated", {
                 commentCreated: payload.record,
             });
 
@@ -217,7 +217,7 @@ const CommentMutation = {
         .withMiddlewares([checkLoggedIn, userCheckComment])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
-            await pubsub.publish("commentUpdated", {
+            pubsub.publish("commentUpdated", {
                 commentCreated: payload.record,
             });
 
@@ -228,7 +228,7 @@ const CommentMutation = {
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
-            await pubsub.publish("commentVoteChanged", {
+            pubsub.publish("commentVoteChanged", {
                 commentVoteChanged: payload,
             });
 
@@ -239,7 +239,7 @@ const CommentMutation = {
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
-            await pubsub.publish("commentVoteChanged", {
+            pubsub.publish("commentVoteChanged", {
                 commentVoteChanged: payload,
             });
 
@@ -250,7 +250,7 @@ const CommentMutation = {
         .withMiddlewares([checkLoggedIn, userCheckComment])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
-            await pubsub.publish("commentRemoved", {
+            pubsub.publish("commentRemoved", {
                 commentUpdated: payload.record,
             });
 
