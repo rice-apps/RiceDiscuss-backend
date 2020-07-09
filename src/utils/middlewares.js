@@ -58,11 +58,13 @@ async function userCheckUserId(resolve, source, args, context, info) {
 }
 
 async function checkHTML(resolve, source, args, context, info) {
-    if (args.record.body) {
-        args.record.body = sanitizeHtml(args.record.body, CHECK_HTML_CONFIG);
+    const newArgs = { ...args };
+
+    if (newArgs.record.body) {
+        newArgs.record.body = sanitizeHtml(args.record.body, CHECK_HTML_CONFIG);
     }
 
-    return resolve(source, args, context, info);
+    return resolve(source, newArgs, context, info);
 }
 
 export {
