@@ -7,6 +7,8 @@ import {
     pubsub,
 } from "../utils";
 
+import { MAX_REPORTS } from "../config";
+
 CommentTC.addFields({
     children: [CommentTC],
 });
@@ -180,25 +182,77 @@ CommentTC.addResolver({
 });
 
 const CommentQuery = {
-    commentById: CommentTC.getResolver("findById").withMiddlewares([
-        checkLoggedIn,
-    ]),
+    commentById: CommentTC.getResolver("findById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            rp.projection.reports = {};
 
-    commentByParent: CommentTC.getResolver(
-        "findManyByParentID",
-    ).withMiddlewares([checkLoggedIn]),
+            const payload = await next(rp);
 
-    commentByPost: CommentTC.getResolver("findManyByPostID").withMiddlewares([
-        checkLoggedIn,
-    ]),
+            if (payload.record.reports > MAX_REPORTS) {
+                payload.record.body = "[This comment has been removed]";
+            }
+
+            return payload;
+        }),
+
+    commentByParent: CommentTC.getResolver("findManyByParentID")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            rp.projection.reports = {};
+
+            const payload = await next(rp);
+
+            for (let i = 0; i < payload.length; i += 1) {
+                if (payload[i].reports > MAX_REPORTS) {
+                    if (payload[i].body) {
+                        payload[i].body = "[This comment has been removed]";
+                    }
+                }
+            }
+
+            return payload;
+        }),
+
+    commentByPost: CommentTC.getResolver("findManyByPostID")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            rp.projection.reports = {};
+
+            const payload = await next(rp);
+
+            for (let i = 0; i < payload.length; i += 1) {
+                if (payload[i].reports > MAX_REPORTS) {
+                    if (payload[i].body) {
+                        payload[i].body = "[This comment has been removed]";
+                    }
+                }
+            }
+
+            return payload;
+        }),
 
     commentCount: CommentTC.getResolver("count").withMiddlewares([
         checkLoggedIn,
     ]),
 
-    commentPagination: CommentTC.getResolver("pagination").withMiddlewares([
-        checkLoggedIn,
-    ]),
+    commentPagination: CommentTC.getResolver("pagination")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            rp.projection.reports = {};
+
+            const payload = await next(rp);
+
+            for (let i = 0; i < payload.items.length; i += 1) {
+                if (payload.items[i].reports > MAX_REPORTS) {
+                    if (payload.items[i].body) {
+                        payload.items[i].body = "[This comment has been removed]";
+                    }
+                }
+            }
+
+            return payload;
+        }),
 };
 
 const CommentMutation = {
@@ -216,7 +270,14 @@ const CommentMutation = {
     commentUpdateById: CommentTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckComment])
         .wrapResolve((next) => async (rp) => {
+            if (rp.args.record.reports) {
+                if (rp.args.record.reports > MAX_REPORTS) {
+                    rp.args.record.body = "[This comment has been removed]";
+                }
+            }
+
             const payload = await next(rp);
+
             pubsub.publish("commentUpdated", {
                 commentCreated: payload.record,
             });

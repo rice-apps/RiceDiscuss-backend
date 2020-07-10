@@ -20,7 +20,7 @@ function userCheckCreate(resolve, source, args, context, info) {
 }
 
 async function userCheckComment(resolve, source, args, context, info) {
-    const comment = await Comment.findById(args._id);
+    const comment = await Comment.findById(args.record._id);
 
     if (comment.creator === context.netID) {
         return resolve(source, args, context, info);
@@ -48,7 +48,7 @@ async function userCheckUserFilter(resolve, source, args, context, info) {
 }
 
 async function userCheckUserId(resolve, source, args, context, info) {
-    const user = await User.findById(args._id);
+    const user = await User.findById(args.record._id);
 
     if (user.netID === context.netID) {
         return resolve(source, args, context, info);

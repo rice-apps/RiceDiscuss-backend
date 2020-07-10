@@ -8,6 +8,8 @@ import {
     pubsub,
 } from "../utils";
 
+import { MAX_REPORTS } from "../config";
+
 PostDTC.addFields({
     comments: [CommentTC],
 });
@@ -157,15 +159,69 @@ PostDTC.addResolver({
 });
 
 const PostQuery = {
-    postById: PostDTC.getResolver("findById").withMiddlewares([checkLoggedIn]),
+    postById: PostDTC.getResolver("findById")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
 
-    postOne: PostDTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
+            if (payload.record.reports >= MAX_REPORTS) {
+                if (payload.record.body) {
+                    payload.record.body = "[This post has been removed.]";
+                }
 
-    postCount: PostDTC.getResolver("count").withMiddlewares([checkLoggedIn]),
+                if (payload.record.title) {
+                    payload.record.title = "[This post has been removed.]";
+                }
+            }
 
-    postPagination: PostDTC.getResolver("pagination").withMiddlewares([
-        checkLoggedIn,
-    ]),
+            return payload;
+        }),
+
+    postOne: PostDTC.getResolver("findOne")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            if (payload.record.reports >= MAX_REPORTS) {
+                if (payload.record.body) {
+                    payload.record.body = "[This post has been removed.]";
+                }
+
+                if (payload.record.title) {
+                    payload.record.title = "[This post has been removed.]";
+                }
+            }
+
+            return payload;
+        }),
+
+    postCount: PostDTC.getResolver("count")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            return payload;
+        }),
+
+    postPagination: PostDTC.getResolver("pagination")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            const payload = await next(rp);
+
+            for (let i = 0; i < payload.items.length; i+= 1) {
+                if (payload.items[i].reports >= MAX_REPORTS) {
+                    if (payload.items[i].body) {
+                        payload.items[i].body = "[This post has been removed.]";
+                    }
+    
+                    if (payload.items[i].title) {
+                        payload.items[i].title = "[This post has been removed.]";
+                    }
+                }
+            }
+
+            return payload;
+        }),
 };
 
 const PostMutation = {
@@ -184,6 +240,14 @@ const PostMutation = {
     postUpdateById: PostDTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
+            console.log(rp.args);
+            if (rp.args.record.reports) {
+                if (rp.args.record.reports >= MAX_REPORTS) {
+                    rp.args.record.body = "[This post has been removed.]";
+                    rp.args.record.title = "[This post has been removed.]";
+                }
+            }
+
             const payload = await next(rp);
 
             pubsub.publish("postUpdated", {

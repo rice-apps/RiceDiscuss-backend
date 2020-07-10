@@ -19,6 +19,8 @@ const COLLEGES = process.env.COLLEGES.split(";");
 const MAJORS = process.env.MAJORS.split(";");
 const MINORS = process.env.MINORS.split(";");
 
+const MAX_REPORTS = parseInt(process.env.MAX_REPORTS, 10);
+
 const CHECK_HTML_CONFIG = {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
     allowedAttributes: {
@@ -44,6 +46,7 @@ export {
     COLLEGES,
     MAJORS,
     MINORS,
+    MAX_REPORTS,
     CHECK_HTML_CONFIG,
     MONGOOSE_CONFIG,
 };
