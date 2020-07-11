@@ -168,7 +168,10 @@ const PostQuery = {
     postById: PostDTC.getResolver("findById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
+            const payload = await next({
+                ...rp,
+                projection: { reports: {}, ...rp.projection },
+            });
 
             if (payload.record.reports > MAX_REPORTS) {
                 if (payload.record.body) {
@@ -186,7 +189,10 @@ const PostQuery = {
     postOne: PostDTC.getResolver("findOne")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
+            const payload = await next({
+                ...rp,
+                projection: { reports: {}, ...rp.projection },
+            });
 
             if (payload.record.reports > MAX_REPORTS) {
                 if (payload.record.body) {
@@ -201,18 +207,15 @@ const PostQuery = {
             return payload;
         }),
 
-    postCount: PostDTC.getResolver("count")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
-
-            return payload;
-        }),
+    postCount: PostDTC.getResolver("count").withMiddlewares([checkLoggedIn]),
 
     postPagination: PostDTC.getResolver("pagination")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
+            const payload = await next({
+                ...rp,
+                projection: { reports: {}, ...rp.projection },
+            });
 
             for (let i = 0; i < payload.items.length; i += 1) {
                 if (payload.items[i].reports > MAX_REPORTS) {

@@ -191,9 +191,10 @@ const CommentQuery = {
     commentById: CommentTC.getResolver("findById")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
-            rp.projection.reports = {};
-
-            const payload = await next(rp);
+            const payload = await next({
+                ...rp,
+                projection: { reports: {}, ...rp.projection },
+            });
 
             if (payload.record.reports > MAX_REPORTS) {
                 payload.record.body = "[This comment has been removed]";
@@ -205,9 +206,10 @@ const CommentQuery = {
     commentByParent: CommentTC.getResolver("findManyByParentID")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
-            rp.projection.reports = {};
-
-            const payload = await next(rp);
+            const payload = await next({
+                ...rp,
+                projection: { reports: {}, ...rp.projection },
+            });
 
             for (let i = 0; i < payload.length; i += 1) {
                 if (payload[i].reports > MAX_REPORTS) {
@@ -223,9 +225,10 @@ const CommentQuery = {
     commentByPost: CommentTC.getResolver("findManyByPostID")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
-            rp.projection.reports = {};
-
-            const payload = await next(rp);
+            const payload = await next({
+                ...rp,
+                projection: { reports: {}, ...rp.projection },
+            });
 
             for (let i = 0; i < payload.length; i += 1) {
                 if (payload[i].reports > MAX_REPORTS) {
@@ -245,9 +248,10 @@ const CommentQuery = {
     commentPagination: CommentTC.getResolver("pagination")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
-            rp.projection.reports = {};
-
-            const payload = await next(rp);
+            const payload = await next({
+                ...rp,
+                projection: { reports: {}, ...rp.projection },
+            });
 
             for (let i = 0; i < payload.items.length; i += 1) {
                 if (payload.items[i].reports > MAX_REPORTS) {
