@@ -81,7 +81,10 @@ UserTC.wrapResolverResolve("findOne", (next) => (rp) =>
 
             return res;
         })
-        .catch((err) => log.error(err)),
+        .catch((err) => {
+            log.error(err);
+            return new Error(`Search failed: ${err}`);
+        }),
 ).wrapResolverResolve("pagination", (next) => (rp) =>
     next({ ...rp, projection: { netID: {}, ...rp.projection } })
         .then((payload) => {
@@ -98,7 +101,10 @@ UserTC.wrapResolverResolve("findOne", (next) => (rp) =>
 
             return res;
         })
-        .catch((err) => log.error(err)),
+        .catch((err) => {
+            log.error(err);
+            return new Error(`Search failed: ${err}`);
+        }),
 );
 
 export { User, UserTC };

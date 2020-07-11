@@ -118,7 +118,10 @@ CommentTC.addResolver({
             .then((res) => {
                 return res;
             })
-            .catch((err) => log.error(err));
+            .catch((err) => {
+                log.error(err);
+                return null;
+            });
 
         if (comment == null) {
             return new Error("trying to upvote nonexistent post");
@@ -156,7 +159,10 @@ CommentTC.addResolver({
             .then((res) => {
                 return res;
             })
-            .catch((err) => log.error(err));
+            .catch((err) => {
+                log.error(err);
+                return null;
+            });
 
         if (comment == null) {
             return new Error("trying to upvote nonexistent post");

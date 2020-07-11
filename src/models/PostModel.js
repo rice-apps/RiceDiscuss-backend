@@ -203,7 +203,10 @@ PostDTC.addResolver({
     resolve: ({ args }) =>
         Post.find({ creator: args.creator })
             .then((res) => res)
-            .catch((err) => log.error(err)),
+            .catch((err) => {
+                log.error(err);
+                return new Error(`Search failed: ${err}`);
+            }),
 });
 
 export {

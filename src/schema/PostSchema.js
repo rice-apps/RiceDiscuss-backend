@@ -95,7 +95,10 @@ PostDTC.addResolver({
             .then((res) => {
                 return res;
             })
-            .catch((err) => log.error(err));
+            .catch((err) => {
+                log.error(err);
+                return null;
+            });
 
         if (post == null) {
             return new Error("trying to upvote nonexistent post");
@@ -133,7 +136,10 @@ PostDTC.addResolver({
             .then((res) => {
                 return res;
             })
-            .catch((err) => log.error(err));
+            .catch((err) => {
+                log.error(err);
+                return null;
+            });
 
         if (post == null) {
             return new Error("trying to upvote nonexistent post");

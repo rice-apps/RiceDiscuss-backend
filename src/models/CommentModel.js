@@ -72,7 +72,10 @@ CommentTC.addResolver({
     resolve: ({ args }) =>
         Comment.find({ parent: args.parent })
             .then((res) => res)
-            .catch((err) => log.error(err)),
+            .catch((err) => {
+                log.error(err);
+                return new Error(`Search failed: ${err}`);
+            }),
 })
     .addResolver({
         name: "findManyByPostID",
@@ -86,7 +89,10 @@ CommentTC.addResolver({
         resolve: ({ args }) =>
             Comment.find({ post: args.post })
                 .then((res) => res)
-                .catch((err) => log.err(err)),
+                .catch((err) => {
+                    log.error(err);
+                    return new Error(`Search failed: ${err}`);
+                }),
     })
     .addResolver({
         name: "findManyByCreator",
@@ -100,7 +106,10 @@ CommentTC.addResolver({
         resolve: ({ args }) =>
             Comment.find({ creator: args.creator })
                 .then((res) => res)
-                .catch((err) => log.err(err)),
+                .catch((err) => {
+                    log.error(err);
+                    return new Error(`Search failed: ${err}`);
+                }),
     });
 
 export { Comment, CommentTC };
