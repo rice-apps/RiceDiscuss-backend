@@ -67,11 +67,8 @@ const User = mongoose.model("User", UserSchema);
 
 const UserTC = composeWithMongoose(User);
 
-UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
-    const newRp = { ...rp };
-    newRp.projection.netID = {};
-
-    return next(newRp)
+UserTC.wrapResolverResolve("findOne", (next) => (rp) => {
+    return next({ ...rp, projection: { netID: {}, ...rp.projection } })
         .then((payload) => {
             const res = { ...payload._doc };
 
@@ -85,11 +82,8 @@ UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
             return res;
         })
         .catch((err) => log.error(err));
-}).wrapResolverResolve("pagination", (next) => async (rp) => {
-    const newRp = { ...rp };
-    newRp.projection.items.netID = {};
-
-    return next(rp)
+}).wrapResolverResolve("pagination", (next) => (rp) => {
+    return next({ ...rp, projection: { netID: {}, ...rp.projection } })
         .then((payload) => {
             const res = { ...payload };
 

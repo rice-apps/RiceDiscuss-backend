@@ -164,7 +164,7 @@ const PostQuery = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            if (payload.record.reports >= MAX_REPORTS) {
+            if (payload.record.reports > MAX_REPORTS) {
                 if (payload.record.body) {
                     payload.record.body = "[This post has been removed.]";
                 }
@@ -182,7 +182,7 @@ const PostQuery = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            if (payload.record.reports >= MAX_REPORTS) {
+            if (payload.record.reports > MAX_REPORTS) {
                 if (payload.record.body) {
                     payload.record.body = "[This post has been removed.]";
                 }
@@ -208,14 +208,15 @@ const PostQuery = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            for (let i = 0; i < payload.items.length; i+= 1) {
-                if (payload.items[i].reports >= MAX_REPORTS) {
+            for (let i = 0; i < payload.items.length; i += 1) {
+                if (payload.items[i].reports > MAX_REPORTS) {
                     if (payload.items[i].body) {
                         payload.items[i].body = "[This post has been removed.]";
                     }
-    
+
                     if (payload.items[i].title) {
-                        payload.items[i].title = "[This post has been removed.]";
+                        payload.items[i].title =
+                            "[This post has been removed.]";
                     }
                 }
             }
@@ -240,9 +241,8 @@ const PostMutation = {
     postUpdateById: PostDTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
-            console.log(rp.args);
             if (rp.args.record.reports) {
-                if (rp.args.record.reports >= MAX_REPORTS) {
+                if (rp.args.record.reports > MAX_REPORTS) {
                     rp.args.record.body = "[This post has been removed.]";
                     rp.args.record.title = "[This post has been removed.]";
                 }

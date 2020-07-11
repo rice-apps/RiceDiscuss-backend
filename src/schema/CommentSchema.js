@@ -246,7 +246,8 @@ const CommentQuery = {
             for (let i = 0; i < payload.items.length; i += 1) {
                 if (payload.items[i].reports > MAX_REPORTS) {
                     if (payload.items[i].body) {
-                        payload.items[i].body = "[This comment has been removed]";
+                        payload.items[i].body =
+                            "[This comment has been removed]";
                     }
                 }
             }

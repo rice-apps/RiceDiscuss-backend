@@ -200,11 +200,10 @@ PostDTC.addResolver({
 
     type: [PostDTC.getDInterface()],
 
-    resolve: async ({ args }) => {
-        return Post.find({ creator: args.creator })
+    resolve: ({ args }) =>
+        Post.find({ creator: args.creator })
             .then((res) => res)
-            .catch((err) => log.error(err));
-    },
+            .catch((err) => log.error(err)),
 });
 
 export {

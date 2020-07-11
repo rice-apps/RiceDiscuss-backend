@@ -69,11 +69,10 @@ CommentTC.addResolver({
 
     type: [CommentTC],
 
-    resolve: async ({ args }) => {
-        return Comment.find({ parent: args.parent })
+    resolve: ({ args }) =>
+        Comment.find({ parent: args.parent })
             .then((res) => res)
-            .catch((err) => log.error(err));
-    },
+            .catch((err) => log.error(err)),
 })
     .addResolver({
         name: "findManyByPostID",
@@ -84,11 +83,10 @@ CommentTC.addResolver({
 
         type: [CommentTC],
 
-        resolve: async ({ args }) => {
-            return Comment.find({ post: args.post })
+        resolve: ({ args }) =>
+            Comment.find({ post: args.post })
                 .then((res) => res)
-                .catch((err) => log.err(err));
-        },
+                .catch((err) => log.err(err)),
     })
     .addResolver({
         name: "findManyByCreator",
@@ -99,11 +97,10 @@ CommentTC.addResolver({
 
         type: [CommentTC],
 
-        resolve: async ({ args }) => {
-            return Comment.find({ creator: args.creator })
+        resolve: ({ args }) =>
+            Comment.find({ creator: args.creator })
                 .then((res) => res)
-                .catch((err) => log.err(err));
-        },
+                .catch((err) => log.err(err)),
     });
 
 export { Comment, CommentTC };
