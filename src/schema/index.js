@@ -17,6 +17,41 @@ sc.addSchemaMustHaveType(DiscussionTC)
     .addSchemaMustHaveType(JobTC)
     .addSchemaMustHaveType(NoticeTC);
 
+sc.createResolver({
+    name: "signS3Url",
+    type: `type S3Payload { signedRequest: String!, url: String! }`,
+    args: {
+        filename: "String!",
+        filetype: "String!",
+    },
+    resolve: async ({ args, context }) => {
+        if (!context.netID) {
+            return new Error("Not logged in. Can't ");
+        }
+
+        const s3Bucket = "";
+
+        const s3Params = {
+            Bucket: s3Bucket,
+            Key: args.filename,
+            Expires: 60,
+            ContentType: args.filetype,
+            ACL: "public-read",
+        };
+
+        const signedRequest = await context.s3.getSignedUrl(
+            "putObject",
+            s3Params,
+        );
+        const url = `https://${s3Bucket}.s3.amazonaws.com/${args.filename}`;
+
+        return {
+            signedRequest,
+            url,
+        };
+    },
+});
+
 sc.Query.addFields({
     ...CommentQuery,
     ...PostQuery,
