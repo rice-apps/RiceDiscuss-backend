@@ -21,6 +21,9 @@ const MINORS = process.env.MINORS.split(";");
 
 const MAX_REPORTS = parseInt(process.env.MAX_REPORTS, 10);
 
+const { AWS_ACCESS_KEY_ID } = process.env;
+const { AWS_SECRET } = process.env;
+
 const CHECK_HTML_CONFIG = {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
     allowedAttributes: {
@@ -47,6 +50,8 @@ export {
     MAJORS,
     MINORS,
     MAX_REPORTS,
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET,
     CHECK_HTML_CONFIG,
     MONGOOSE_CONFIG,
 };
