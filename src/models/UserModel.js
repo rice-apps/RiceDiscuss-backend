@@ -67,38 +67,44 @@ const User = mongoose.model("User", UserSchema);
 
 const UserTC = composeWithMongoose(User);
 
-UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
-    const resPromise = next(rp);
-
-    resPromise
+UserTC.wrapResolverResolve("findOne", (next) => (rp) =>
+    next({ ...rp, projection: { netID: {}, ...rp.projection } })
         .then((payload) => {
+            const res = { ...payload._doc };
+
             if (
-                typeof payload.netID === "undefined" ||
-                payload.netID !== rp.context.netID
+                typeof res.netID === "undefined" ||
+                res.netID !== rp.context.netID
             ) {
-                payload.token = null;
+                res.token = null;
             }
+
+            return res;
         })
-        .catch((err) => log.error(err));
-
-    return resPromise;
-}).wrapResolverResolve("pagination", (next) => async (rp) => {
-    const resPromise = next(rp);
-
-    resPromise
+        .catch((err) => {
+            log.error(err);
+            return new Error(`Search failed: ${err}`);
+        }),
+).wrapResolverResolve("pagination", (next) => (rp) =>
+    next({ ...rp, projection: { netID: {}, ...rp.projection } })
         .then((payload) => {
-            for (let i = 0; i < payload.items.length; i += 1) {
+            const res = { ...payload };
+
+            for (let i = 0; i < res.items.length; i += 1) {
                 if (
-                    typeof payload.items[i].netID === "undefined" ||
-                    payload.netID !== rp.context.netID
+                    typeof res.items[i].netID === "undefined" ||
+                    res.items[i].netID !== rp.context.netID
                 ) {
-                    payload.items[i].token = null;
+                    res.items[i].token = null;
                 }
             }
-        })
-        .catch((err) => log.error(err));
 
-    return resPromise;
-});
+            return res;
+        })
+        .catch((err) => {
+            log.error(err);
+            return new Error(`Search failed: ${err}`);
+        }),
+);
 
 export { User, UserTC };

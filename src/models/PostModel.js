@@ -61,10 +61,11 @@ const PostSchema = new mongoose.Schema({
         },
     ],
 
-    reports: {
-        type: Number,
-        default: 0,
-    },
+    reports: [
+        {
+            type: String,
+        },
+    ],
 });
 
 const DiscussionSchema = new mongoose.Schema();
@@ -200,11 +201,13 @@ PostDTC.addResolver({
 
     type: [PostDTC.getDInterface()],
 
-    resolve: async ({ args }) => {
-        return Post.find({ creator: args.creator }).catch((err) =>
-            log.error(err),
-        );
-    },
+    resolve: ({ args }) =>
+        Post.find({ creator: args.creator })
+            .then((res) => res)
+            .catch((err) => {
+                log.error(err);
+                return new Error(`Search failed: ${err}`);
+            }),
 });
 
 export {
