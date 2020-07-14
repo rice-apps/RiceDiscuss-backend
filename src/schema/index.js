@@ -24,8 +24,8 @@ sc.createResolver({
     name: "signS3Url",
     type: `type S3Payload { signedRequest: String!, url: String! }`,
     args: {
-        filename: "String!",
-        filetype: "String!",
+        filename: `String!`,
+        filetype: `String!`,
     },
     resolve: async ({ args, context }) => {
         if (!context.netID) {
