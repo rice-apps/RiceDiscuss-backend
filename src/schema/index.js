@@ -20,7 +20,7 @@ sc.addSchemaMustHaveType(DiscussionTC)
     .addSchemaMustHaveType(JobTC)
     .addSchemaMustHaveType(NoticeTC);
 
-sc.createResolver({
+const signS3Url = sc.createResolver({
     name: "signS3Url",
     type: `type S3Payload { signedRequest: String!, url: String! }`,
     args: {
@@ -63,6 +63,7 @@ sc.Query.addFields({
     ...CommentQuery,
     ...PostQuery,
     ...UserQuery,
+    signS3Url,
 });
 
 sc.Mutation.addFields({
