@@ -12,68 +12,69 @@ import {
 UserTC.addFields({
     posts: [PostDTC.getDInterface()],
     comments: [CommentTC],
-});
+})
+    .addRelation("posts", {
+        resolver: () => PostDTC.getResolver("findManyByCreator"),
 
-UserTC.addRelation("posts", {
-    resolver: () => PostDTC.getResolver("findManyByCreator"),
+        prepareArgs: {
+            creator: (source) => source.netID,
+        },
 
-    prepareArgs: {
-        creator: (source) => source.netID,
-    },
+        projection: {
+            netID: 1,
+        },
+    })
+    .addRelation("comments", {
+        resolver: () => CommentTC.getResolver("findManyByCreator"),
 
-    projection: {
-        netID: 1,
-    },
-});
+        prepareArgs: {
+            creator: (source) => source.netID,
+        },
 
-UserTC.addRelation("comments", {
-    resolver: () => CommentTC.getResolver("findManyByCreator"),
+        projection: {
+            netID: 1,
+        },
+    })
+    .addResolver({
+        name: "authenticate",
+        type: UserTC,
+        args: { ticket: "String!" },
+        resolve: async ({ args }) => {
+            const res = await checkWithCAS(args.ticket);
 
-    prepareArgs: {
-        creator: (source) => source.netID,
-    },
+            if (res.success) {
+                const isNewUser = !(await User.exists({
+                    netID: res.netID,
+                }).catch((err) => log.error(err)));
 
-    projection: {
-        netID: 1,
-    },
-});
-
-UserTC.addResolver({
-    name: "authenticate",
-    type: UserTC,
-    args: { ticket: "String!" },
-    resolve: async ({ args }) => {
-        const res = await checkWithCAS(args.ticket);
-
-        if (res.success) {
-            const isNewUser = !(await User.exists({
-                netID: res.netID,
-            }).catch((err) => log.error(err)));
-
-            return isNewUser
-                ? User.create({ netID: res.netID, username: res.netID })
-                      .then((doc) => {
-                          doc.token = createToken(doc);
-
-                          return doc.save();
-                      })
-                      .catch((err) => new Error(`User creation failed: ${err}`))
-                : User.findOne({ netID: res.netID })
-                      .then((doc) => {
-                          if (isTokenExpired(doc)) {
+                return isNewUser
+                    ? User.create({ netID: res.netID, username: res.netID })
+                          .then((doc) => {
                               doc.token = createToken(doc);
-                          }
 
-                          return doc.save();
-                      })
-                      .catch(
-                          (err) => new Error(`User creation failed: ${err}`),
-                      );
-        }
+                              return doc.save();
+                          })
+                          .catch(
+                              (err) =>
+                                  new Error(`User creation failed: ${err}`),
+                          )
+                    : User.findOne({ netID: res.netID })
+                          .then((doc) => {
+                              if (isTokenExpired(doc)) {
+                                  doc.token = createToken(doc);
+                              }
 
-        return null;
-    },
-});
+                              return doc.save();
+                          })
+                          .catch(
+                              (err) =>
+                                  new Error(`User creation failed: ${err}`),
+                          );
+            }
+
+            return null;
+        },
+    });
 
 const UserQuery = {
     userOne: UserTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),

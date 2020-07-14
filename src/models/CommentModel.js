@@ -50,10 +50,11 @@ const CommentSchema = new mongoose.Schema({
         },
     ],
 
-    reports: {
-        type: Number,
-        default: 0,
-    },
+    reports: [
+        {
+            type: String,
+        },
+    ],
 });
 
 const Comment = mongoose.model("Comment", CommentSchema);

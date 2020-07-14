@@ -12,157 +12,205 @@ import { MAX_REPORTS } from "../config";
 
 PostDTC.addFields({
     comments: [CommentTC],
-});
+})
+    .addRelation("comments", {
+        resolver: () => CommentTC.getResolver("findManyByPostID"),
 
-PostDTC.addRelation("comments", {
-    resolver: () => CommentTC.getResolver("findManyByPostID"),
-
-    prepareArgs: {
-        post: (source) => source._id,
-    },
-
-    projection: {
-        _id: 1,
-    },
-});
-
-PostDTC.addRelation("creator", {
-    resolver: () => UserTC.getResolver("findOne"),
-
-    prepareArgs: {
-        filter: (source) => {
-            return {
-                netID: source.creator,
-            };
+        prepareArgs: {
+            post: (source) => source._id,
         },
-    },
 
-    projection: {
-        creator: 1,
-    },
-});
+        projection: {
+            _id: 1,
+        },
+    })
+    .addRelation("creator", {
+        resolver: () => UserTC.getResolver("findOne"),
 
-PostDTC.addRelation("upvotes", {
-    resolver: () => UserTC.getResolver("findMany"),
+        prepareArgs: {
+            filter: (source) => {
+                return {
+                    netID: source.creator,
+                };
+            },
+        },
 
-    prepareArgs: {
-        filter: (source) => {
-            return {
-                _operators: {
-                    netID: {
-                        in: source.upvotes,
+        projection: {
+            creator: 1,
+        },
+    })
+    .addRelation("upvotes", {
+        resolver: () => UserTC.getResolver("findMany"),
+
+        prepareArgs: {
+            filter: (source) => {
+                return {
+                    _operators: {
+                        netID: {
+                            in: source.upvotes,
+                        },
                     },
-                },
-            };
+                };
+            },
         },
-    },
 
-    projection: {
-        upvotes: 1,
-    },
-});
+        projection: {
+            upvotes: 1,
+        },
+    })
+    .addRelation("downvotes", {
+        resolver: () => UserTC.getResolver("findMany"),
 
-PostDTC.addRelation("downvotes", {
-    resolver: () => UserTC.getResolver("findMany"),
-
-    prepareArgs: {
-        filter: (source) => {
-            return {
-                _operators: {
-                    netID: {
-                        in: source.downvotes,
+        prepareArgs: {
+            filter: (source) => {
+                return {
+                    _operators: {
+                        netID: {
+                            in: source.downvotes,
+                        },
                     },
-                },
-            };
+                };
+            },
         },
-    },
 
-    projection: {
-        downvotes: 1,
-    },
-});
+        projection: {
+            downvotes: 1,
+        },
+    })
+    .addRelation("reports", {
+        resolver: () => UserTC.getResolver("findMany"),
 
-PostDTC.addResolver({
-    name: "upvotePost",
-    type: PostDTC.getDInterface(),
-    args: { _id: "ID!", netID: "String!" },
-    resolve: async ({ args, context }) => {
-        if (args.netID !== context.netID) {
-            return new Error("cannot upvote as someone else");
-        }
+        prepareArgs: {
+            filter: (source) => {
+                return {
+                    _operators: {
+                        netID: {
+                            in: source.reports,
+                        },
+                    },
+                };
+            },
+        },
 
-        const post = await Post.findById(args._id)
-            .then((res) => {
-                return res;
-            })
-            .catch((err) => {
-                log.error(err);
-                return null;
-            });
+        projection: {
+            reports: 1,
+        },
+    })
+    .addResolver({
+        name: "upvotePost",
+        type: PostDTC.getDInterface(),
+        args: { _id: "ID!", netID: "String!" },
+        resolve: async ({ args, context }) => {
+            if (args.netID !== context.netID) {
+                return new Error("cannot upvote as someone else");
+            }
 
-        if (post == null) {
-            return new Error("trying to upvote nonexistent post");
-        }
+            const post = await Post.findById(args._id)
+                .then((res) => {
+                    return res;
+                })
+                .catch((err) => {
+                    log.error(err);
+                    return null;
+                });
 
-        if (post.upvotes.includes(args.netID)) {
-            post.upvotes = post.upvotes.filter(
-                (upvoter) => upvoter !== args.netID,
-            );
-        } else if (post.downvotes.includes(args.netID)) {
-            post.downvotes = post.downvotes.filter(
-                (downvoter) => downvoter !== args.netID,
-            );
-            post.upvotes.push(args.netID);
-        } else {
-            post.upvotes.push(args.netID);
-        }
+            if (post === null) {
+                return new Error("trying to upvote nonexistent post");
+            }
 
-        await post.save().catch((err) => log.error(err));
+            if (post.upvotes.includes(args.netID)) {
+                post.upvotes = post.upvotes.filter(
+                    (upvoter) => upvoter !== args.netID,
+                );
+            } else if (post.downvotes.includes(args.netID)) {
+                post.downvotes = post.downvotes.filter(
+                    (downvoter) => downvoter !== args.netID,
+                );
+                post.upvotes.push(args.netID);
+            } else {
+                post.upvotes.push(args.netID);
+            }
 
-        return post;
-    },
-});
+            await post.save().catch((err) => log.error(err));
 
-PostDTC.addResolver({
-    name: "downvotePost",
-    type: PostDTC.getDInterface(),
-    args: { _id: "ID!", netID: "String!" },
-    resolve: async ({ args, context }) => {
-        if (args.netID !== context.netID) {
-            return new Error("cannot downvote as someone else");
-        }
+            return post;
+        },
+    })
+    .addResolver({
+        name: "downvotePost",
+        type: PostDTC.getDInterface(),
+        args: { _id: "ID!", netID: "String!" },
+        resolve: async ({ args, context }) => {
+            if (args.netID !== context.netID) {
+                return new Error("cannot downvote as someone else");
+            }
 
-        const post = await Post.findById(args._id)
-            .then((res) => {
-                return res;
-            })
-            .catch((err) => {
-                log.error(err);
-                return null;
-            });
+            const post = await Post.findById(args._id)
+                .then((res) => {
+                    return res;
+                })
+                .catch((err) => {
+                    log.error(err);
+                    return null;
+                });
 
-        if (post == null) {
-            return new Error("trying to upvote nonexistent post");
-        }
+            if (post === null) {
+                return new Error("trying to upvote nonexistent post");
+            }
 
-        if (post.downvotes.includes(args.netID)) {
-            post.downvotes = post.downvotes.filter(
-                (downvoter) => downvoter !== args.netID,
-            );
-        } else if (post.upvotes.includes(args.netID)) {
-            post.upvotes = post.upvotes.filter(
-                (upvoter) => upvoter !== args.netID,
-            );
-            post.downvotes.push(args.netID);
-        } else {
-            post.downvotes.push(args.netID);
-        }
+            if (post.downvotes.includes(args.netID)) {
+                post.downvotes = post.downvotes.filter(
+                    (downvoter) => downvoter !== args.netID,
+                );
+            } else if (post.upvotes.includes(args.netID)) {
+                post.upvotes = post.upvotes.filter(
+                    (upvoter) => upvoter !== args.netID,
+                );
+                post.downvotes.push(args.netID);
+            } else {
+                post.downvotes.push(args.netID);
+            }
 
-        await post.save().catch((err) => log.error(err));
+            await post.save().catch((err) => log.error(err));
 
-        return post;
-    },
-});
+            return post;
+        },
+    })
+    .addResolver({
+        name: "toggleReport",
+        type: PostDTC.getDInterface(),
+        args: { _id: "ID!", netID: "String!" },
+        resolve: async ({ args, context }) => {
+            if (args.netID !== context.netID) {
+                return new Error("cannot report post as someone else");
+            }
+
+            const post = await Post.findById(args._id)
+                .then((res) => {
+                    return res;
+                })
+                .catch((err) => {
+                    log.error(err);
+                    return null;
+                });
+
+            if (post === null) {
+                return new Error("trying to report nonexistent post");
+            }
+
+            if (post.reports.includes(args.netID)) {
+                post.reports = post.reports.filter(
+                    (reporter) => reporter !== args.netID,
+                );
+            } else {
+                post.reports.push(args.netID);
+            }
+
+            await post.save().catch((err) => log.error(err));
+
+            return post;
+        },
+    });
 
 const PostQuery = {
     postById: PostDTC.getResolver("findById")
@@ -173,7 +221,7 @@ const PostQuery = {
                 projection: { reports: {}, ...rp.projection },
             });
 
-            if (payload.record.reports > MAX_REPORTS) {
+            if (payload.record.reports.length > MAX_REPORTS) {
                 if (payload.record.body) {
                     payload.record.body = "[This post has been removed.]";
                 }
@@ -194,7 +242,7 @@ const PostQuery = {
                 projection: { reports: {}, ...rp.projection },
             });
 
-            if (payload.record.reports > MAX_REPORTS) {
+            if (payload.record.reports.length > MAX_REPORTS) {
                 if (payload.record.body) {
                     payload.record.body = "[This post has been removed.]";
                 }
@@ -218,7 +266,7 @@ const PostQuery = {
             });
 
             for (let i = 0; i < payload.items.length; i += 1) {
-                if (payload.items[i].reports > MAX_REPORTS) {
+                if (payload.items[i].reports.length > MAX_REPORTS) {
                     if (payload.items[i].body) {
                         payload.items[i].body = "[This post has been removed.]";
                     }
@@ -250,13 +298,6 @@ const PostMutation = {
     postUpdateById: PostDTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckPost, checkHTML])
         .wrapResolve((next) => async (rp) => {
-            if (rp.args.record.reports) {
-                if (rp.args.record.reports > MAX_REPORTS) {
-                    rp.args.record.body = "[This post has been removed.]";
-                    rp.args.record.title = "[This post has been removed.]";
-                }
-            }
-
             const payload = await next(rp);
 
             pubsub.publish("postUpdated", {
@@ -285,6 +326,25 @@ const PostMutation = {
 
             pubsub.publish("postVoteChanged", {
                 postVoteChanged: payload,
+            });
+
+            return payload;
+        }),
+
+    togglePostReport: PostDTC.getResolver("toggleReport")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            if (rp.args.record.reports) {
+                if (rp.args.record.reports.length > MAX_REPORTS) {
+                    rp.args.record.body = "[This post has been removed.]";
+                    rp.args.record.title = "[This post has been removed.]";
+                }
+            }
+
+            const payload = await next(rp);
+
+            pubsub.publish("postReported", {
+                postReported: payload,
             });
 
             return payload;
@@ -320,6 +380,12 @@ const PostSubscription = {
         type: PostDTC.getDInterface(),
 
         subscribe: () => pubsub.asyncIterator("postVoteChanged"),
+    },
+
+    postReported: {
+        type: PostDTC.getDInterface(),
+
+        subscribe: () => pubsub.asyncIterator("postReported"),
     },
 
     postRemoved: {

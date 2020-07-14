@@ -11,181 +11,227 @@ import { MAX_REPORTS } from "../config";
 
 CommentTC.addFields({
     children: [CommentTC],
-});
+})
+    .addRelation("creator", {
+        resolver: () => UserTC.getResolver("findOne"),
 
-CommentTC.addRelation("creator", {
-    resolver: () => UserTC.getResolver("findOne"),
-
-    prepareArgs: {
-        filter: (source) => {
-            return {
-                netID: source.creator,
-            };
+        prepareArgs: {
+            filter: (source) => {
+                return {
+                    netID: source.creator,
+                };
+            },
         },
-    },
 
-    projection: {
-        creator: 1,
-    },
-});
+        projection: {
+            creator: 1,
+        },
+    })
+    .addRelation("post", {
+        resolver: () => PostDTC.getResolver("findById"),
 
-CommentTC.addRelation("post", {
-    resolver: () => PostDTC.getResolver("findById"),
+        prepareArgs: {
+            _id: (source) => source.post,
+        },
 
-    prepareArgs: {
-        _id: (source) => source.post,
-    },
+        projection: {
+            post: 1,
+        },
+    })
+    .addRelation("parent", {
+        resolver: () => CommentTC.getResolver("findById"),
 
-    projection: {
-        post: 1,
-    },
-});
+        prepareArgs: {
+            _id: (source) => source.parent,
+        },
 
-CommentTC.addRelation("parent", {
-    resolver: () => CommentTC.getResolver("findById"),
+        projection: {
+            parent: 1,
+        },
+    })
+    .addRelation("upvotes", {
+        resolver: () => UserTC.getResolver("findMany"),
 
-    prepareArgs: {
-        _id: (source) => source.parent,
-    },
-
-    projection: {
-        parent: 1,
-    },
-});
-
-CommentTC.addRelation("upvotes", {
-    resolver: () => UserTC.getResolver("findMany"),
-
-    prepareArgs: {
-        filter: (source) => {
-            return {
-                _operators: {
-                    netID: {
-                        in: source.upvotes,
+        prepareArgs: {
+            filter: (source) => {
+                return {
+                    _operators: {
+                        netID: {
+                            in: source.upvotes,
+                        },
                     },
-                },
-            };
+                };
+            },
         },
-    },
 
-    projection: {
-        upvotes: 1,
-    },
-});
+        projection: {
+            upvotes: 1,
+        },
+    })
+    .addRelation("downvotes", {
+        resolver: () => UserTC.getResolver("findMany"),
 
-CommentTC.addRelation("downvotes", {
-    resolver: () => UserTC.getResolver("findMany"),
-
-    prepareArgs: {
-        filter: (source) => {
-            return {
-                _operators: {
-                    netID: {
-                        in: source.downvotes,
+        prepareArgs: {
+            filter: (source) => {
+                return {
+                    _operators: {
+                        netID: {
+                            in: source.downvotes,
+                        },
                     },
-                },
-            };
+                };
+            },
         },
-    },
 
-    projection: {
-        downvotes: 1,
-    },
-});
+        projection: {
+            downvotes: 1,
+        },
+    })
+    .addRelation("children", {
+        resolver: () => CommentTC.getResolver("findManyByParentID"),
 
-CommentTC.addRelation("children", {
-    resolver: () => CommentTC.getResolver("findManyByParentID"),
+        prepareArgs: {
+            parent: (source) => source._id,
+        },
 
-    prepareArgs: {
-        parent: (source) => source._id,
-    },
+        projection: {
+            _id: 1,
+        },
+    })
+    .addRelation("reports", {
+        resolver: () => UserTC.getResolver("findMany"),
 
-    projection: {
-        _id: 1,
-    },
-});
+        prepareArgs: {
+            filter: (source) => {
+                return {
+                    _operators: {
+                        netID: {
+                            in: source.reports,
+                        },
+                    },
+                };
+            },
+        },
 
-CommentTC.addResolver({
-    name: "upvoteComment",
-    type: CommentTC,
-    args: { _id: `ID`, netID: `String!` },
-    resolve: async ({ args, context }) => {
-        if (args.netID !== context.netID) {
-            return new Error("cannot upvote as someone else");
-        }
+        projection: {
+            reports: 1,
+        },
+    })
+    .addResolver({
+        name: "upvoteComment",
+        type: CommentTC,
+        args: { _id: `ID`, netID: `String!` },
+        resolve: async ({ args, context }) => {
+            if (args.netID !== context.netID) {
+                return new Error("cannot upvote as someone else");
+            }
 
-        const comment = await Comment.findById(args._id)
-            .then((res) => {
-                return res;
-            })
-            .catch((err) => {
-                log.error(err);
-                return null;
-            });
+            const comment = await Comment.findById(args._id)
+                .then((res) => {
+                    return res;
+                })
+                .catch((err) => {
+                    log.error(err);
+                    return null;
+                });
 
-        if (comment == null) {
-            return new Error("trying to upvote nonexistent post");
-        }
+            if (comment == null) {
+                return new Error("trying to upvote nonexistent post");
+            }
 
-        if (comment.upvotes.includes(args.netID)) {
-            comment.upvotes = comment.upvotes.filter(
-                (upvoter) => upvoter !== args.netID,
-            );
-        } else if (comment.downvotes.includes(args.netID)) {
-            comment.downvotes = comment.downvotes.filter(
-                (downvoter) => downvoter !== args.netID,
-            );
-            comment.upvotes.push(args.netID);
-        } else {
-            comment.upvotes.push(args.netID);
-        }
+            if (comment.upvotes.includes(args.netID)) {
+                comment.upvotes = comment.upvotes.filter(
+                    (upvoter) => upvoter !== args.netID,
+                );
+            } else if (comment.downvotes.includes(args.netID)) {
+                comment.downvotes = comment.downvotes.filter(
+                    (downvoter) => downvoter !== args.netID,
+                );
+                comment.upvotes.push(args.netID);
+            } else {
+                comment.upvotes.push(args.netID);
+            }
 
-        await comment.save().catch((err) => log.error(err));
+            await comment.save().catch((err) => log.error(err));
 
-        return comment;
-    },
-});
+            return comment;
+        },
+    })
+    .addResolver({
+        name: "downvoteComment",
+        type: CommentTC,
+        args: { _id: "ID!", netID: "String!" },
+        resolve: async ({ args, context }) => {
+            if (args.netID !== context.netID) {
+                return new Error("cannot downvote as someone else");
+            }
 
-CommentTC.addResolver({
-    name: "downvoteComment",
-    type: CommentTC,
-    args: { _id: "ID!", netID: "String!" },
-    resolve: async ({ args, context }) => {
-        if (args.netID !== context.netID) {
-            return new Error("cannot downvote as someone else");
-        }
+            const comment = await Comment.findById(args._id)
+                .then((res) => {
+                    return res;
+                })
+                .catch((err) => {
+                    log.error(err);
+                    return null;
+                });
 
-        const comment = await Comment.findById(args._id)
-            .then((res) => {
-                return res;
-            })
-            .catch((err) => {
-                log.error(err);
-                return null;
-            });
+            if (comment == null) {
+                return new Error("trying to upvote nonexistent post");
+            }
 
-        if (comment == null) {
-            return new Error("trying to upvote nonexistent post");
-        }
+            if (comment.downvotes.includes(args.netID)) {
+                comment.downvotes = comment.downvotes.filter(
+                    (downvoter) => downvoter !== args.netID,
+                );
+            } else if (comment.upvotes.includes(args.netID)) {
+                comment.upvotes = comment.upvotes.filter(
+                    (upvoter) => upvoter !== args.netID,
+                );
+                comment.downvotes.push(args.netID);
+            } else {
+                comment.downvotes.push(args.netID);
+            }
 
-        if (comment.downvotes.includes(args.netID)) {
-            comment.downvotes = comment.downvotes.filter(
-                (downvoter) => downvoter !== args.netID,
-            );
-        } else if (comment.upvotes.includes(args.netID)) {
-            comment.upvotes = comment.upvotes.filter(
-                (upvoter) => upvoter !== args.netID,
-            );
-            comment.downvotes.push(args.netID);
-        } else {
-            comment.downvotes.push(args.netID);
-        }
+            await comment.save().catch((err) => log.error(err));
 
-        await comment.save().catch((err) => log.error(err));
+            return comment;
+        },
+    })
+    .addResolver({
+        name: "toggleReport",
+        type: CommentTC,
+        args: { _id: "ID!", netID: "String!" },
+        resolve: async ({ args, context }) => {
+            if (args.netID !== context.netID) {
+                return new Error("cannot report post as someone else");
+            }
 
-        return comment;
-    },
-});
+            const comment = await Comment.findById(args._id)
+                .then((res) => {
+                    return res;
+                })
+                .catch((err) => {
+                    log.error(err);
+                    return null;
+                });
+
+            if (comment === null) {
+                return new Error("trying to report nonexistent post");
+            }
+
+            if (comment.reports.includes(args.netID)) {
+                comment.reports = comment.reports.filter(
+                    (reporter) => reporter !== args.netID,
+                );
+            } else {
+                comment.reports.push(args.netID);
+            }
+
+            await comment.save().catch((err) => log.error(err));
+
+            return comment;
+        },
+    });
 
 const CommentQuery = {
     commentById: CommentTC.getResolver("findById")
@@ -196,7 +242,7 @@ const CommentQuery = {
                 projection: { reports: {}, ...rp.projection },
             });
 
-            if (payload.record.reports > MAX_REPORTS) {
+            if (payload.record.reports.length > MAX_REPORTS) {
                 payload.record.body = "[This comment has been removed]";
             }
 
@@ -212,7 +258,7 @@ const CommentQuery = {
             });
 
             for (let i = 0; i < payload.length; i += 1) {
-                if (payload[i].reports > MAX_REPORTS) {
+                if (payload[i].reports.length > MAX_REPORTS) {
                     if (payload[i].body) {
                         payload[i].body = "[This comment has been removed]";
                     }
@@ -231,7 +277,7 @@ const CommentQuery = {
             });
 
             for (let i = 0; i < payload.length; i += 1) {
-                if (payload[i].reports > MAX_REPORTS) {
+                if (payload[i].reports.length > MAX_REPORTS) {
                     if (payload[i].body) {
                         payload[i].body = "[This comment has been removed]";
                     }
@@ -254,7 +300,7 @@ const CommentQuery = {
             });
 
             for (let i = 0; i < payload.items.length; i += 1) {
-                if (payload.items[i].reports > MAX_REPORTS) {
+                if (payload.items[i].reports.length > MAX_REPORTS) {
                     if (payload.items[i].body) {
                         payload.items[i].body =
                             "[This comment has been removed]";
@@ -271,6 +317,7 @@ const CommentMutation = {
         .withMiddlewares([checkLoggedIn, userCheckCreate])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
+
             pubsub.publish("commentCreated", {
                 commentCreated: payload.record,
             });
@@ -281,12 +328,6 @@ const CommentMutation = {
     commentUpdateById: CommentTC.getResolver("updateById")
         .withMiddlewares([checkLoggedIn, userCheckComment])
         .wrapResolve((next) => async (rp) => {
-            if (rp.args.record.reports) {
-                if (rp.args.record.reports > MAX_REPORTS) {
-                    rp.args.record.body = "[This comment has been removed]";
-                }
-            }
-
             const payload = await next(rp);
 
             pubsub.publish("commentUpdated", {
@@ -300,6 +341,7 @@ const CommentMutation = {
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
+
             pubsub.publish("commentVoteChanged", {
                 commentVoteChanged: payload,
             });
@@ -311,8 +353,27 @@ const CommentMutation = {
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
+
             pubsub.publish("commentVoteChanged", {
                 commentVoteChanged: payload,
+            });
+
+            return payload;
+        }),
+
+    toggleCommentReport: CommentTC.getResolver("toggleReport")
+        .withMiddlewares([checkLoggedIn])
+        .wrapResolve((next) => async (rp) => {
+            if (rp.args.record.reports) {
+                if (rp.args.record.reports.length > MAX_REPORTS) {
+                    rp.args.record.body = "[This comment has been removed]";
+                }
+            }
+
+            const payload = await next(rp);
+
+            pubsub.publish("commentReported", {
+                commentReported: payload,
             });
 
             return payload;
@@ -322,8 +383,9 @@ const CommentMutation = {
         .withMiddlewares([checkLoggedIn, userCheckComment])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
+
             pubsub.publish("commentRemoved", {
-                commentUpdated: payload.record,
+                commentRemoved: payload.record,
             });
 
             return payload;
@@ -347,6 +409,12 @@ const CommentSubscription = {
         type: CommentTC,
 
         subscribe: () => pubsub.asyncIterator("commentVotedChanged"),
+    },
+
+    commentReported: {
+        type: CommentTC,
+
+        subscribe: () => pubsub.asyncIterator("commentReported"),
     },
 
     commentRemoved: {

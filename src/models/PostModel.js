@@ -61,10 +61,11 @@ const PostSchema = new mongoose.Schema({
         },
     ],
 
-    reports: {
-        type: Number,
-        default: 0,
-    },
+    reports: [
+        {
+            type: String,
+        },
+    ],
 });
 
 const DiscussionSchema = new mongoose.Schema();
