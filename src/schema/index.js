@@ -1,4 +1,5 @@
 import { SchemaComposer } from "graphql-compose";
+import S3 from "aws-sdk/clients/s3";
 
 import { DiscussionTC, EventTC, JobTC, NoticeTC } from "../models";
 
@@ -9,6 +10,8 @@ import {
 } from "./CommentSchema";
 import { PostQuery, PostMutation, PostSubscription } from "./PostSchema";
 import { UserQuery, UserMutation, UserSubscription } from "./UserSchema";
+
+import { AWS_ACCESS_KEY_ID, AWS_SECRET, BUCKET } from "../config";
 
 const sc = new SchemaComposer();
 
@@ -26,24 +29,28 @@ sc.createResolver({
     },
     resolve: async ({ args, context }) => {
         if (!context.netID) {
-            return new Error("Not logged in. Can't ");
+            return new Error("Not logged in. Can't upload image");
         }
 
-        const s3Bucket = "";
+        const s3 = new S3({
+            apiVersion: "2006-03-01",
+            region: "us-west-2",
+            credentials: {
+                accessKeyId: AWS_ACCESS_KEY_ID,
+                secretAccessKey: AWS_SECRET,
+            },
+        });
 
         const s3Params = {
-            Bucket: s3Bucket,
+            Bucket: BUCKET,
             Key: args.filename,
             Expires: 60,
             ContentType: args.filetype,
             ACL: "public-read",
         };
 
-        const signedRequest = await context.s3.getSignedUrl(
-            "putObject",
-            s3Params,
-        );
-        const url = `https://${s3Bucket}.s3.amazonaws.com/${args.filename}`;
+        const signedRequest = s3.getSignedUrl("putObject", s3Params);
+        const url = `https://${BUCKET}.s3.amazonaws.com/${args.filename}`;
 
         return {
             signedRequest,

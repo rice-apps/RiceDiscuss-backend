@@ -23,6 +23,7 @@ const MAX_REPORTS = parseInt(process.env.MAX_REPORTS, 10);
 
 const { AWS_ACCESS_KEY_ID } = process.env;
 const { AWS_SECRET } = process.env;
+const { BUCKET } = process.env;
 
 const CHECK_HTML_CONFIG = {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
@@ -52,6 +53,7 @@ export {
     MAX_REPORTS,
     AWS_ACCESS_KEY_ID,
     AWS_SECRET,
+    BUCKET,
     CHECK_HTML_CONFIG,
     MONGOOSE_CONFIG,
 };
