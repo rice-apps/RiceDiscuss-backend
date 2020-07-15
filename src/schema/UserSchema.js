@@ -1,74 +1,80 @@
+import log from "loglevel";
 import { UserTC, PostDTC, CommentTC, User } from "../models";
-
-import { checkWithCAS, createToken, isTokenExpired } from "../utils/auth";
-
-import { checkLoggedIn, userCheckUserFilter } from "../utils/middlewares";
-
-import pubsub from "../pubsub";
+import {
+    checkWithCAS,
+    createToken,
+    isTokenExpired,
+    checkLoggedIn,
+    userCheckUserFilter,
+    pubsub,
+} from "../utils";
 
 UserTC.addFields({
-    posts: [PostDTC],
+    posts: [PostDTC.getDInterface()],
     comments: [CommentTC],
-});
+})
+    .addRelation("posts", {
+        resolver: () => PostDTC.getResolver("findManyByCreator"),
 
-UserTC.addRelation("posts", {
-    resolver: () => PostDTC.getResolver("findManyByCreator"),
+        prepareArgs: {
+            creator: (source) => source.netID,
+        },
 
-    prepareArgs: {
-        creator: (source) => source.netID,
-    },
+        projection: {
+            netID: 1,
+        },
+    })
+    .addRelation("comments", {
+        resolver: () => CommentTC.getResolver("findManyByCreator"),
 
-    projection: {
-        netID: 1,
-    },
-});
+        prepareArgs: {
+            creator: (source) => source.netID,
+        },
 
-UserTC.addRelation("comments", {
-    resolver: () => CommentTC.getResolver("findManyByCreator"),
+        projection: {
+            netID: 1,
+        },
+    })
+    .addResolver({
+        name: "authenticate",
+        type: UserTC,
+        args: { ticket: "String!" },
+        resolve: async ({ args }) => {
+            const res = await checkWithCAS(args.ticket);
 
-    prepareArgs: {
-        creator: (source) => source.netID,
-    },
-
-    projection: {
-        netID: 1,
-    },
-});
-
-UserTC.addResolver({
-    name: "authenticate",
-    type: UserTC,
-    args: { ticket: `String!` },
-    resolve: async ({ args }) => {
-        const res = await checkWithCAS(args.ticket);
-
-        if (res.success) {
-            let user;
-            const isNewUser = !(await User.exists({ netID: res.netID }));
-
-            if (isNewUser) {
-                user = await User.create({
+            if (res.success) {
+                const isNewUser = !(await User.exists({
                     netID: res.netID,
-                    username: res.netID,
-                }).then((doc) => {
-                    doc.token = createToken(doc);
+                }).catch((err) => log.error(err)));
 
-                    return doc.save();
-                });
-            } else {
-                user = await User.findOne({ netID: res.netID }).then((doc) => {
-                    if (isTokenExpired(doc)) {
-                        doc.token = createToken(doc);
-                    }
+                return isNewUser
+                    ? User.create({ netID: res.netID, username: res.netID })
+                          .then((doc) => {
+                              doc.token = createToken(doc);
 
-                    return doc.save();
-                });
+                              return doc.save();
+                          })
+                          .catch(
+                              (err) =>
+                                  new Error(`User creation failed: ${err}`),
+                          )
+                    : User.findOne({ netID: res.netID })
+                          .then((doc) => {
+                              if (isTokenExpired(doc)) {
+                                  doc.token = createToken(doc);
+                              }
+
+                              return doc.save();
+                          })
+                          .catch(
+                              (err) =>
+                                  new Error(`User creation failed: ${err}`),
+                          );
             }
 
-            return user;
-        }
-    },
-});
+            return null;
+        },
+    });
 
 const UserQuery = {
     userOne: UserTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
@@ -80,12 +86,13 @@ const UserQuery = {
 
 const UserMutation = {
     userAuthentication: UserTC.getResolver("authenticate"),
+
     userUpdateOne: UserTC.getResolver("updateOne")
         .withMiddlewares([checkLoggedIn, userCheckUserFilter])
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("profileUpdated", {
+            pubsub.publish("profileUpdated", {
                 profileUpdated: payload.record,
             });
 
@@ -97,7 +104,7 @@ const UserMutation = {
         .wrapResolve((next) => async (rp) => {
             const payload = await next(rp);
 
-            await pubsub.publish("profileRemoved", {
+            pubsub.publish("profileRemoved", {
                 profileRemoved: payload.record,
             });
 

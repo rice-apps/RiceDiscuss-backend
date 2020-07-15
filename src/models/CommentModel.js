@@ -1,9 +1,6 @@
-import mongoose from "mongoose";
 import { composeWithMongoose } from "graphql-compose-mongoose";
-
-import composeDataloader from "../utils/dataloader";
-
-import { DATALOADER_OPTIONS, DATALOADER_RESOLVERS } from "../config";
+import log from "loglevel";
+import mongoose from "mongoose";
 
 const CommentSchema = new mongoose.Schema({
     creator: {
@@ -13,7 +10,7 @@ const CommentSchema = new mongoose.Schema({
 
     post: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Post",
+        ref: "PostInterface",
         required: true,
     },
 
@@ -53,10 +50,11 @@ const CommentSchema = new mongoose.Schema({
         },
     ],
 
-    reports: {
-        type: Number,
-        default: 0,
-    },
+    reports: [
+        {
+            type: String,
+        },
+    ],
 });
 
 const Comment = mongoose.model("Comment", CommentSchema);
@@ -67,70 +65,52 @@ CommentTC.addResolver({
     name: "findManyByParentID",
 
     args: {
-        parent: `ID`,
+        parent: "ID",
     },
 
     type: [CommentTC],
 
-    resolve: async ({ args }) => {
-        return Comment.find({ parent: args.parent });
-    },
-});
+    resolve: ({ args }) =>
+        Comment.find({ parent: args.parent })
+            .then((res) => res)
+            .catch((err) => {
+                log.error(err);
+                return new Error(`Search failed: ${err}`);
+            }),
+})
+    .addResolver({
+        name: "findManyByPostID",
 
-CommentTC.addResolver({
-    name: "findManyByPostID",
+        args: {
+            post: "ID",
+        },
 
-    args: {
-        post: `ID`,
-    },
+        type: [CommentTC],
 
-    type: [CommentTC],
+        resolve: ({ args }) =>
+            Comment.find({ post: args.post })
+                .then((res) => res)
+                .catch((err) => {
+                    log.error(err);
+                    return new Error(`Search failed: ${err}`);
+                }),
+    })
+    .addResolver({
+        name: "findManyByCreator",
 
-    resolve: async ({ args }) => {
-        return Comment.find({ post: args.post });
-    },
-});
+        args: {
+            creator: "String",
+        },
 
-CommentTC.addResolver({
-    name: "findManyByCreator",
+        type: [CommentTC],
 
-    args: {
-        creator: `String`,
-    },
+        resolve: ({ args }) =>
+            Comment.find({ creator: args.creator })
+                .then((res) => res)
+                .catch((err) => {
+                    log.error(err);
+                    return new Error(`Search failed: ${err}`);
+                }),
+    });
 
-    type: [CommentTC],
-
-    resolve: async ({ args }) => {
-        return Comment.find({ creator: args.creator });
-    },
-});
-
-CommentTC.wrapResolverResolve(
-    "updateById",
-    (next) => async ({ source, args, context, info, projection }) => {
-        return next({
-            source: source,
-            args: {
-                ...args,
-                record: {
-                    ...args.record,
-                    body:
-                        args.record.report > 10
-                            ? "[deleted]"
-                            : args.record.body,
-                },
-            },
-            context: context,
-            info: info,
-            projection: projection,
-        });
-    },
-);
-
-const CommentTCDL = composeDataloader(
-    CommentTC,
-    DATALOADER_RESOLVERS,
-    DATALOADER_OPTIONS,
-);
-
-export { Comment, CommentTCDL as CommentTC };
+export { Comment, CommentTC };

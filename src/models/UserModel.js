@@ -1,11 +1,7 @@
-import mongoose from "mongoose";
 import { composeWithMongoose } from "graphql-compose-mongoose";
-
-import composeDataloader from "../utils/dataloader";
-
+import log from "loglevel";
+import mongoose from "mongoose";
 import { COLLEGES, MAJORS, MINORS } from "../config";
-
-import { DATALOADER_OPTIONS, DATALOADER_RESOLVERS } from "../config";
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -42,7 +38,7 @@ const UserSchema = new mongoose.Schema({
     major: {
         type: [String],
         validate: {
-            validator: function (majors) {
+            validator(majors) {
                 return majors.every((major) => MAJORS.includes(major));
             },
             message: (props) => `${props.value} has a major that's not valid!`,
@@ -53,7 +49,7 @@ const UserSchema = new mongoose.Schema({
     minor: {
         type: [String],
         validate: {
-            validator: function (minors) {
+            validator(minors) {
                 return minors.every((minor) => MINORS.includes(minor));
             },
             message: (props) => `${props.value} has a minor that's not valid!`,
@@ -71,36 +67,44 @@ const User = mongoose.model("User", UserSchema);
 
 const UserTC = composeWithMongoose(User);
 
-UserTC.wrapResolverResolve("findOne", (next) => async (rp) => {
-    const resPromise = next(rp);
+UserTC.wrapResolverResolve("findOne", (next) => (rp) =>
+    next({ ...rp, projection: { netID: {}, ...rp.projection } })
+        .then((payload) => {
+            const res = { ...payload._doc };
 
-    resPromise.then((payload) => {
-        if (payload.netID != rp.context.netID) {
-            payload.token = null;
-        }
-    });
-
-    return resPromise;
-});
-
-UserTC.wrapResolverResolve("pagination", (next) => async (rp) => {
-    const resPromise = next(rp);
-
-    resPromise.then((payload) => {
-        for (let i = 0; i < payload.items.length; i++) {
-            if (payload.items[i].netID != rp.context.netID) {
-                payload.items[i].token = null;
+            if (
+                typeof res.netID === "undefined" ||
+                res.netID !== rp.context.netID
+            ) {
+                res.token = null;
             }
-        }
-    });
 
-    return resPromise;
-});
+            return res;
+        })
+        .catch((err) => {
+            log.error(err);
+            return new Error(`Search failed: ${err}`);
+        }),
+).wrapResolverResolve("pagination", (next) => (rp) =>
+    next({ ...rp, projection: { netID: {}, ...rp.projection } })
+        .then((payload) => {
+            const res = { ...payload };
 
-const UserTCDL = composeDataloader(
-    UserTC,
-    DATALOADER_RESOLVERS,
-    DATALOADER_OPTIONS,
+            for (let i = 0; i < res.items.length; i += 1) {
+                if (
+                    typeof res.items[i].netID === "undefined" ||
+                    res.items[i].netID !== rp.context.netID
+                ) {
+                    res.items[i].token = null;
+                }
+            }
+
+            return res;
+        })
+        .catch((err) => {
+            log.error(err);
+            return new Error(`Search failed: ${err}`);
+        }),
 );
 
-export { User, UserTCDL as UserTC };
+export { User, UserTC };
