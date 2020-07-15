@@ -70,13 +70,6 @@ const PostSchema = new mongoose.Schema({
 
 const DiscussionSchema = new mongoose.Schema();
 
-const NoticeSchema = new mongoose.Schema({
-    deadline: {
-        type: Date,
-        required: true,
-    },
-});
-
 const EventSchema = new mongoose.Schema({
     start: {
         type: Date,
@@ -117,6 +110,13 @@ const JobSchema = new mongoose.Schema({
 
     isClosed: {
         type: Boolean,
+        required: true,
+    },
+});
+
+const NoticeSchema = new mongoose.Schema({
+    deadline: {
+        type: Date,
         required: true,
     },
 });
@@ -208,6 +208,10 @@ PostDTC.addResolver({
                 log.error(err);
                 return new Error(`Search failed: ${err}`);
             }),
+}).wrapResolverResolve("connection", (next) => (rp) => {
+    rp.projection.kind = {};
+
+    return next(rp);
 });
 
 export {

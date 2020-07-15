@@ -257,7 +257,7 @@ const PostQuery = {
 
     postCount: PostDTC.getResolver("count").withMiddlewares([checkLoggedIn]),
 
-    postPagination: PostDTC.getResolver("pagination")
+    postConnection: PostDTC.getResolver("connection")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
             const payload = await next({
@@ -265,14 +265,15 @@ const PostQuery = {
                 projection: { reports: {}, ...rp.projection },
             });
 
-            for (let i = 0; i < payload.items.length; i += 1) {
-                if (payload.items[i].reports.length > MAX_REPORTS) {
-                    if (payload.items[i].body) {
-                        payload.items[i].body = "[This post has been removed.]";
+            for (let i = 0; i < payload.edges.length; i += 1) {
+                if (payload.edges[i].node.reports.length > MAX_REPORTS) {
+                    if (payload.edges[i].node.title) {
+                        payload.edges[i].node.title =
+                            "[This post has been removed.]";
                     }
 
-                    if (payload.items[i].title) {
-                        payload.items[i].title =
+                    if (payload.edges[i].node.body) {
+                        payload.edges[i].node.body =
                             "[This post has been removed.]";
                     }
                 }
