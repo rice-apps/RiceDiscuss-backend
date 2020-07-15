@@ -21,7 +21,6 @@ const app = express().use(
 const server = new ApolloServer({
     schema: Schema,
     introspection: true,
-    playground: true,
     context: ({ req }) => {
         if (req) {
             try {
@@ -62,7 +61,7 @@ const server = new ApolloServer({
                     };
                 } catch (err) {
                     websocket.close();
-                    throw new Error(
+                    return new Error(
                         `WebSocket authentication failed due to ${err}`,
                     );
                 }

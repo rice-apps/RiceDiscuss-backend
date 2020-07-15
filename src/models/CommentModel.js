@@ -50,10 +50,11 @@ const CommentSchema = new mongoose.Schema({
         },
     ],
 
-    reports: {
-        type: Number,
-        default: 0,
-    },
+    reports: [
+        {
+            type: String,
+        },
+    ],
 });
 
 const Comment = mongoose.model("Comment", CommentSchema);
@@ -69,11 +70,13 @@ CommentTC.addResolver({
 
     type: [CommentTC],
 
-    resolve: async ({ args }) => {
-        return Comment.find({ parent: args.parent }).catch((err) =>
-            log.error(err),
-        );
-    },
+    resolve: ({ args }) =>
+        Comment.find({ parent: args.parent })
+            .then((res) => res)
+            .catch((err) => {
+                log.error(err);
+                return new Error(`Search failed: ${err}`);
+            }),
 })
     .addResolver({
         name: "findManyByPostID",
@@ -84,11 +87,13 @@ CommentTC.addResolver({
 
         type: [CommentTC],
 
-        resolve: async ({ args }) => {
-            return Comment.find({ post: args.post }).catch((err) =>
-                log.err(err),
-            );
-        },
+        resolve: ({ args }) =>
+            Comment.find({ post: args.post })
+                .then((res) => res)
+                .catch((err) => {
+                    log.error(err);
+                    return new Error(`Search failed: ${err}`);
+                }),
     })
     .addResolver({
         name: "findManyByCreator",
@@ -99,11 +104,13 @@ CommentTC.addResolver({
 
         type: [CommentTC],
 
-        resolve: async ({ args }) => {
-            return Comment.find({ creator: args.creator }).catch((err) =>
-                log.err(err),
-            );
-        },
+        resolve: ({ args }) =>
+            Comment.find({ creator: args.creator })
+                .then((res) => res)
+                .catch((err) => {
+                    log.error(err);
+                    return new Error(`Search failed: ${err}`);
+                }),
     });
 
 export { Comment, CommentTC };

@@ -6,7 +6,6 @@ import {
     userCheckComment,
     userCheckPost,
     userCheckUserFilter,
-    userCheckUserId,
 } from "./middlewares";
 
 import pubsub from "./pubsub";
@@ -21,6 +20,5 @@ export {
     userCheckComment,
     userCheckPost,
     userCheckUserFilter,
-    userCheckUserId,
     pubsub,
 };

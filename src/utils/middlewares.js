@@ -8,7 +8,7 @@ function checkLoggedIn(resolve, source, args, context, info) {
         return resolve(source, args, context, info);
     }
 
-    throw new Error("Not logged in!");
+    return new Error("Not logged in!");
 }
 
 function userCheckCreate(resolve, source, args, context, info) {
@@ -16,17 +16,17 @@ function userCheckCreate(resolve, source, args, context, info) {
         return resolve(source, args, context, info);
     }
 
-    throw new Error("User cannot create content as different user!");
+    return new Error("User cannot create content as different user!");
 }
 
 async function userCheckComment(resolve, source, args, context, info) {
-    const comment = await Comment.findById(args._id);
+    const comment = await Comment.findById(args.record._id);
 
     if (comment.creator === context.netID) {
         return resolve(source, args, context, info);
     }
 
-    throw new Error("User does not have edit access to this comment");
+    return new Error("User does not have edit access to this comment");
 }
 
 async function userCheckPost(resolve, source, args, context, info) {
@@ -36,7 +36,7 @@ async function userCheckPost(resolve, source, args, context, info) {
         return resolve(source, args, context, info);
     }
 
-    throw new Error("User does not have access to edit this post");
+    return new Error("User does not have access to edit this post");
 }
 
 async function userCheckUserFilter(resolve, source, args, context, info) {
@@ -44,25 +44,27 @@ async function userCheckUserFilter(resolve, source, args, context, info) {
         return resolve(source, args, context, info);
     }
 
-    throw new Error("User is not the same");
+    return new Error("User is not the same");
 }
 
 async function userCheckUserId(resolve, source, args, context, info) {
-    const user = await User.findById(args._id);
+    const user = await User.findById(args.record._id);
 
     if (user.netID === context.netID) {
         return resolve(source, args, context, info);
     }
 
-    throw new Error("User is not the same");
+    return new Error("User is not the same");
 }
 
 async function checkHTML(resolve, source, args, context, info) {
-    if (args.record.body) {
-        args.record.body = sanitizeHtml(args.record.body, CHECK_HTML_CONFIG);
+    const newArgs = { ...args };
+
+    if (newArgs.record.body) {
+        newArgs.record.body = sanitizeHtml(args.record.body, CHECK_HTML_CONFIG);
     }
 
-    return resolve(source, args, context, info);
+    return resolve(source, newArgs, context, info);
 }
 
 export {
