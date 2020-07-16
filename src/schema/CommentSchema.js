@@ -291,7 +291,7 @@ const CommentQuery = {
         checkLoggedIn,
     ]),
 
-    commentPagination: CommentTC.getResolver("pagination")
+    commentConnection: CommentTC.getResolver("connection")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
             const payload = await next({
@@ -299,10 +299,10 @@ const CommentQuery = {
                 projection: { reports: {}, ...rp.projection },
             });
 
-            for (let i = 0; i < payload.items.length; i += 1) {
-                if (payload.items[i].reports.length > MAX_REPORTS) {
-                    if (payload.items[i].body) {
-                        payload.items[i].body =
+            for (let i = 0; i < payload.edges.length; i += 1) {
+                if (payload.edges[i].node.reports.length > MAX_REPORTS) {
+                    if (payload.edges[i].node.body) {
+                        payload.edges[i].node.body =
                             "[This comment has been removed]";
                     }
                 }

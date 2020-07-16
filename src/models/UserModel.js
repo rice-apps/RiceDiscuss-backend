@@ -85,17 +85,17 @@ UserTC.wrapResolverResolve("findOne", (next) => (rp) =>
             log.error(err);
             return new Error(`Search failed: ${err}`);
         }),
-).wrapResolverResolve("pagination", (next) => (rp) =>
+).wrapResolverResolve("connection", (next) => (rp) =>
     next({ ...rp, projection: { netID: {}, ...rp.projection } })
         .then((payload) => {
             const res = { ...payload };
 
-            for (let i = 0; i < res.items.length; i += 1) {
+            for (let i = 0; i < res.edges.length; i += 1) {
                 if (
-                    typeof res.items[i].netID === "undefined" ||
-                    res.items[i].netID !== rp.context.netID
+                    typeof res.edges[i].node.netID === "undefined" ||
+                    res.edges[i].node.netID !== rp.context.netID
                 ) {
-                    res.items[i].token = null;
+                    res.edges[i].node.token = null;
                 }
             }
 
