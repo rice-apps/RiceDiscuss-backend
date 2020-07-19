@@ -9,7 +9,9 @@
         "build": "rm -rf build && babel src -d build",
         "start": "nodemon",
         "serve": "node --trace-warnings build/index.js",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "make-exec": "npx pkg build/index.js --options trace-warnings",
+        "pkg": "run-s build make-exec"
     },
     "repository": {
         "type": "git",
