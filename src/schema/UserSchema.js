@@ -79,7 +79,7 @@ UserTC.addFields({
 const UserQuery = {
     userOne: UserTC.getResolver("findOne").withMiddlewares([checkLoggedIn]),
 
-    userPagination: UserTC.getResolver("pagination").withMiddlewares([
+    userConnection: UserTC.getResolver("connection").withMiddlewares([
         checkLoggedIn,
     ]),
 };

@@ -9,7 +9,9 @@
         "build": "rm -rf build && babel src -d build",
         "start": "nodemon",
         "serve": "node --trace-warnings build/index.js",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "make-exec": "npx pkg build/index.js --options trace-warnings",
+        "pkg": "run-s build make-exec"
     },
     "repository": {
         "type": "git",
@@ -53,8 +55,8 @@
         "express-ws": "^4.0.0",
         "graphql": "^14.6.0",
         "graphql-compose": "^7.15.0",
+        "graphql-compose-connection": "^6.2.1",
         "graphql-compose-mongoose": "^7.3.8",
-        "graphql-compose-pagination": "^6.0.3",
         "jsonwebtoken": "^8.5.1",
         "loglevel": "^1.6.8",
         "mongoose": "^5.9.5",
