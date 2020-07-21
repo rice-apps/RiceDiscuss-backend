@@ -4,13 +4,14 @@
     "description": "The backend for RiceDiscuss, written in Node and Apollo GraphQL",
     "main": "src/index.js",
     "scripts": {
-        "lint": "eslint ./src --fix",
-        "start": "nodemon --exec babel-node src/index.js",
-        "test": "jest -i --verbose --coverage --runInBand",
-        "dboff": "killall mongod",
-        "watch": "nodemon src/index.js",
-        "dbon": "mkdir -p ./db && mongod --dbpath ./db",
-        "format": "npx prettier --write \"src/**/*.{js,html,css,scss,json}\""
+        "prod": "run-s build serve",
+        "lint": "eslint --fix .",
+        "build": "rm -rf build && babel src -d build",
+        "start": "nodemon",
+        "serve": "node --trace-warnings build/index.js",
+        "format": "prettier --write .",
+        "make-exec": "npx pkg build/index.js --options trace-warnings",
+        "pkg": "run-s build make-exec"
     },
     "repository": {
         "type": "git",
