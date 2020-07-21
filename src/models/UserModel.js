@@ -61,6 +61,10 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+
+    savedPosts: {
+        type: [String],
+    },
 });
 
 const User = mongoose.model("User", UserSchema);
