@@ -35,6 +35,17 @@ UserTC.addFields({
             netID: 1,
         },
     })
+    .addRelation("savedPosts", {
+        resolver: () => PostDTC.getResolver("findByIds"),
+
+        prepareArgs: {
+            _ids: (source) => source.savedPosts,
+        },
+
+        projection: {
+            savedPosts: 1,
+        },
+    })
     .addResolver({
         name: "authenticate",
         type: UserTC,

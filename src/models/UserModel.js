@@ -62,9 +62,12 @@ const UserSchema = new mongoose.Schema({
         default: true,
     },
 
-    savedPosts: {
-        type: [String],
-    },
+    savedPosts: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "PostInterface",
+        },
+    ],
 });
 
 const User = mongoose.model("User", UserSchema);
