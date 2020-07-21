@@ -1,4 +1,4 @@
-import { SchemaComposer } from "graphql-compose";
+import { sc } from "graphql-compose";
 import S3 from "aws-sdk/clients/s3";
 
 import { DiscussionTC, EventTC, JobTC, NoticeTC } from "../models";
@@ -12,8 +12,6 @@ import { PostQuery, PostMutation, PostSubscription } from "./PostSchema";
 import { UserQuery, UserMutation, UserSubscription } from "./UserSchema";
 
 import { AWS_ACCESS_KEY_ID, AWS_SECRET, BUCKET } from "../config";
-
-const sc = new SchemaComposer();
 
 sc.addSchemaMustHaveType(DiscussionTC)
     .addSchemaMustHaveType(EventTC)
@@ -63,13 +61,13 @@ sc.Query.addFields({
     ...CommentQuery,
     ...PostQuery,
     ...UserQuery,
-    signS3Url,
 });
 
 sc.Mutation.addFields({
     ...CommentMutation,
     ...PostMutation,
     ...UserMutation,
+    signS3Url,
 });
 
 sc.Subscription.addFields({
