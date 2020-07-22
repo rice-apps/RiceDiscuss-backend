@@ -61,13 +61,13 @@ sc.Query.addFields({
     ...CommentQuery,
     ...PostQuery,
     ...UserQuery,
-    signS3Url,
 });
 
 sc.Mutation.addFields({
     ...CommentMutation,
     ...PostMutation,
     ...UserMutation,
+    signS3Url,
 });
 
 sc.Subscription.addFields({
