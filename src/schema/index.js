@@ -1,3 +1,4 @@
+import log from "loglevel";
 import { sc } from "graphql-compose";
 import S3 from "aws-sdk/clients/s3";
 
@@ -20,11 +21,11 @@ sc.addSchemaMustHaveType(DiscussionTC)
 
 const doesUsernameExist = sc.createResolver({
     name: "doesUsernameExist",
-    type: 'type BooleanPayload { usernameExists: Boolean! }',
+    type: "type BooleanPayload { usernameExists: Boolean! }",
     args: {
-        username: `String!`
+        username: `String!`,
     },
-    resolve: async ({args, context}) => {
+    resolve: async ({ args, context }) => {
         if (!context.netID) {
             return new Error("Not logged in. Stop trying to access the data");
         }
@@ -34,11 +35,10 @@ const doesUsernameExist = sc.createResolver({
         }).catch((err) => log.error(err));
 
         return {
-            usernameExists
+            usernameExists,
         };
-    }
+    },
 });
-
 
 const signS3Url = sc.createResolver({
     name: "signS3Url",
@@ -83,7 +83,7 @@ sc.Query.addFields({
     ...CommentQuery,
     ...PostQuery,
     ...UserQuery,
-    doesUsernameExist
+    doesUsernameExist,
 });
 
 sc.Mutation.addFields({
