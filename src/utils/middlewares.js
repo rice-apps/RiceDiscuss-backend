@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import sanitizeHtml from "sanitize-html";
 
 import { Post, Comment, User } from "../models";
@@ -8,7 +9,7 @@ function checkLoggedIn(resolve, source, args, context, info) {
         return resolve(source, args, context, info);
     }
 
-    return new Error("Not logged in!");
+    return new AuthenticationError("Not logged in!");
 }
 
 function userCheckCreate(resolve, source, args, context, info) {
@@ -44,7 +45,7 @@ async function userCheckUserFilter(resolve, source, args, context, info) {
         return resolve(source, args, context, info);
     }
 
-    return new Error("User is not the same");
+    return new AuthenticationError("User is not the same");
 }
 
 async function userCheckUserId(resolve, source, args, context, info) {
@@ -54,7 +55,7 @@ async function userCheckUserId(resolve, source, args, context, info) {
         return resolve(source, args, context, info);
     }
 
-    return new Error("User is not the same");
+    return new AuthenticationError("User is not the same");
 }
 
 async function checkHTML(resolve, source, args, context, info) {

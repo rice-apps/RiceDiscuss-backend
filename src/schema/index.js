@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import log from "loglevel";
 import { sc } from "graphql-compose";
 import S3 from "aws-sdk/clients/s3";
@@ -27,7 +28,7 @@ const doesUsernameExist = sc.createResolver({
     },
     resolve: async ({ args, context }) => {
         if (!context.netID) {
-            return new Error("Not logged in. Stop trying to access the data");
+            return new AuthenticationError("Not logged in. Stop trying to access the data");
         }
 
         const usernameExists = await User.exists({
@@ -49,7 +50,7 @@ const signS3Url = sc.createResolver({
     },
     resolve: async ({ args, context }) => {
         if (!context.netID) {
-            return new Error("Not logged in. Can't upload image");
+            return new AuthenticationError("Not logged in. Can't upload image");
         }
 
         const s3 = new S3({
