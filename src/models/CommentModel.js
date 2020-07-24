@@ -1,3 +1,4 @@
+import { ApolloError } from "apollo-server-express";
 import { composeWithMongoose } from "graphql-compose-mongoose";
 import log from "loglevel";
 import mongoose from "mongoose";
@@ -75,7 +76,7 @@ CommentTC.addResolver({
             .then((res) => res)
             .catch((err) => {
                 log.error(err);
-                return new Error(`Search failed: ${err}`);
+                return new ApolloError(`Comment findManyByParentID failed: ${err}`);
             }),
 })
     .addResolver({
@@ -92,7 +93,7 @@ CommentTC.addResolver({
                 .then((res) => res)
                 .catch((err) => {
                     log.error(err);
-                    return new Error(`Search failed: ${err}`);
+                    return new ApolloError(`Comment findManyByPostID failed: ${err}`);
                 }),
     })
     .addResolver({
@@ -109,7 +110,7 @@ CommentTC.addResolver({
                 .then((res) => res)
                 .catch((err) => {
                     log.error(err);
-                    return new Error(`Search failed: ${err}`);
+                    return new ApolloError(`Comment findManyByCreator failed: ${err}`);
                 }),
     });
 

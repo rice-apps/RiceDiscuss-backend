@@ -1,3 +1,4 @@
+import { ApolloError, AuthenticationError } from "apollo-server-express";
 import log from "loglevel";
 import { UserTC, PostDTC, CommentTC, User } from "../models";
 import {
@@ -67,7 +68,7 @@ UserTC.addFields({
                           })
                           .catch(
                               (err) =>
-                                  new Error(`User creation failed: ${err}`),
+                                  new ApolloError(`User creation failed: ${err}`),
                           )
                     : User.findOne({ netID: res.netID })
                           .then((doc) => {
@@ -79,11 +80,11 @@ UserTC.addFields({
                           })
                           .catch(
                               (err) =>
-                                  new Error(`User creation failed: ${err}`),
+                                  new ApolloError(`User search failed: ${err}`),
                           );
             }
 
-            return null;
+            return new AuthenticationError("User creation failed because authentication failed");
         },
     });
 

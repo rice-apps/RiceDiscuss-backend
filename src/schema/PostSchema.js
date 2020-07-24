@@ -1,3 +1,4 @@
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import log from "loglevel";
 import { CommentTC, PostDTC, UserTC, Post } from "../models";
 import {
@@ -102,7 +103,7 @@ PostDTC.addFields({
         args: { _id: "ID!", netID: "String!" },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
-                return new Error("cannot upvote as someone else");
+                return new ForbiddenError("Cannot upvote post as someone else");
             }
 
             const post = await Post.findById(args._id)
@@ -115,7 +116,7 @@ PostDTC.addFields({
                 });
 
             if (post === null) {
-                return new Error("trying to upvote nonexistent post");
+                return new UserInputError("Trying to upvote nonexistent post");
             }
 
             if (post.upvotes.includes(args.netID)) {
@@ -142,7 +143,7 @@ PostDTC.addFields({
         args: { _id: "ID!", netID: "String!" },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
-                return new Error("cannot downvote as someone else");
+                return new ForbiddenError("Cannot downvote post as someone else");
             }
 
             const post = await Post.findById(args._id)
@@ -155,7 +156,7 @@ PostDTC.addFields({
                 });
 
             if (post === null) {
-                return new Error("trying to upvote nonexistent post");
+                return new UserInputError("Trying to downvote nonexistent post");
             }
 
             if (post.downvotes.includes(args.netID)) {
@@ -182,7 +183,7 @@ PostDTC.addFields({
         args: { _id: "ID!", netID: "String!" },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
-                return new Error("cannot report post as someone else");
+                return new ForbiddenError("Cannot report post as someone else");
             }
 
             const post = await Post.findById(args._id)
@@ -195,7 +196,7 @@ PostDTC.addFields({
                 });
 
             if (post === null) {
-                return new Error("trying to report nonexistent post");
+                return new UserInputError("Trying to report nonexistent post");
             }
 
             if (post.reports.includes(args.netID)) {

@@ -1,3 +1,4 @@
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import log from "loglevel";
 import { Comment, CommentTC, PostDTC, UserTC } from "../models";
 import {
@@ -123,7 +124,7 @@ CommentTC.addFields({
         args: { _id: `ID`, netID: `String!` },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
-                return new Error("cannot upvote as someone else");
+                return new ForbiddenError("Cannot upvote comment as someone else");
             }
 
             const comment = await Comment.findById(args._id)
@@ -136,7 +137,7 @@ CommentTC.addFields({
                 });
 
             if (comment == null) {
-                return new Error("trying to upvote nonexistent post");
+                return new UserInputError("Trying to upvote nonexistent comment");
             }
 
             if (comment.upvotes.includes(args.netID)) {
@@ -163,7 +164,7 @@ CommentTC.addFields({
         args: { _id: "ID!", netID: "String!" },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
-                return new Error("cannot downvote as someone else");
+                return new ForbiddenError("Cannot downvote comment as someone else");
             }
 
             const comment = await Comment.findById(args._id)
@@ -176,7 +177,7 @@ CommentTC.addFields({
                 });
 
             if (comment == null) {
-                return new Error("trying to upvote nonexistent post");
+                return new UserInputError("Trying to downvote nonexistent comment");
             }
 
             if (comment.downvotes.includes(args.netID)) {
@@ -203,7 +204,7 @@ CommentTC.addFields({
         args: { _id: "ID!", netID: "String!" },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
-                return new Error("cannot report post as someone else");
+                return new ForbiddenError("Cannot report comment as someone else");
             }
 
             const comment = await Comment.findById(args._id)
@@ -216,7 +217,7 @@ CommentTC.addFields({
                 });
 
             if (comment === null) {
-                return new Error("trying to report nonexistent post");
+                return new UserInputError("trying to report nonexistent comment");
             }
 
             if (comment.reports.includes(args.netID)) {

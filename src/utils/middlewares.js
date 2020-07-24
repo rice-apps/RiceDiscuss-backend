@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, ForbiddenError } from "apollo-server-express";
 import sanitizeHtml from "sanitize-html";
 
 import { Post, Comment, User } from "../models";
@@ -17,7 +17,7 @@ function userCheckCreate(resolve, source, args, context, info) {
         return resolve(source, args, context, info);
     }
 
-    return new Error("User cannot create content as different user!");
+    return new ForbiddenError("User cannot create content as different user!");
 }
 
 async function userCheckComment(resolve, source, args, context, info) {
@@ -27,7 +27,7 @@ async function userCheckComment(resolve, source, args, context, info) {
         return resolve(source, args, context, info);
     }
 
-    return new Error("User does not have edit access to this comment");
+    return new ForbiddenError("User does not have edit access to this comment");
 }
 
 async function userCheckPost(resolve, source, args, context, info) {
@@ -37,7 +37,7 @@ async function userCheckPost(resolve, source, args, context, info) {
         return resolve(source, args, context, info);
     }
 
-    return new Error("User does not have access to edit this post");
+    return new ForbiddenError("User does not have access to edit this post");
 }
 
 async function userCheckUserFilter(resolve, source, args, context, info) {
