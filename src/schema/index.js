@@ -28,7 +28,9 @@ const doesUsernameExist = sc.createResolver({
     },
     resolve: async ({ args, context }) => {
         if (!context.netID) {
-            return new AuthenticationError("Not logged in. Stop trying to access the data");
+            return new AuthenticationError(
+                "Not logged in. Stop trying to access the data",
+            );
         }
 
         const usernameExists = await User.exists({
