@@ -2,9 +2,10 @@ import { ApolloError } from "apollo-server-express";
 import { composeWithMongooseDiscriminators } from "graphql-compose-mongoose";
 import log from "loglevel";
 import mongoose from "mongoose";
-import { sc, toInputObjectType } from "graphql-compose";
-import { Kind, GraphQLError } from "graphql";
+import { toInputObjectType } from "graphql-compose";
 import "mongoose-type-url";
+
+import { UrlTC } from "../schema/CustomTypes";
 
 const DKey = "kind";
 
@@ -71,7 +72,6 @@ const PostSchema = new mongoose.Schema({
     ],
 
     imageUrl: {
-        // type: String,
         type: mongoose.SchemaTypes.Url,
     },
 });
@@ -141,32 +141,14 @@ const Notice = Post.discriminator(enumPostType.Notice, NoticeSchema);
 const Event = Post.discriminator(enumPostType.Event, EventSchema);
 const Job = Post.discriminator(enumPostType.Job, JobSchema);
 
-const UrlTC = sc.createScalarTC({
-    name: "URL",
-    description:
-        "A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.",
-    serialize(value) {
-        return new URL(value.toString()).toString();
-    },
-    parseValue: (value) => new URL(value.toString()),
-    parseLiteral(ast) {
-        if (ast.kind !== Kind.STRING) {
-            throw new GraphQLError(
-                `Can only validate strings as URLs but got a: ${ast.kind}`,
-            );
-        }
-        return new URL(ast.value.toString());
-    },
+const PostDTC = composeWithMongooseDiscriminators(Post).setField("imageUrl", {
+    type: UrlTC,
 });
-
-const PostDTC = composeWithMongooseDiscriminators(Post);
 
 const DiscussionTC = PostDTC.discriminator(Discussion);
 const NoticeTC = PostDTC.discriminator(Notice);
 const EventTC = PostDTC.discriminator(Event);
 const JobTC = PostDTC.discriminator(Job);
-
-PostDTC.setField("imageUrl", { type: UrlTC });
 
 PostDTC.getDInterface()
     .addTypeResolver(

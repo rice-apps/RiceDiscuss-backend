@@ -1,5 +1,6 @@
 import { AuthenticationError } from "apollo-server-express";
 import log from "loglevel";
+import { GraphQLNonNull, GraphQLString } from "graphql";
 import { sc } from "graphql-compose";
 import S3 from "aws-sdk/clients/s3";
 
@@ -13,6 +14,8 @@ import {
 import { PostQuery, PostMutation, PostSubscription } from "./PostSchema";
 import { UserQuery, UserMutation, UserSubscription } from "./UserSchema";
 
+import { S3PayloadTC, UsernameExistsPayloadTC } from "./CustomTypes";
+
 import { AWS_ACCESS_KEY_ID, AWS_SECRET, BUCKET } from "../config";
 
 sc.addSchemaMustHaveType(DiscussionTC)
@@ -22,9 +25,9 @@ sc.addSchemaMustHaveType(DiscussionTC)
 
 const doesUsernameExist = sc.createResolver({
     name: "doesUsernameExist",
-    type: "type BooleanPayload { usernameExists: Boolean! }",
+    type: () => UsernameExistsPayloadTC,
     args: {
-        username: `String!`,
+        username: new GraphQLNonNull(GraphQLString),
     },
     resolve: async ({ args, context }) => {
         if (!context.netID) {
@@ -45,7 +48,7 @@ const doesUsernameExist = sc.createResolver({
 
 const signS3Url = sc.createResolver({
     name: "signS3Url",
-    type: `type S3Payload { signedRequest: URL!, url: URL! }`,
+    type: () => S3PayloadTC,
     args: {
         filename: `String!`,
         filetype: `String!`,
