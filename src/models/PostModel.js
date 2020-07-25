@@ -3,6 +3,9 @@ import { composeWithMongooseDiscriminators } from "graphql-compose-mongoose";
 import log from "loglevel";
 import mongoose from "mongoose";
 import { toInputObjectType } from "graphql-compose";
+import "mongoose-type-url";
+// require("mongoose-type-url");
+import { sc } from "graphql-compose";
 
 const DKey = "kind";
 
@@ -12,6 +15,26 @@ const enumPostType = {
     Notice: "Notice",
     Job: "Job",
 };
+
+const urlTC = sc.createScalarTC(
+    {
+        name: 'URL',
+        description:
+        'A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.',
+        serialize(value) {
+            return new URL(value.toString()).toString();
+        },
+        parseValue: (value) => new URL(value.toString()),
+        parseLiteral(ast) {
+        if (ast.kind !== Kind.STRING) {
+            throw new GraphQLError(
+            `Can only validate strings as URLs but got a: ${ast.kind}`,
+            );
+        }
+        return new URL(ast.value.toString());
+        },
+    }
+);
 
 const PostSchema = new mongoose.Schema({
     kind: {
@@ -67,6 +90,11 @@ const PostSchema = new mongoose.Schema({
             type: String,
         },
     ],
+
+    imageUrl: {
+        // type: String,
+        type: mongoose.SchemaTypes.Url
+    },
 });
 
 const DiscussionSchema = new mongoose.Schema();
@@ -140,6 +168,11 @@ const DiscussionTC = PostDTC.discriminator(Discussion);
 const NoticeTC = PostDTC.discriminator(Notice);
 const EventTC = PostDTC.discriminator(Event);
 const JobTC = PostDTC.discriminator(Job);
+
+PostDTC.setField(
+    "imageUrl", 
+    { type: urlTC }
+);
 
 PostDTC.getDInterface()
     .addTypeResolver(

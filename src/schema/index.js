@@ -45,7 +45,7 @@ const doesUsernameExist = sc.createResolver({
 
 const signS3Url = sc.createResolver({
     name: "signS3Url",
-    type: `type S3Payload { signedRequest: String!, url: String! }`,
+    type: `type S3Payload { signedRequest: URL!, url: URL! }`,
     args: {
         filename: `String!`,
         filetype: `String!`,
