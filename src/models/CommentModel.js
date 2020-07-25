@@ -76,7 +76,9 @@ CommentTC.addResolver({
             .then((res) => res)
             .catch((err) => {
                 log.error(err);
-                return new ApolloError(`Comment findManyByParentID failed: ${err}`);
+                return new ApolloError(
+                    `Comment findManyByParentID failed: ${err}`,
+                );
             }),
 })
     .addResolver({
@@ -93,7 +95,9 @@ CommentTC.addResolver({
                 .then((res) => res)
                 .catch((err) => {
                     log.error(err);
-                    return new ApolloError(`Comment findManyByPostID failed: ${err}`);
+                    return new ApolloError(
+                        `Comment findManyByPostID failed: ${err}`,
+                    );
                 }),
     })
     .addResolver({
@@ -110,7 +114,9 @@ CommentTC.addResolver({
                 .then((res) => res)
                 .catch((err) => {
                     log.error(err);
-                    return new ApolloError(`Comment findManyByCreator failed: ${err}`);
+                    return new ApolloError(
+                        `Comment findManyByCreator failed: ${err}`,
+                    );
                 }),
     });
 

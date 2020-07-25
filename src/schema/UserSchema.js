@@ -68,7 +68,9 @@ UserTC.addFields({
                           })
                           .catch(
                               (err) =>
-                                  new ApolloError(`User creation failed: ${err}`),
+                                  new ApolloError(
+                                      `User creation failed: ${err}`,
+                                  ),
                           )
                     : User.findOne({ netID: res.netID })
                           .then((doc) => {
@@ -84,7 +86,9 @@ UserTC.addFields({
                           );
             }
 
-            return new AuthenticationError("User creation failed because authentication failed");
+            return new AuthenticationError(
+                "User creation failed because authentication failed",
+            );
         },
     });
 

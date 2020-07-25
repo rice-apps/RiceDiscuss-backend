@@ -143,7 +143,9 @@ PostDTC.addFields({
         args: { _id: "ID!", netID: "String!" },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
-                return new ForbiddenError("Cannot downvote post as someone else");
+                return new ForbiddenError(
+                    "Cannot downvote post as someone else",
+                );
             }
 
             const post = await Post.findById(args._id)
@@ -156,7 +158,9 @@ PostDTC.addFields({
                 });
 
             if (post === null) {
-                return new UserInputError("Trying to downvote nonexistent post");
+                return new UserInputError(
+                    "Trying to downvote nonexistent post",
+                );
             }
 
             if (post.downvotes.includes(args.netID)) {

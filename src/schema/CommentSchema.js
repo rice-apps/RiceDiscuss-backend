@@ -124,7 +124,9 @@ CommentTC.addFields({
         args: { _id: `ID`, netID: `String!` },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
-                return new ForbiddenError("Cannot upvote comment as someone else");
+                return new ForbiddenError(
+                    "Cannot upvote comment as someone else",
+                );
             }
 
             const comment = await Comment.findById(args._id)
@@ -137,7 +139,9 @@ CommentTC.addFields({
                 });
 
             if (comment == null) {
-                return new UserInputError("Trying to upvote nonexistent comment");
+                return new UserInputError(
+                    "Trying to upvote nonexistent comment",
+                );
             }
 
             if (comment.upvotes.includes(args.netID)) {
@@ -164,7 +168,9 @@ CommentTC.addFields({
         args: { _id: "ID!", netID: "String!" },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
-                return new ForbiddenError("Cannot downvote comment as someone else");
+                return new ForbiddenError(
+                    "Cannot downvote comment as someone else",
+                );
             }
 
             const comment = await Comment.findById(args._id)
@@ -177,7 +183,9 @@ CommentTC.addFields({
                 });
 
             if (comment == null) {
-                return new UserInputError("Trying to downvote nonexistent comment");
+                return new UserInputError(
+                    "Trying to downvote nonexistent comment",
+                );
             }
 
             if (comment.downvotes.includes(args.netID)) {
@@ -204,7 +212,9 @@ CommentTC.addFields({
         args: { _id: "ID!", netID: "String!" },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
-                return new ForbiddenError("Cannot report comment as someone else");
+                return new ForbiddenError(
+                    "Cannot report comment as someone else",
+                );
             }
 
             const comment = await Comment.findById(args._id)
@@ -217,7 +227,9 @@ CommentTC.addFields({
                 });
 
             if (comment === null) {
-                return new UserInputError("trying to report nonexistent comment");
+                return new UserInputError(
+                    "trying to report nonexistent comment",
+                );
             }
 
             if (comment.reports.includes(args.netID)) {
