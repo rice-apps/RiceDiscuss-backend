@@ -1,3 +1,4 @@
+import { ApolloError } from "apollo-server-express";
 import { composeWithMongoose } from "graphql-compose-mongoose";
 import log from "loglevel";
 import mongoose from "mongoose";
@@ -90,7 +91,7 @@ UserTC.wrapResolverResolve("findOne", (next) => (rp) =>
         })
         .catch((err) => {
             log.error(err);
-            return new Error(`Search failed: ${err}`);
+            return new ApolloError(`User findOne failed: ${err}`);
         }),
 ).wrapResolverResolve("connection", (next) => (rp) =>
     next({ ...rp, projection: { netID: {}, ...rp.projection } })
@@ -110,7 +111,7 @@ UserTC.wrapResolverResolve("findOne", (next) => (rp) =>
         })
         .catch((err) => {
             log.error(err);
-            return new Error(`Search failed: ${err}`);
+            return new ApolloError(`User connection resolver failed: ${err}`);
         }),
 );
 

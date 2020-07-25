@@ -1,3 +1,4 @@
+import { ApolloError } from "apollo-server-express";
 import { composeWithMongooseDiscriminators } from "graphql-compose-mongoose";
 import log from "loglevel";
 import mongoose from "mongoose";
@@ -206,7 +207,7 @@ PostDTC.addResolver({
             .then((res) => res)
             .catch((err) => {
                 log.error(err);
-                return new Error(`Search failed: ${err}`);
+                return new ApolloError(`Post findManyByCreator failed: ${err}`);
             }),
 }).wrapResolverResolve("connection", (next) => (rp) => {
     rp.projection.kind = {};
