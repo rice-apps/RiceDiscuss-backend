@@ -60,6 +60,7 @@
         "jsonwebtoken": "^8.5.1",
         "loglevel": "^1.6.8",
         "mongoose": "^5.9.5",
+        "mongoose-type-url": "^2.0.0",
         "sanitize-html": "^1.27.0",
         "xml2js": "^0.4.23"
     }
