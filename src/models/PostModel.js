@@ -3,7 +3,6 @@ import { composeWithMongooseDiscriminators } from "graphql-compose-mongoose";
 import log from "loglevel";
 import mongoose from "mongoose";
 import { toInputObjectType } from "graphql-compose";
-import "mongoose-type-url";
 
 import { UrlTC } from "../schema/CustomTypes";
 
@@ -72,7 +71,15 @@ const PostSchema = new mongoose.Schema({
     ],
 
     imageUrl: {
-        type: mongoose.SchemaTypes.Url,
+        type: String,
+        validate: {
+            validator: (testUrl) =>
+                /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(
+                    testUrl,
+                ),
+            message: (props) => `${props.value} is not a valid URL!`,
+        },
+        required: false,
     },
 });
 

@@ -3,13 +3,10 @@ import { Kind, GraphQLError, GraphQLNonNull, GraphQLBoolean } from "graphql";
 
 const UrlTC = sc.createScalarTC({
     name: "URL",
-    description:
-        "A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.",
-    serialize(value) {
-        return new URL(value.toString()).toString();
-    },
+    description: "Represents a URL as specified in RFC 3986",
+    serialize: (value) => new URL(value.toString()).toString(),
     parseValue: (value) => new URL(value.toString()),
-    parseLiteral(ast) {
+    parseLiteral: (ast) => {
         if (ast.kind !== Kind.STRING) {
             throw new GraphQLError(
                 `Can only validate strings as URLs but got a: ${ast.kind}`,
