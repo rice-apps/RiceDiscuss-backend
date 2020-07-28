@@ -16,7 +16,7 @@ import { UserQuery, UserMutation, UserSubscription } from "./UserSchema";
 
 import { S3PayloadTC, UsernameExistsPayloadTC } from "./CustomTypes";
 
-import { AWS_ACCESS_KEY_ID, AWS_SECRET, BUCKET } from "../config";
+import { AWS_ACCESS_KEY_ID, AWS_SECRET, BUCKET, REGION } from "../config";
 
 sc.addSchemaMustHaveType(DiscussionTC)
     .addSchemaMustHaveType(EventTC)
@@ -60,7 +60,7 @@ const signS3Url = sc.createResolver({
 
         const s3 = new S3({
             apiVersion: "2006-03-01",
-            region: "us-west-2",
+            region: REGION,
             credentials: {
                 accessKeyId: AWS_ACCESS_KEY_ID,
                 secretAccessKey: AWS_SECRET,
