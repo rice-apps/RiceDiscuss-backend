@@ -15,10 +15,10 @@ PostDTC.addFields({
     comments: [CommentTC],
 })
     .addRelation("comments", {
-        resolver: () => CommentTC.getResolver("findManyByPostID"),
+        resolver: () => CommentTC.getResolver("findTopLevelByPostID"),
 
         prepareArgs: {
-            post: (source) => source._id,
+            postID: (source) => source._id,
         },
 
         projection: {

@@ -118,6 +118,25 @@ CommentTC.addResolver({
                         `Comment findManyByCreator failed: ${err}`,
                     );
                 }),
+    })
+    .addResolver({
+        name: "findTopLevelByPostID",
+
+        args: {
+            postID: `ID`,
+        },
+
+        type: [CommentTC],
+
+        resolve: ({ args }) =>
+            Comment.find({ post: args.postID, parent: { $exists: false } })
+                .then((res) => res)
+                .catch((err) => {
+                    log.error(err);
+                    return new ApolloError(
+                        `Comment findTopLevelByPostID failed: ${err}`,
+                    );
+                }),
     });
 
 export { Comment, CommentTC };
