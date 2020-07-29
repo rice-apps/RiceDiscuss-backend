@@ -4,7 +4,7 @@ import log from "loglevel";
 import mongoose from "mongoose";
 import { toInputObjectType } from "graphql-compose";
 
-import { UrlTC } from "../schema/CustomTypes";
+import { UrlTC } from "./CustomTypes";
 
 const DKey = "kind";
 

@@ -1,7 +1,7 @@
 import { AuthenticationError } from "apollo-server-express";
 import log from "loglevel";
 import { GraphQLNonNull, GraphQLString } from "graphql";
-import { sc } from "graphql-compose";
+import { SchemaComposer } from "graphql-compose";
 import S3 from "aws-sdk/clients/s3";
 
 import { DiscussionTC, EventTC, JobTC, NoticeTC, User } from "../models";
@@ -14,9 +14,11 @@ import {
 import { PostQuery, PostMutation, PostSubscription } from "./PostSchema";
 import { UserQuery, UserMutation, UserSubscription } from "./UserSchema";
 
-import { S3PayloadTC, UsernameExistsPayloadTC } from "./CustomTypes";
+import { S3PayloadTC, UsernameExistsPayloadTC } from "../models/CustomTypes";
 
 import { AWS_ACCESS_KEY_ID, AWS_SECRET, BUCKET, REGION } from "../config";
+
+const sc = new SchemaComposer();
 
 sc.addSchemaMustHaveType(DiscussionTC)
     .addSchemaMustHaveType(EventTC)
