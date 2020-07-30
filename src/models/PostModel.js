@@ -76,7 +76,7 @@ const PostSchema = new mongoose.Schema({
             validator: (testUrl) =>
                 /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(
                     testUrl,
-                ),
+                ) || testUrl === "",
             message: (props) => `${props.value} is not a valid URL!`,
         },
         required: false,
