@@ -55,7 +55,7 @@
         "express": "^4.17.1",
         "express-ws": "^4.0.0",
         "graphql": "^14.6.0",
-        "graphql-compose": "^7.15.0",
+        "graphql-compose": "^7.19.1",
         "graphql-compose-connection": "^6.2.1",
         "graphql-compose-mongoose": "^7.3.8",
         "jsonwebtoken": "^8.5.1",
