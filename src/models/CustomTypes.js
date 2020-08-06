@@ -19,8 +19,8 @@ const UrlTC = sc.createScalarTC({
 const S3PayloadTC = sc.createObjectTC({
     name: "S3Payload",
     fields: {
-        signedRequest: () => GraphQLNonNull(UrlTC.getType()),
-        url: () => GraphQLNonNull(UrlTC.getType()),
+        signedRequest: UrlTC.getTypeNonNull().getType(),
+        url: UrlTC.getTypeNonNull().getType(),
     },
 });
 
