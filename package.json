@@ -48,7 +48,7 @@
     "dependencies": {
         "@babel/runtime": "^7.11.2",
         "apollo-server-express": "^2.16.1",
-        "aws-sdk": "^2.727.1",
+        "aws-sdk": "^2.728.0",
         "bent": "^7.3.9",
         "cors": "^2.8.5",
         "dotenv": "^8.2.0",
