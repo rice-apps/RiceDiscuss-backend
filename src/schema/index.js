@@ -40,7 +40,10 @@ const doesUsernameExist = sc.createResolver({
 
         const usernameExists = await User.exists({
             username: args.username,
-        }).catch((err) => log.error(err));
+        }).catch((err) => {
+            log.error(err);
+            return true;
+        });
 
         return {
             usernameExists,
