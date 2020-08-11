@@ -1,118 +1,115 @@
-import { ApolloError } from "apollo-server-express";
-import { composeWithMongoose } from "graphql-compose-mongoose";
-import log from "loglevel";
-import mongoose from "mongoose";
-import { COLLEGES, MAJORS, MINORS } from "../config";
+import { ApolloError } from 'apollo-server-express'
+import { composeWithMongoose } from 'graphql-compose-mongoose'
+import log from 'loglevel'
+import mongoose from 'mongoose'
+import { COLLEGES, MAJORS, MINORS } from '../config'
 
 const UserSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true,
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  },
+
+  netID: {
+    type: String,
+    required: true,
+    unique: true
+  },
+
+  token: {
+    type: String,
+    required: false,
+    unique: true
+  },
+
+  date_joined: {
+    type: Date,
+    required: false,
+    default: new Date().getTime(),
+    index: true
+  },
+
+  college: {
+    type: String,
+    enum: COLLEGES,
+    required: false
+  },
+
+  major: {
+    type: [String],
+    validate: {
+      validator (majors) {
+        return majors.every(major => MAJORS.includes(major))
+      },
+      message: props => `${props.value} has a major that's not valid!`
     },
+    required: false
+  },
 
-    netID: {
-        type: String,
-        required: true,
-        unique: true,
+  minor: {
+    type: [String],
+    validate: {
+      validator (minors) {
+        return minors.every(minor => MINORS.includes(minor))
+      },
+      message: props => `${props.value} has a minor that's not valid!`
     },
+    required: false
+  },
 
-    token: {
-        type: String,
-        required: false,
-        unique: true,
-    },
+  isNewUser: {
+    type: Boolean,
+    default: true
+  },
 
-    date_joined: {
-        type: Date,
-        required: false,
-        default: new Date().getTime(),
-        index: true,
-    },
+  savedPosts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'PostInterface'
+    }
+  ]
+})
 
-    college: {
-        type: String,
-        enum: COLLEGES,
-        required: false,
-    },
+const User = mongoose.model('User', UserSchema)
 
-    major: {
-        type: [String],
-        validate: {
-            validator(majors) {
-                return majors.every((major) => MAJORS.includes(major));
-            },
-            message: (props) => `${props.value} has a major that's not valid!`,
-        },
-        required: false,
-    },
+const UserTC = composeWithMongoose(User)
 
-    minor: {
-        type: [String],
-        validate: {
-            validator(minors) {
-                return minors.every((minor) => MINORS.includes(minor));
-            },
-            message: (props) => `${props.value} has a minor that's not valid!`,
-        },
-        required: false,
-    },
+UserTC.wrapResolverResolve('findOne', next => rp =>
+  next({ ...rp, projection: { netID: {}, ...rp.projection } })
+    .then(payload => {
+      const res = { ...payload._doc }
 
-    isNewUser: {
-        type: Boolean,
-        default: true,
-    },
+      if (typeof res.netID === 'undefined' || res.netID !== rp.context.netID) {
+        res.token = null
+      }
 
-    savedPosts: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "PostInterface",
-        },
-    ],
-});
+      return res
+    })
+    .catch(err => {
+      log.error(err)
+      return new ApolloError(`User findOne failed: ${err}`)
+    })
+).wrapResolverResolve('connection', next => rp =>
+  next({ ...rp, projection: { netID: {}, ...rp.projection } })
+    .then(payload => {
+      const res = { ...payload }
 
-const User = mongoose.model("User", UserSchema);
+      for (let i = 0; i < res.edges.length; i += 1) {
+        if (
+          typeof res.edges[i].node.netID === 'undefined' ||
+          res.edges[i].node.netID !== rp.context.netID
+        ) {
+          res.edges[i].node.token = null
+        }
+      }
 
-const UserTC = composeWithMongoose(User);
+      return res
+    })
+    .catch(err => {
+      log.error(err)
+      return new ApolloError(`User connection resolver failed: ${err}`)
+    })
+)
 
-UserTC.wrapResolverResolve("findOne", (next) => (rp) =>
-    next({ ...rp, projection: { netID: {}, ...rp.projection } })
-        .then((payload) => {
-            const res = { ...payload._doc };
-
-            if (
-                typeof res.netID === "undefined" ||
-                res.netID !== rp.context.netID
-            ) {
-                res.token = null;
-            }
-
-            return res;
-        })
-        .catch((err) => {
-            log.error(err);
-            return new ApolloError(`User findOne failed: ${err}`);
-        }),
-).wrapResolverResolve("connection", (next) => (rp) =>
-    next({ ...rp, projection: { netID: {}, ...rp.projection } })
-        .then((payload) => {
-            const res = { ...payload };
-
-            for (let i = 0; i < res.edges.length; i += 1) {
-                if (
-                    typeof res.edges[i].node.netID === "undefined" ||
-                    res.edges[i].node.netID !== rp.context.netID
-                ) {
-                    res.edges[i].node.token = null;
-                }
-            }
-
-            return res;
-        })
-        .catch((err) => {
-            log.error(err);
-            return new ApolloError(`User connection resolver failed: ${err}`);
-        }),
-);
-
-export { User, UserTC };
+export { User, UserTC }

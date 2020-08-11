@@ -1,440 +1,425 @@
-import { ForbiddenError, UserInputError } from "apollo-server-express";
-import log from "loglevel";
-import { Comment, CommentTC, PostDTC, UserTC } from "../models";
+import { ForbiddenError, UserInputError } from 'apollo-server-express'
+import log from 'loglevel'
+import { Comment, CommentTC, PostDTC, UserTC } from '../models'
 import {
-    checkLoggedIn,
-    userCheckComment,
-    userCheckCreate,
-    pubsub,
-} from "../utils";
+  checkLoggedIn,
+  userCheckComment,
+  userCheckCreate,
+  pubsub
+} from '../utils'
 
-import { MAX_REPORTS } from "../config";
+import { MAX_REPORTS } from '../config'
 
 CommentTC.addFields({
-    children: [CommentTC],
+  children: [CommentTC]
 })
-    .addRelation("creator", {
-        resolver: () => UserTC.getResolver("findOne"),
+  .addRelation('creator', {
+    resolver: () => UserTC.getResolver('findOne'),
 
-        prepareArgs: {
-            filter: (source) => {
-                return {
-                    netID: source.creator,
-                };
-            },
-        },
+    prepareArgs: {
+      filter: source => {
+        return {
+          netID: source.creator
+        }
+      }
+    },
 
-        projection: {
-            creator: 1,
-        },
-    })
-    .addRelation("post", {
-        resolver: () => PostDTC.getResolver("findById"),
+    projection: {
+      creator: 1
+    }
+  })
+  .addRelation('post', {
+    resolver: () => PostDTC.getResolver('findById'),
 
-        prepareArgs: {
-            _id: (source) => source.post,
-        },
+    prepareArgs: {
+      _id: source => source.post
+    },
 
-        projection: {
-            post: 1,
-        },
-    })
-    .addRelation("parent", {
-        resolver: () => CommentTC.getResolver("findById"),
+    projection: {
+      post: 1
+    }
+  })
+  .addRelation('parent', {
+    resolver: () => CommentTC.getResolver('findById'),
 
-        prepareArgs: {
-            _id: (source) => source.parent,
-        },
+    prepareArgs: {
+      _id: source => source.parent
+    },
 
-        projection: {
-            parent: 1,
-        },
-    })
-    .addRelation("upvotes", {
-        resolver: () => UserTC.getResolver("findMany"),
+    projection: {
+      parent: 1
+    }
+  })
+  .addRelation('upvotes', {
+    resolver: () => UserTC.getResolver('findMany'),
 
-        prepareArgs: {
-            filter: (source) => {
-                return {
-                    _operators: {
-                        netID: {
-                            in: source.upvotes,
-                        },
-                    },
-                };
-            },
-        },
-
-        projection: {
-            upvotes: 1,
-        },
-    })
-    .addRelation("downvotes", {
-        resolver: () => UserTC.getResolver("findMany"),
-
-        prepareArgs: {
-            filter: (source) => {
-                return {
-                    _operators: {
-                        netID: {
-                            in: source.downvotes,
-                        },
-                    },
-                };
-            },
-        },
-
-        projection: {
-            downvotes: 1,
-        },
-    })
-    .addRelation("children", {
-        resolver: () => CommentTC.getResolver("findManyByParentID"),
-
-        prepareArgs: {
-            parent: (source) => source._id,
-        },
-
-        projection: {
-            _id: 1,
-        },
-    })
-    .addRelation("reports", {
-        resolver: () => UserTC.getResolver("findMany"),
-
-        prepareArgs: {
-            filter: (source) => {
-                return {
-                    _operators: {
-                        netID: {
-                            in: source.reports,
-                        },
-                    },
-                };
-            },
-        },
-
-        projection: {
-            reports: 1,
-        },
-    })
-    .addResolver({
-        name: "upvoteComment",
-        type: CommentTC,
-        args: { _id: `ID`, netID: `String!` },
-        resolve: async ({ args, context }) => {
-            if (args.netID !== context.netID) {
-                return new ForbiddenError(
-                    "Cannot upvote comment as someone else",
-                );
+    prepareArgs: {
+      filter: source => {
+        return {
+          _operators: {
+            netID: {
+              in: source.upvotes
             }
+          }
+        }
+      }
+    },
 
-            const comment = await Comment.findById(args._id)
-                .then((res) => {
-                    return res;
-                })
-                .catch((err) => {
-                    log.error(err);
-                    return null;
-                });
+    projection: {
+      upvotes: 1
+    }
+  })
+  .addRelation('downvotes', {
+    resolver: () => UserTC.getResolver('findMany'),
 
-            if (comment == null) {
-                return new UserInputError(
-                    "Trying to upvote nonexistent comment",
-                );
+    prepareArgs: {
+      filter: source => {
+        return {
+          _operators: {
+            netID: {
+              in: source.downvotes
             }
+          }
+        }
+      }
+    },
 
-            if (comment.upvotes.includes(args.netID)) {
-                comment.upvotes = comment.upvotes.filter(
-                    (upvoter) => upvoter !== args.netID,
-                );
-            } else if (comment.downvotes.includes(args.netID)) {
-                comment.downvotes = comment.downvotes.filter(
-                    (downvoter) => downvoter !== args.netID,
-                );
-                comment.upvotes.push(args.netID);
-            } else {
-                comment.upvotes.push(args.netID);
+    projection: {
+      downvotes: 1
+    }
+  })
+  .addRelation('children', {
+    resolver: () => CommentTC.getResolver('findManyByParentID'),
+
+    prepareArgs: {
+      parent: source => source._id
+    },
+
+    projection: {
+      _id: 1
+    }
+  })
+  .addRelation('reports', {
+    resolver: () => UserTC.getResolver('findMany'),
+
+    prepareArgs: {
+      filter: source => {
+        return {
+          _operators: {
+            netID: {
+              in: source.reports
             }
+          }
+        }
+      }
+    },
 
-            await comment.save().catch((err) => log.error(err));
+    projection: {
+      reports: 1
+    }
+  })
+  .addResolver({
+    name: 'upvoteComment',
+    type: CommentTC,
+    args: { _id: `ID`, netID: `String!` },
+    resolve: async ({ args, context }) => {
+      if (args.netID !== context.netID) {
+        return new ForbiddenError('Cannot upvote comment as someone else')
+      }
 
-            return comment;
-        },
-    })
-    .addResolver({
-        name: "downvoteComment",
-        type: CommentTC,
-        args: { _id: "ID!", netID: "String!" },
-        resolve: async ({ args, context }) => {
-            if (args.netID !== context.netID) {
-                return new ForbiddenError(
-                    "Cannot downvote comment as someone else",
-                );
-            }
+      const comment = await Comment.findById(args._id)
+        .then(res => {
+          return res
+        })
+        .catch(err => {
+          log.error(err)
+          return null
+        })
 
-            const comment = await Comment.findById(args._id)
-                .then((res) => {
-                    return res;
-                })
-                .catch((err) => {
-                    log.error(err);
-                    return null;
-                });
+      if (comment == null) {
+        return new UserInputError('Trying to upvote nonexistent comment')
+      }
 
-            if (comment == null) {
-                return new UserInputError(
-                    "Trying to downvote nonexistent comment",
-                );
-            }
+      if (comment.upvotes.includes(args.netID)) {
+        comment.upvotes = comment.upvotes.filter(
+          upvoter => upvoter !== args.netID
+        )
+      } else if (comment.downvotes.includes(args.netID)) {
+        comment.downvotes = comment.downvotes.filter(
+          downvoter => downvoter !== args.netID
+        )
+        comment.upvotes.push(args.netID)
+      } else {
+        comment.upvotes.push(args.netID)
+      }
 
-            if (comment.downvotes.includes(args.netID)) {
-                comment.downvotes = comment.downvotes.filter(
-                    (downvoter) => downvoter !== args.netID,
-                );
-            } else if (comment.upvotes.includes(args.netID)) {
-                comment.upvotes = comment.upvotes.filter(
-                    (upvoter) => upvoter !== args.netID,
-                );
-                comment.downvotes.push(args.netID);
-            } else {
-                comment.downvotes.push(args.netID);
-            }
+      await comment.save().catch(err => log.error(err))
 
-            await comment.save().catch((err) => log.error(err));
+      return comment
+    }
+  })
+  .addResolver({
+    name: 'downvoteComment',
+    type: CommentTC,
+    args: { _id: 'ID!', netID: 'String!' },
+    resolve: async ({ args, context }) => {
+      if (args.netID !== context.netID) {
+        return new ForbiddenError('Cannot downvote comment as someone else')
+      }
 
-            return comment;
-        },
-    })
-    .addResolver({
-        name: "toggleReport",
-        type: CommentTC,
-        args: { _id: "ID!", netID: "String!" },
-        resolve: async ({ args, context }) => {
-            if (args.netID !== context.netID) {
-                return new ForbiddenError(
-                    "Cannot report comment as someone else",
-                );
-            }
+      const comment = await Comment.findById(args._id)
+        .then(res => {
+          return res
+        })
+        .catch(err => {
+          log.error(err)
+          return null
+        })
 
-            const comment = await Comment.findById(args._id)
-                .then((res) => {
-                    return res;
-                })
-                .catch((err) => {
-                    log.error(err);
-                    return null;
-                });
+      if (comment == null) {
+        return new UserInputError('Trying to downvote nonexistent comment')
+      }
 
-            if (comment === null) {
-                return new UserInputError(
-                    "trying to report nonexistent comment",
-                );
-            }
+      if (comment.downvotes.includes(args.netID)) {
+        comment.downvotes = comment.downvotes.filter(
+          downvoter => downvoter !== args.netID
+        )
+      } else if (comment.upvotes.includes(args.netID)) {
+        comment.upvotes = comment.upvotes.filter(
+          upvoter => upvoter !== args.netID
+        )
+        comment.downvotes.push(args.netID)
+      } else {
+        comment.downvotes.push(args.netID)
+      }
 
-            if (comment.reports.includes(args.netID)) {
-                comment.reports = comment.reports.filter(
-                    (reporter) => reporter !== args.netID,
-                );
-            } else {
-                comment.reports.push(args.netID);
-            }
+      await comment.save().catch(err => log.error(err))
 
-            await comment.save().catch((err) => log.error(err));
+      return comment
+    }
+  })
+  .addResolver({
+    name: 'toggleReport',
+    type: CommentTC,
+    args: { _id: 'ID!', netID: 'String!' },
+    resolve: async ({ args, context }) => {
+      if (args.netID !== context.netID) {
+        return new ForbiddenError('Cannot report comment as someone else')
+      }
 
-            return comment;
-        },
-    });
+      const comment = await Comment.findById(args._id)
+        .then(res => {
+          return res
+        })
+        .catch(err => {
+          log.error(err)
+          return null
+        })
+
+      if (comment === null) {
+        return new UserInputError('trying to report nonexistent comment')
+      }
+
+      if (comment.reports.includes(args.netID)) {
+        comment.reports = comment.reports.filter(
+          reporter => reporter !== args.netID
+        )
+      } else {
+        comment.reports.push(args.netID)
+      }
+
+      await comment.save().catch(err => log.error(err))
+
+      return comment
+    }
+  })
 
 const CommentQuery = {
-    commentById: CommentTC.getResolver("findById")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next({
-                ...rp,
-                projection: { reports: {}, ...rp.projection },
-            });
+  commentById: CommentTC.getResolver('findById')
+    .withMiddlewares([checkLoggedIn])
+    .wrapResolve(next => async rp => {
+      const payload = await next({
+        ...rp,
+        projection: { reports: {}, ...rp.projection }
+      })
 
-            if (payload.record.reports.length > MAX_REPORTS) {
-                payload.record.body = "[This comment has been removed]";
-            }
+      if (payload.record.reports.length > MAX_REPORTS) {
+        payload.record.body = '[This comment has been removed]'
+      }
 
-            return payload;
-        }),
+      return payload
+    }),
 
-    commentByParent: CommentTC.getResolver("findManyByParentID")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next({
-                ...rp,
-                projection: { reports: {}, ...rp.projection },
-            });
+  commentByParent: CommentTC.getResolver('findManyByParentID')
+    .withMiddlewares([checkLoggedIn])
+    .wrapResolve(next => async rp => {
+      const payload = await next({
+        ...rp,
+        projection: { reports: {}, ...rp.projection }
+      })
 
-            for (let i = 0; i < payload.length; i += 1) {
-                if (payload[i].reports.length > MAX_REPORTS) {
-                    if (payload[i].body) {
-                        payload[i].body = "[This comment has been removed]";
-                    }
-                }
-            }
+      for (let i = 0; i < payload.length; i += 1) {
+        if (payload[i].reports.length > MAX_REPORTS) {
+          if (payload[i].body) {
+            payload[i].body = '[This comment has been removed]'
+          }
+        }
+      }
 
-            return payload;
-        }),
+      return payload
+    }),
 
-    commentByPost: CommentTC.getResolver("findManyByPostID")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next({
-                ...rp,
-                projection: { reports: {}, ...rp.projection },
-            });
+  commentByPost: CommentTC.getResolver('findManyByPostID')
+    .withMiddlewares([checkLoggedIn])
+    .wrapResolve(next => async rp => {
+      const payload = await next({
+        ...rp,
+        projection: { reports: {}, ...rp.projection }
+      })
 
-            for (let i = 0; i < payload.length; i += 1) {
-                if (payload[i].reports.length > MAX_REPORTS) {
-                    if (payload[i].body) {
-                        payload[i].body = "[This comment has been removed]";
-                    }
-                }
-            }
+      for (let i = 0; i < payload.length; i += 1) {
+        if (payload[i].reports.length > MAX_REPORTS) {
+          if (payload[i].body) {
+            payload[i].body = '[This comment has been removed]'
+          }
+        }
+      }
 
-            return payload;
-        }),
+      return payload
+    }),
 
-    commentCount: CommentTC.getResolver("count").withMiddlewares([
-        checkLoggedIn,
-    ]),
+  commentCount: CommentTC.getResolver('count').withMiddlewares([checkLoggedIn]),
 
-    commentConnection: CommentTC.getResolver("connection")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next({
-                ...rp,
-                projection: { reports: {}, ...rp.projection },
-            });
+  commentConnection: CommentTC.getResolver('connection')
+    .withMiddlewares([checkLoggedIn])
+    .wrapResolve(next => async rp => {
+      const payload = await next({
+        ...rp,
+        projection: { reports: {}, ...rp.projection }
+      })
 
-            for (let i = 0; i < payload.edges.length; i += 1) {
-                if (payload.edges[i].node.reports.length > MAX_REPORTS) {
-                    if (payload.edges[i].node.body) {
-                        payload.edges[i].node.body =
-                            "[This comment has been removed]";
-                    }
-                }
-            }
+      for (let i = 0; i < payload.edges.length; i += 1) {
+        if (payload.edges[i].node.reports.length > MAX_REPORTS) {
+          if (payload.edges[i].node.body) {
+            payload.edges[i].node.body = '[This comment has been removed]'
+          }
+        }
+      }
 
-            return payload;
-        }),
-};
+      return payload
+    })
+}
 
 const CommentMutation = {
-    commentCreateOne: CommentTC.getResolver("createOne")
-        .withMiddlewares([checkLoggedIn, userCheckCreate])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
+  commentCreateOne: CommentTC.getResolver('createOne')
+    .withMiddlewares([checkLoggedIn, userCheckCreate])
+    .wrapResolve(next => async rp => {
+      const payload = await next(rp)
 
-            pubsub.publish("commentCreated", {
-                commentCreated: payload.record,
-            });
+      pubsub.publish('commentCreated', {
+        commentCreated: payload.record
+      })
 
-            return payload;
-        }),
+      return payload
+    }),
 
-    commentUpdateById: CommentTC.getResolver("updateById")
-        .withMiddlewares([checkLoggedIn, userCheckComment])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
+  commentUpdateById: CommentTC.getResolver('updateById')
+    .withMiddlewares([checkLoggedIn, userCheckComment])
+    .wrapResolve(next => async rp => {
+      const payload = await next(rp)
 
-            pubsub.publish("commentUpdated", {
-                commentCreated: payload.record,
-            });
+      pubsub.publish('commentUpdated', {
+        commentCreated: payload.record
+      })
 
-            return payload;
-        }),
+      return payload
+    }),
 
-    upvoteCommentById: CommentTC.getResolver("upvoteComment")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
+  upvoteCommentById: CommentTC.getResolver('upvoteComment')
+    .withMiddlewares([checkLoggedIn])
+    .wrapResolve(next => async rp => {
+      const payload = await next(rp)
 
-            pubsub.publish("commentVoteChanged", {
-                commentVoteChanged: payload,
-            });
+      pubsub.publish('commentVoteChanged', {
+        commentVoteChanged: payload
+      })
 
-            return payload;
-        }),
+      return payload
+    }),
 
-    downvoteCommentById: CommentTC.getResolver("downvoteComment")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
+  downvoteCommentById: CommentTC.getResolver('downvoteComment')
+    .withMiddlewares([checkLoggedIn])
+    .wrapResolve(next => async rp => {
+      const payload = await next(rp)
 
-            pubsub.publish("commentVoteChanged", {
-                commentVoteChanged: payload,
-            });
+      pubsub.publish('commentVoteChanged', {
+        commentVoteChanged: payload
+      })
 
-            return payload;
-        }),
+      return payload
+    }),
 
-    toggleCommentReport: CommentTC.getResolver("toggleReport")
-        .withMiddlewares([checkLoggedIn])
-        .wrapResolve((next) => async (rp) => {
-            if (rp.args.record.reports) {
-                if (rp.args.record.reports.length > MAX_REPORTS) {
-                    rp.args.record.body = "[This comment has been removed]";
-                }
-            }
+  toggleCommentReport: CommentTC.getResolver('toggleReport')
+    .withMiddlewares([checkLoggedIn])
+    .wrapResolve(next => async rp => {
+      if (rp.args.record.reports) {
+        if (rp.args.record.reports.length > MAX_REPORTS) {
+          rp.args.record.body = '[This comment has been removed]'
+        }
+      }
 
-            const payload = await next(rp);
+      const payload = await next(rp)
 
-            pubsub.publish("commentReported", {
-                commentReported: payload,
-            });
+      pubsub.publish('commentReported', {
+        commentReported: payload
+      })
 
-            return payload;
-        }),
+      return payload
+    }),
 
-    commentRemoveById: CommentTC.getResolver("removeById")
-        .withMiddlewares([checkLoggedIn, userCheckComment])
-        .wrapResolve((next) => async (rp) => {
-            const payload = await next(rp);
+  commentRemoveById: CommentTC.getResolver('removeById')
+    .withMiddlewares([checkLoggedIn, userCheckComment])
+    .wrapResolve(next => async rp => {
+      const payload = await next(rp)
 
-            pubsub.publish("commentRemoved", {
-                commentRemoved: payload.record,
-            });
+      pubsub.publish('commentRemoved', {
+        commentRemoved: payload.record
+      })
 
-            return payload;
-        }),
-};
+      return payload
+    })
+}
 
 const CommentSubscription = {
-    commentCreated: {
-        type: CommentTC,
+  commentCreated: {
+    type: CommentTC,
 
-        subscribe: () => pubsub.asyncIterator("commentCreated"),
-    },
+    subscribe: () => pubsub.asyncIterator('commentCreated')
+  },
 
-    commentUpdated: {
-        type: CommentTC,
+  commentUpdated: {
+    type: CommentTC,
 
-        subscribe: () => pubsub.asyncIterator("commentUpdated"),
-    },
+    subscribe: () => pubsub.asyncIterator('commentUpdated')
+  },
 
-    commentVoteChanged: {
-        type: CommentTC,
+  commentVoteChanged: {
+    type: CommentTC,
 
-        subscribe: () => pubsub.asyncIterator("commentVotedChanged"),
-    },
+    subscribe: () => pubsub.asyncIterator('commentVotedChanged')
+  },
 
-    commentReported: {
-        type: CommentTC,
+  commentReported: {
+    type: CommentTC,
 
-        subscribe: () => pubsub.asyncIterator("commentReported"),
-    },
+    subscribe: () => pubsub.asyncIterator('commentReported')
+  },
 
-    commentRemoved: {
-        type: CommentTC,
+  commentRemoved: {
+    type: CommentTC,
 
-        subscribe: () => pubsub.asyncIterator("commentRemoved"),
-    },
-};
+    subscribe: () => pubsub.asyncIterator('commentRemoved')
+  }
+}
 
-export { CommentQuery, CommentMutation, CommentSubscription };
+export { CommentQuery, CommentMutation, CommentSubscription }
