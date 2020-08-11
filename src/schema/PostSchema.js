@@ -187,9 +187,6 @@ PostDTC.addFields({
         args: {
             _id: "ID!",
             netID: "String!",
-            reports: "[String!]",
-            body: "String!",
-            title: "String!",
         },
         resolve: async ({ args, context }) => {
             if (args.netID !== context.netID) {
