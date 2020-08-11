@@ -340,10 +340,10 @@ const PostMutation = {
     togglePostReport: PostDTC.getResolver("toggleReport")
         .withMiddlewares([checkLoggedIn])
         .wrapResolve((next) => async (rp) => {
-            if (rp.args.record.reports) {
-                if (rp.args.record.reports.length > MAX_REPORTS) {
-                    rp.args.record.body = "[This post has been removed.]";
-                    rp.args.record.title = "[This post has been removed.]";
+            if (rp.args.reports) {
+                if (rp.args.reports.length > MAX_REPORTS) {
+                    rp.args.body = "[This post has been removed.]";
+                    rp.args.title = "[This post has been removed.]";
                 }
             }
 
