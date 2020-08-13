@@ -226,13 +226,13 @@ const PostQuery = {
                 projection: { reports: {}, ...rp.projection },
             });
 
-            if (payload.record.reports.length > MAX_REPORTS) {
-                if (payload.record.body) {
-                    payload.record.body = "[This post has been removed.]";
+            if (payload.reports.length > MAX_REPORTS) {
+                if (payload.body) {
+                    payload.body = "[This post has been removed.]";
                 }
 
-                if (payload.record.title) {
-                    payload.record.title = "[This post has been removed.]";
+                if (payload.title) {
+                    payload.title = "[This post has been removed.]";
                 }
             }
 
