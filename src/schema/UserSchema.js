@@ -1,4 +1,5 @@
 import { ApolloError, AuthenticationError } from 'apollo-server-express'
+import jwt from 'jsonwebtoken'
 import log from 'loglevel'
 import { UserTC, PostDTC, CommentTC, User } from '../models'
 import {
@@ -9,6 +10,7 @@ import {
   userCheckUserFilter,
   pubsub
 } from '../utils'
+import { CLIENT_TOKEN_SECRET } from '../config'
 
 UserTC.addFields({
   posts: [PostDTC.getDInterface()],
@@ -83,13 +85,31 @@ UserTC.addFields({
       )
     }
   })
+  .addResolver({
+    name: 'verifyToken',
+    type: UserTC,
+    args: {
+      token: 'String!'
+    },
+    resolve: async ({ args }) => {
+      try {
+        const { netID } = jwt.verify(args.token, CLIENT_TOKEN_SECRET)
+
+        return User.findOne({ netID: netID })
+      } catch (error) {
+        return new AuthenticationError(`Token verification failed: ${error}`)
+      }
+    }
+  })
 
 const UserQuery = {
   userOne: UserTC.getResolver('findOne').withMiddlewares([checkLoggedIn]),
 
   userConnection: UserTC.getResolver('connection').withMiddlewares([
     checkLoggedIn
-  ])
+  ]),
+
+  verifyToken: UserTC.getResolver('verifyToken')
 }
 
 const UserMutation = {
