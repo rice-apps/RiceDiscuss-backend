@@ -1,5 +1,5 @@
 import express from 'express'
-import { ApolloServer } from 'apollo-server-express'
+import { ApolloServer, AuthenticationError } from 'apollo-server-express'
 import http from 'http'
 import jwt from 'jsonwebtoken'
 import log from 'loglevel'
@@ -62,7 +62,9 @@ const server = new ApolloServer({
           }
         } catch (err) {
           websocket.close()
-          return new Error(`WebSocket authentication failed due to ${err}`)
+          return new AuthenticationError(
+            `WebSocket authentication failed due to ${err}`
+          )
         }
       }
 
