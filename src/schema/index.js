@@ -28,7 +28,7 @@ const doesUsernameExist = sc.createResolver({
   name: 'doesUsernameExist',
   type: () => UsernameExistsPayloadTC,
   args: {
-    username: "String!"
+    username: 'String!'
   },
   resolve: async ({ args, context }) => {
     if (!context.netID) {

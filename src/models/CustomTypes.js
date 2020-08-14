@@ -25,7 +25,7 @@ const S3PayloadTC = sc.createObjectTC({
 const UsernameExistsPayloadTC = sc.createObjectTC({
   name: 'UsernameExistsPayload',
   fields: {
-    usernameExists: () => "Boolean!"
+    usernameExists: () => 'Boolean!'
   }
 })
 
