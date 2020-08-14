@@ -1,5 +1,5 @@
 import { sc } from 'graphql-compose'
-import { Kind, GraphQLNonNull, GraphQLBoolean } from 'graphql'
+import { Kind } from 'graphql'
 
 const UrlTC = sc.createScalarTC({
   name: 'URL',

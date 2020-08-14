@@ -1,6 +1,5 @@
 import { AuthenticationError } from 'apollo-server-express'
 import log from 'loglevel'
-import { GraphQLNonNull, GraphQLString } from 'graphql'
 import { SchemaComposer } from 'graphql-compose'
 import S3 from 'aws-sdk/clients/s3'
 
@@ -29,7 +28,7 @@ const doesUsernameExist = sc.createResolver({
   name: 'doesUsernameExist',
   type: () => UsernameExistsPayloadTC,
   args: {
-    username: new GraphQLNonNull(GraphQLString)
+    username: "String!"
   },
   resolve: async ({ args, context }) => {
     if (!context.netID) {
