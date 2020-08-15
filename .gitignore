@@ -13,3 +13,6 @@ config.js
 build/
 dist/
 .vs/
+
+.pnp.*
+.yarn/
