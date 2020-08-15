@@ -218,6 +218,44 @@ PostDTC.addFields({
 
             return post;
         },
+    })
+    .addResolver({
+        name: "removeById",
+        type: PostDTC.getDInterface(),
+        args: {
+            _id: "ID!",
+            netID: "String!",
+        },
+        resolve: async ({ args, context }) => {
+            if (args.netID !== context.netID) {
+                return new ForbiddenError("Cannot delete post as someone else");
+            }
+
+            const post = await Post.findById(args._id)
+                .then((res) => {
+                    return res;
+                })
+                .catch((err) => {
+                    log.error(err);
+                    return null;
+                });
+
+            if (post === null) {
+                return new UserInputError("Trying to delete nonexistent post");
+            }
+
+            if (post.reports.includes(args.netID)) {
+                post.reports = post.reports.filter(
+                    (reporter) => reporter !== args.netID,
+                );
+            } else {
+                post.reports.push(args.netID);
+            }
+
+            await post.save().catch((err) => log.error(err));
+
+            return post;
+        },
     });
 
 const PostQuery = {
