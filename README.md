@@ -4,11 +4,11 @@ This is the backend for RiceDiscuss. It provides an Apollo GraphQL endpoint for 
 
 ## Tech to be familiar with
 
--   [Apollo GraphQL](https://www.apollographql.com/docs/apollo-server/getting-started/)
--   [MongoDB](https://www.mongodb.com/) and [MongooseJS](https://mongoosejs.com/)
--   [GraphQL Compose](https://graphql-compose.github.io/)
--   [Express](https://expressjs.com/)
--   [Web Sockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+- [Apollo GraphQL](https://www.apollographql.com/docs/apollo-server/getting-started/)
+- [MongoDB](https://www.mongodb.com/) and [MongooseJS](https://mongoosejs.com/)
+- [GraphQL Compose](https://graphql-compose.github.io/)
+- [Express](https://expressjs.com/)
+- [Web Sockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
 
 Furthermore, the RiceApps leadership team has a list of tutorials you can ask them for.
 
