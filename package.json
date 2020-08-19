@@ -56,6 +56,7 @@
     "jsonwebtoken": "^8.5.1",
     "loglevel": "^1.6.8",
     "mongoose": "^5.9.28",
+    "react-add-to-calendar-hoc": "^1.0.10",
     "sanitize-html": "^1.27.2",
     "xml2js": "^0.4.23"
   }
