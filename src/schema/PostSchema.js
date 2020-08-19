@@ -345,7 +345,7 @@ const PostMutation = {
     }),
 
   postRemoveById: PostDTC.getResolver('removeById')
-    .withMiddlewares([checkLoggedIn, userCheckPost])
+    .withMiddlewares([checkLoggedIn])
     .wrapResolve(next => async rp => {
       const payload = await next(rp)
 
