@@ -5,8 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "build": "rm -rf build && babel src -d build",
-    "start": "nodemon",
-    "serve": "node --trace-warnings build/index.js"
+    "make": "pkg build/index.js -o build/rice-discuss-backend --options trace-warnings",
+    "serve": "node --trace-warnings build/index.js",
+    "start": "nodemon"
   },
   "repository": {
     "type": "git",
