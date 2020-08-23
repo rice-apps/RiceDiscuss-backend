@@ -1,5 +1,24 @@
 {
-  "name": "RiceDiscuss-backend",
+  "name": "rice-discuss-backend",
+  "version": "1.2.0",
+  "description": "The backend for RiceDiscuss, written in Node and Apollo GraphQL",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "rm -rf build && babel src -d build",
+    "start": "nodemon",
+    "serve": "node --trace-warnings build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rice-apps/RiceDiscuss-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rice-apps/RiceDiscuss-backend/issues"
+  },
+  "homepage": "https://github.com/rice-apps/RiceDiscuss-backend#readme",
   "dependencies": {
     "@babel/runtime": "^7.11.2",
     "apollo-server-express": "^2.16.1",
@@ -26,6 +45,7 @@
     "@babel/plugin-transform-runtime": "^7.11.0",
     "@babel/preset-env": "^7.11.0",
     "@types/babel-core": "^6.25.6",
+    "@types/bent": "^7.3.0",
     "@types/express": "^4.17.7",
     "@types/mongoose": "^5.7.36",
     "@types/node": "^14.6.0",

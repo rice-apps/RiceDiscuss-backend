@@ -1441,6 +1441,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/bent@npm:^7.3.0":
+  version: 7.3.0
+  resolution: "@types/bent@npm:7.3.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: 36a6b16b3ad1339914c084070814d39778ad6386a94ef3cccaeb05da9ebfd389c6b5748c0e90352605e39e2eca7c39d0fc70581f27eca242bbed888f6522f867
+  languageName: node
+  linkType: hard
+
 "@types/body-parser@npm:*, @types/body-parser@npm:1.19.0":
   version: 1.19.0
   resolution: "@types/body-parser@npm:1.19.0"
@@ -1711,43 +1720,6 @@ __metadata:
   checksum: 3d1da5799967fc272ae53f698514c169c85a04c11c1db3e4641a21edc82af75bfb4db9221c4f87aa333f14c7b43b72311fa66dae1ae981fa6f24c2bc5863d92b
   languageName: node
   linkType: hard
-
-"RiceDiscuss-backend@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "RiceDiscuss-backend@workspace:."
-  dependencies:
-    "@babel/cli": ^7.10.5
-    "@babel/core": ^7.11.4
-    "@babel/node": ^7.10.5
-    "@babel/plugin-transform-runtime": ^7.11.0
-    "@babel/preset-env": ^7.11.0
-    "@babel/runtime": ^7.11.2
-    "@types/babel-core": ^6.25.6
-    "@types/express": ^4.17.7
-    "@types/mongoose": ^5.7.36
-    "@types/node": ^14.6.0
-    "@types/ws": ^7.2.6
-    apollo-server-express: ^2.16.1
-    aws-sdk: ^2.738.0
-    bent: ^7.3.10
-    cors: ^2.8.5
-    dotenv: ^8.2.0
-    express: ^4.17.1
-    express-ws: ^4.0.0
-    graphql: ^15.3.0
-    graphql-compose: ^7.19.4
-    graphql-compose-connection: ^7.0.1
-    graphql-compose-mongoose: ^8.0.2
-    jsonwebtoken: ^8.5.1
-    loglevel: ^1.6.8
-    mongoose: ^5.10.0
-    nodemon: ^2.0.4
-    pkg: ^4.4.9
-    sanitize-html: ^1.27.3
-    typescript: ^4.0.2
-    xml2js: ^0.4.23
-  languageName: unknown
-  linkType: soft
 
 "abbrev@npm:1":
   version: 1.1.1
@@ -6108,6 +6080,44 @@ fsevents@~2.1.2:
   checksum: 08ef02ed0514f020a51131ba2e6c27c66ccebe25d49cfc83467a0d4054db4634a2853480d0895c710b645ab66af1a6fb3e183888306ae559413bd96c69f39ccd
   languageName: node
   linkType: hard
+
+"rice-discuss-backend@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "rice-discuss-backend@workspace:."
+  dependencies:
+    "@babel/cli": ^7.10.5
+    "@babel/core": ^7.11.4
+    "@babel/node": ^7.10.5
+    "@babel/plugin-transform-runtime": ^7.11.0
+    "@babel/preset-env": ^7.11.0
+    "@babel/runtime": ^7.11.2
+    "@types/babel-core": ^6.25.6
+    "@types/bent": ^7.3.0
+    "@types/express": ^4.17.7
+    "@types/mongoose": ^5.7.36
+    "@types/node": ^14.6.0
+    "@types/ws": ^7.2.6
+    apollo-server-express: ^2.16.1
+    aws-sdk: ^2.738.0
+    bent: ^7.3.10
+    cors: ^2.8.5
+    dotenv: ^8.2.0
+    express: ^4.17.1
+    express-ws: ^4.0.0
+    graphql: ^15.3.0
+    graphql-compose: ^7.19.4
+    graphql-compose-connection: ^7.0.1
+    graphql-compose-mongoose: ^8.0.2
+    jsonwebtoken: ^8.5.1
+    loglevel: ^1.6.8
+    mongoose: ^5.10.0
+    nodemon: ^2.0.4
+    pkg: ^4.4.9
+    sanitize-html: ^1.27.3
+    typescript: ^4.0.2
+    xml2js: ^0.4.23
+  languageName: unknown
+  linkType: soft
 
 "rimraf@npm:^2.6.3":
   version: 2.7.1
