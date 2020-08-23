@@ -1,22 +1,22 @@
 import { ApolloError } from 'apollo-server-express'
 import { composeWithMongoose } from 'graphql-compose-mongoose'
 import log from 'loglevel'
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 
-const CommentSchema = new mongoose.Schema({
+const CommentSchema = new Schema({
   creator: {
     type: String,
     required: true
   },
 
   post: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'PostInterface',
     required: true
   },
 
   parent: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Comment',
     required: false
   },
@@ -58,7 +58,7 @@ const CommentSchema = new mongoose.Schema({
   ]
 })
 
-const Comment = mongoose.model('Comment', CommentSchema)
+const Comment = model('Comment', CommentSchema)
 
 const CommentTC = composeWithMongoose(Comment)
 

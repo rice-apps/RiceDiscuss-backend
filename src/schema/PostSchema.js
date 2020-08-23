@@ -1,4 +1,5 @@
 import { ForbiddenError, UserInputError } from 'apollo-server-express'
+import S3 from 'aws-sdk/clients/s3'
 import log from 'loglevel'
 import { CommentTC, PostDTC, UserTC, Post } from '../models'
 import {
@@ -9,7 +10,15 @@ import {
   pubsub
 } from '../utils'
 
-import { MAX_REPORTS } from '../config'
+import { S3PayloadTC } from '../models/CustomTypes'
+
+import {
+  AWS_ACCESS_KEY_ID,
+  AWS_SECRET,
+  BUCKET,
+  REGION,
+  MAX_REPORTS
+} from '../config'
 
 PostDTC.addFields({
   comments: [CommentTC]
@@ -206,6 +215,40 @@ PostDTC.addFields({
       return post
     }
   })
+  .addResolver({
+    name: 'signS3Url',
+    type: () => S3PayloadTC,
+    args: {
+      filename: `String!`,
+      filetype: `String!`
+    },
+    resolve: async ({ args }) => {
+      const s3 = new S3({
+        apiVersion: '2006-03-01',
+        region: REGION,
+        credentials: {
+          accessKeyId: AWS_ACCESS_KEY_ID,
+          secretAccessKey: AWS_SECRET
+        }
+      })
+
+      const s3Params = {
+        Bucket: BUCKET,
+        Key: args.filename,
+        Expires: 60,
+        ContentType: args.filetype,
+        ACL: 'public-read'
+      }
+
+      const signedRequest = s3.getSignedUrl('putObject', s3Params)
+      const url = `https://${BUCKET}.s3.amazonaws.com/${args.filename}`
+
+      return {
+        signedRequest,
+        url
+      }
+    }
+  })
 
 const PostQuery = {
   postById: PostDTC.getResolver('findById')
@@ -354,7 +397,9 @@ const PostMutation = {
       })
 
       return payload
-    })
+    }),
+
+  signS3Url: PostDTC.getResolver('signS3Url').withMiddlewares([checkLoggedIn])
 }
 
 const PostSubscription = {

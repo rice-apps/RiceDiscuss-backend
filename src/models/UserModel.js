@@ -1,10 +1,10 @@
 import { ApolloError } from 'apollo-server-express'
 import { composeWithMongoose } from 'graphql-compose-mongoose'
 import log from 'loglevel'
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 import { COLLEGES, MAJORS, MINORS } from '../config'
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
   username: {
     type: String,
     required: true,
@@ -65,13 +65,13 @@ const UserSchema = new mongoose.Schema({
 
   savedPosts: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'PostInterface'
     }
   ]
 })
 
-const User = mongoose.model('User', UserSchema)
+const User = model('User', UserSchema)
 
 const UserTC = composeWithMongoose(User)
 

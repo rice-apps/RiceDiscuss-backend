@@ -101,6 +101,20 @@ UserTC.addFields({
       }
     }
   })
+  .addResolver({
+    name: 'doesUsernameExist',
+    type: 'Boolean',
+    args: {
+      username: 'String!'
+    },
+    resolve: async ({ args }) =>
+      User.exists({
+        username: args.username
+      }).catch(err => {
+        log.error(err)
+        return null
+      })
+  })
 
 const UserQuery = {
   userOne: UserTC.getResolver('findOne').withMiddlewares([checkLoggedIn]),
@@ -109,7 +123,11 @@ const UserQuery = {
     checkLoggedIn
   ]),
 
-  verifyToken: UserTC.getResolver('verifyToken')
+  verifyToken: UserTC.getResolver('verifyToken'),
+
+  doesUsernameExist: UserTC.getResolver('doesUsernameExist').withMiddlewares([
+    checkLoggedIn
+  ])
 }
 
 const UserMutation = {

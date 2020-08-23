@@ -1,7 +1,7 @@
 import { ApolloError } from 'apollo-server-express'
 import { composeWithMongooseDiscriminators } from 'graphql-compose-mongoose'
 import log from 'loglevel'
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 import { toInputObjectType } from 'graphql-compose'
 
 import { UrlTC } from './CustomTypes'
@@ -15,7 +15,7 @@ const enumPostType = {
   Job: 'Job'
 }
 
-const PostSchema = new mongoose.Schema({
+const PostSchema = new Schema({
   kind: {
     type: String,
     require: true,
@@ -84,9 +84,9 @@ const PostSchema = new mongoose.Schema({
   }
 })
 
-const DiscussionSchema = new mongoose.Schema()
+const DiscussionSchema = new Schema()
 
-const EventSchema = new mongoose.Schema({
+const EventSchema = new Schema({
   start: {
     type: Date,
     required: true
@@ -103,7 +103,7 @@ const EventSchema = new mongoose.Schema({
   }
 })
 
-const JobSchema = new mongoose.Schema({
+const JobSchema = new Schema({
   start: {
     type: Date,
     required: true
@@ -130,7 +130,7 @@ const JobSchema = new mongoose.Schema({
   }
 })
 
-const NoticeSchema = new mongoose.Schema({
+const NoticeSchema = new Schema({
   deadline: {
     type: Date,
     required: true
@@ -139,7 +139,7 @@ const NoticeSchema = new mongoose.Schema({
 
 PostSchema.set('discriminatorKey', DKey)
 
-const Post = mongoose.model('Post', PostSchema)
+const Post = model('Post', PostSchema)
 
 const Discussion = Post.discriminator(enumPostType.Discussion, DiscussionSchema)
 const Notice = Post.discriminator(enumPostType.Notice, NoticeSchema)
