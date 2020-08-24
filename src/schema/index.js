@@ -1,6 +1,6 @@
 import { SchemaComposer } from 'graphql-compose'
 
-import { DiscussionTC, EventTC, JobTC, NoticeTC } from '../models'
+import { DiscussionTC, EventTC, JobTC, NoticeTC, User, Post } from '../models'
 
 import {
   CommentQuery,
@@ -20,7 +20,8 @@ sc.addSchemaMustHaveType(DiscussionTC)
 sc.Query.addFields({
   ...CommentQuery,
   ...PostQuery,
-  ...UserQuery
+  ...UserQuery,
+  getAllTags
 })
 
 sc.Mutation.addFields({
