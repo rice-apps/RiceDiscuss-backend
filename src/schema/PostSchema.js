@@ -249,6 +249,22 @@ PostDTC.addFields({
       }
     }
   })
+  .addResolver({
+    name: 'getAllTags',
+    type: '[String]',
+    resolve: async () => {
+      const allTags = await Post.find({})
+        .select('tags')
+        .exec()
+        .then(mongoDocs => mongoDocs.map(post => post.tags).flat())
+        .catch(err => {
+          log.error(err)
+          return true
+        })
+
+      return Array.from(new Set(allTags))
+    }
+  })
 
 const PostQuery = {
   postById: PostDTC.getResolver('findById')
@@ -316,7 +332,9 @@ const PostQuery = {
       }
 
       return payload
-    })
+    }),
+
+  getAllTags: PostDTC.getResolver('getAllTags').withMiddlewares([checkLoggedIn])
 }
 
 const PostMutation = {
