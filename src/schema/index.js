@@ -4,7 +4,7 @@ import { GraphQLNonNull, GraphQLString } from "graphql";
 import { SchemaComposer } from "graphql-compose";
 import S3 from "aws-sdk/clients/s3";
 
-import { DiscussionTC, EventTC, JobTC, NoticeTC, User } from "../models";
+import { DiscussionTC, EventTC, JobTC, NoticeTC, User, Post } from '../models'
 
 import {
     CommentQuery,
@@ -14,7 +14,7 @@ import {
 import { PostQuery, PostMutation, PostSubscription } from "./PostSchema";
 import { UserQuery, UserMutation, UserSubscription } from "./UserSchema";
 
-import { S3PayloadTC, UsernameExistsPayloadTC } from "../models/CustomTypes";
+import { S3PayloadTC, } from '../models/CustomTypes'
 
 import { AWS_ACCESS_KEY_ID, AWS_SECRET, BUCKET, REGION } from "../config";
 
@@ -25,28 +25,51 @@ sc.addSchemaMustHaveType(DiscussionTC)
     .addSchemaMustHaveType(JobTC)
     .addSchemaMustHaveType(NoticeTC);
 
+  const getAllTags = sc.createResolver({
+    name: 'getAllTags',
+    type: '[String]',
+    resolve: async ({ context }) => {
+      if (!context.netID) {
+        return new AuthenticationError(
+          'Not logged in. Stop trying to access the data'
+        )
+      }
+
+      let all_tags = await Post.find({}).select("tags").exec()
+                            .then(mongoDocs => mongoDocs.map(post => post.tags).flat())
+                            .catch(err => {
+                              log.error(err);
+                              return true;
+                            })
+
+      all_tags = Array.from(new Set(all_tags))
+      return all_tags;
+    }
+  })
+
 const doesUsernameExist = sc.createResolver({
-    name: "doesUsernameExist",
-    type: () => UsernameExistsPayloadTC,
-    args: {
-        username: new GraphQLNonNull(GraphQLString),
-    },
-    resolve: async ({ args, context }) => {
-        if (!context.netID) {
-            return new AuthenticationError(
-                "Not logged in. Stop trying to access the data",
-            );
-        }
+  name: 'doesUsernameExist',
+  type: 'Boolean',
+  args: {
+    username: 'String!'
+  },
+  resolve: async ({ args, context }) => {
+    if (!context.netID) {
+      return new AuthenticationError(
+        'Not logged in. Stop trying to access the data'
+      )
+    }
 
-        const usernameExists = await User.exists({
-            username: args.username,
-        }).catch((err) => log.error(err));
+    const usernameExists = await User.exists({
+      username: args.username
+    }).catch(err => {
+      log.error(err)
+      return true
+    })
 
-        return {
-            usernameExists,
-        };
-    },
-});
+    return usernameExists
+  }
+})
 
 const signS3Url = sc.createResolver({
     name: "signS3Url",
@@ -88,11 +111,12 @@ const signS3Url = sc.createResolver({
 });
 
 sc.Query.addFields({
-    ...CommentQuery,
-    ...PostQuery,
-    ...UserQuery,
-    doesUsernameExist,
-});
+  ...CommentQuery,
+  ...PostQuery,
+  ...UserQuery,
+  doesUsernameExist,
+  getAllTags
+})
 
 sc.Mutation.addFields({
     ...CommentMutation,
