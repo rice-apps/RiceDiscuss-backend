@@ -33,6 +33,12 @@ const PostSchema = new Schema({
     required: true
   },
 
+  text_align: {
+    type: String,
+    required: false,
+    default: 'left'
+  },
+
   date_created: {
     type: Date,
     required: false,
