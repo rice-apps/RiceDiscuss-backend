@@ -4,13 +4,11 @@
   "description": "The backend for RiceDiscuss, written in Node and Apollo GraphQL",
   "main": "src/index.js",
   "scripts": {
-    "prod": "run-s build serve",
     "lint": "prettier-standard --lint",
     "build": "rm -rf build && babel src -d build",
     "start": "nodemon",
     "serve": "node --trace-warnings build/index.js",
-    "make-exec": "pkg build/index.js -o build/RiceDiscussBackend --options trace-warnings",
-    "pkg": "run-s build make-exec"
+    "pkg": "pkg build/index.js -o build/$npm_package_name --options trace-warnings"
   },
   "repository": {
     "type": "git",
