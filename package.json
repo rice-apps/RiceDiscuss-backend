@@ -8,7 +8,8 @@
     "build": "rm -rf build && babel src -d build",
     "make": "pkg build/index.js -o build/rice-discuss-backend --options trace-warnings",
     "serve": "node --trace-warnings build/index.js",
-    "pkg": "pkg build/index.js -o build/$npm_package_name --options trace-warnings"
+    "pkg": "pkg build/index.js -o build/$npm_package_name --options trace-warnings",
+    "start": "nodemon"
   },
   "repository": {
     "type": "git",
