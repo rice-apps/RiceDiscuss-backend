@@ -1182,8 +1182,8 @@ __metadata:
   linkType: hard
 
 "@babel/preset-modules@npm:^0.1.3":
-  version: 0.1.3
-  resolution: "@babel/preset-modules@npm:0.1.3"
+  version: 0.1.4
+  resolution: "@babel/preset-modules@npm:0.1.4"
   dependencies:
     "@babel/helper-plugin-utils": ^7.0.0
     "@babel/plugin-proposal-unicode-property-regex": ^7.4.4
@@ -1192,7 +1192,7 @@ __metadata:
     esutils: ^2.0.2
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: 341c13de18779d682ec710c40e60e92285d9a557211c0448398b7308cffb7a1edaaaf4862c1dfe9b02c8b1184c3fdad73daead66cc48aa37b8e90602a49ac175
+  checksum: 8a463709fd9db195c73ad1d6ff2d85ce92976167f20ded23ec49b47754c42fae40f93ff3287fb2e980f0d7f0b7ddf163aa92faf416ef422bdccf722bdae50138
   languageName: node
   linkType: hard
 
@@ -1666,9 +1666,9 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:^14.6.0":
-  version: 14.6.0
-  resolution: "@types/node@npm:14.6.0"
-  checksum: ff23553ab77516d0f90b6710a041a49723fc1b1ca33a5379d5746068cac8b9ddbec428d3a4913afaee50bcdc69b9583843740a18a3519ae997982694f5287c6b
+  version: 14.6.1
+  resolution: "@types/node@npm:14.6.1"
+  checksum: 0cc38a56a464f34daba7a948eca861909649c17094de4b43b2b3b89af8c56da77ee99c5992e9b0c33c71c1e3e2653ccfd745f3da77458c71b0909a911af5eaaf
   languageName: node
   linkType: hard
 
@@ -1925,9 +1925,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apollo-server-core@npm:^2.16.1":
-  version: 2.16.1
-  resolution: "apollo-server-core@npm:2.16.1"
+"apollo-server-core@npm:^2.17.0":
+  version: 2.17.0
+  resolution: "apollo-server-core@npm:2.17.0"
   dependencies:
     "@apollographql/apollo-tools": ^0.4.3
     "@apollographql/graphql-playground-html": 1.6.26
@@ -1941,7 +1941,7 @@ __metadata:
     apollo-server-errors: ^2.4.2
     apollo-server-plugin-base: ^0.9.1
     apollo-server-types: ^0.5.1
-    apollo-tracing: ^0.11.1
+    apollo-tracing: ^0.11.2
     fast-json-stable-stringify: ^2.0.0
     graphql-extensions: ^0.12.4
     graphql-tag: ^2.9.2
@@ -1953,7 +1953,7 @@ __metadata:
     ws: ^6.0.0
   peerDependencies:
     graphql: ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
-  checksum: 90ce35432dddc60d0c04340b50b8a066cc58bd585c64e6b8de2dda3241252040e25c1362828718641010fabe2499ddcc3b06420888eb49c75ee025a18eff3fee
+  checksum: 964ca1d69799316d70c521db49de6d1004980ba1e5235945d96a8adc2faed09facef41f15b9a4706e4f34b80fce211f897be18b30bfba4263a2021586bcbac6b
   languageName: node
   linkType: hard
 
@@ -1977,8 +1977,8 @@ __metadata:
   linkType: hard
 
 "apollo-server-express@npm:^2.16.1":
-  version: 2.16.1
-  resolution: "apollo-server-express@npm:2.16.1"
+  version: 2.17.0
+  resolution: "apollo-server-express@npm:2.17.0"
   dependencies:
     "@apollographql/graphql-playground-html": 1.6.26
     "@types/accepts": ^1.3.5
@@ -1986,7 +1986,7 @@ __metadata:
     "@types/cors": ^2.8.4
     "@types/express": 4.17.7
     accepts: ^1.3.5
-    apollo-server-core: ^2.16.1
+    apollo-server-core: ^2.17.0
     apollo-server-types: ^0.5.1
     body-parser: ^1.18.3
     cors: ^2.8.4
@@ -1998,7 +1998,7 @@ __metadata:
     type-is: ^1.6.16
   peerDependencies:
     graphql: ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
-  checksum: e1c9e649950228695d42c45e0a363fc823dc97eddd5c7ea8aeba39d38a34d3ac6e11d5d8b5749eff232ca1367826074b7d44e9fd228daf006ac771b1acac9ea8
+  checksum: 0e88dc73edacb3a27fee928d60cca326e922c17288bd58179b3eee23891e531d662d8c4796506ee4713ac9dc66c4350a837320c160d70a65b69662bf730745be
   languageName: node
   linkType: hard
 
@@ -2026,15 +2026,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apollo-tracing@npm:^0.11.1":
-  version: 0.11.1
-  resolution: "apollo-tracing@npm:0.11.1"
+"apollo-tracing@npm:^0.11.2":
+  version: 0.11.2
+  resolution: "apollo-tracing@npm:0.11.2"
   dependencies:
     apollo-server-env: ^2.4.5
     apollo-server-plugin-base: ^0.9.1
   peerDependencies:
     graphql: ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
-  checksum: 6c9daa774656b65031515a453e1d5d6f06b8e294bbcd6db698c777f7ca726fd37bcd8bf930649c1c999451706a382d0d203c4255ab6102b96c2bf5b4731240ab
+  checksum: f0625eb7768ac494dbb1195a6bbc637db0d2a9bc0752f6bbd4e85574207f114729107271f6b0891c8e755b72734276c166b0f9832cd037f1ccf0cc18061912dd
   languageName: node
   linkType: hard
 
@@ -2174,8 +2174,8 @@ __metadata:
   linkType: hard
 
 "aws-sdk@npm:^2.738.0":
-  version: 2.738.0
-  resolution: "aws-sdk@npm:2.738.0"
+  version: 2.741.0
+  resolution: "aws-sdk@npm:2.741.0"
   dependencies:
     buffer: 4.9.2
     events: 1.1.1
@@ -2186,7 +2186,7 @@ __metadata:
     url: 0.10.3
     uuid: 3.3.2
     xml2js: 0.4.19
-  checksum: 03efd993e743740880433d63db490fd15b96c6ab1eb95128c76bba38abb561a52a207e6ced84cd958d2a760aa4526476399ebd6645f3c2ce0213031a6332a970
+  checksum: d0255aa1c016033418c37f0ee247d5499e54b524954b5efa046223b14fa812967b4368904f449e1540b2b9517de21519e054ed4efd798bedb654d1b215fb00b1
   languageName: node
   linkType: hard
 
@@ -2293,12 +2293,12 @@ __metadata:
   linkType: hard
 
 "bl@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "bl@npm:2.2.0"
+  version: 2.2.1
+  resolution: "bl@npm:2.2.1"
   dependencies:
     readable-stream: ^2.3.5
     safe-buffer: ^5.1.1
-  checksum: a944248044a8a488f225124addb944d1618df846fdc8ba38be85dd95207f58322637800cd213d3886074d85d38ef0dc9ba9cc09ae85859effa7077f408ba6595
+  checksum: 438c510aa211ec4398819ad1cb4ef1617b0ffeb0f1946c2b359fc5aefbe6f8e22dc2f6788e8746509779fabee89f1c3b34ec87ff30fb7b3d95654d8cd51e3b70
   languageName: node
   linkType: hard
 
@@ -2506,9 +2506,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001111":
-  version: 1.0.30001117
-  resolution: "caniuse-lite@npm:1.0.30001117"
-  checksum: 1e662b55088f83c50164f765d6a3d67109cb94bda943b8ac1efeb8be74c2320ea61eed3e49572d9f98d6de3d7968831cd3370ac29196b632a909ae25f5084bc7
+  version: 1.0.30001119
+  resolution: "caniuse-lite@npm:1.0.30001119"
+  checksum: 9f50c22551035e107db9eef659847ea0bebfa4228cb978977274e4cfb0a1e807fb3d3c968b77b0575e70ad1c9a2f7637c905e0c14990f9730a7e487173e33579
   languageName: node
   linkType: hard
 
@@ -3104,9 +3104,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.3.523":
-  version: 1.3.544
-  resolution: "electron-to-chromium@npm:1.3.544"
-  checksum: bb86613254a499835f08f2480c9f8247bb7ee8a81b0154c9d51f61906051d69c9ccdccf37f6b4180e181b03248712317a4668096212d6b837239452726dba72c
+  version: 1.3.553
+  resolution: "electron-to-chromium@npm:1.3.553"
+  checksum: e874e0c8e57403e2817ff31a55ddb9966b5a445481e08bedc65b4452a4da24092948319280059198f54a5cdc8a3d0c983489ac70513a6e353a573b54abf91cba
   languageName: node
   linkType: hard
 
@@ -3840,15 +3840,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"graphql-compose@npm:^7.19.4":
-  version: 7.19.4
-  resolution: "graphql-compose@npm:7.19.4"
+"graphql-compose@npm:^7.20.1":
+  version: 7.20.1
+  resolution: "graphql-compose@npm:7.20.1"
   dependencies:
     graphql-type-json: 0.3.2
     object-path: ^0.11.4
   peerDependencies:
     graphql: ^14.2.0 || ^15.0.0
-  checksum: bf30dc63501c2be78e9ed95e6e4683033626ca2431948e58ed2c18c59e33b736aecbd3737468915fcef94f101bd03c79295295eac83db62d3c1d91dc5bc4c78d
+  checksum: 13130b1df9decf4acb0e0ae52fd85ee06c58d79619b54e6bee6ebd3d36d0c69571dc1ec89b54ae7f9889428892eed7cc466fb0f8fe2d385cb248c6f2542d5a78
   languageName: node
   linkType: hard
 
@@ -3923,14 +3923,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"graphql@npm:*":
-  version: 15.3.0
-  resolution: "graphql@npm:15.3.0"
-  checksum: f01c05eb9102a88f33b4276b38399f066067d5be03c66c3bfec3e71e1793a91750e408f7abb001831bc2daf09746ab70ac0af16894d0ef1f1c1246fb0c2f4b0e
-  languageName: node
-  linkType: hard
-
-"graphql@npm:^14.5.3, graphql@npm:^14.6.0":
+"graphql@npm:*, graphql@npm:^14.0.0, graphql@npm:^14.5.3":
   version: 14.7.0
   resolution: "graphql@npm:14.7.0"
   dependencies:
@@ -4821,9 +4814,9 @@ fsevents@~2.1.2:
   linkType: hard
 
 "loglevel@npm:^1.6.7, loglevel@npm:^1.6.8":
-  version: 1.6.8
-  resolution: "loglevel@npm:1.6.8"
-  checksum: 847939b08549649a0495e1b0d25ac89cec537a057fbb6deae468a066236ca0295aabce314366c026605537c345ece982d88783c7f44ab3599a40554bb09442ed
+  version: 1.7.0
+  resolution: "loglevel@npm:1.7.0"
+  checksum: 5d14de3bef87a53aab782c6e47bd096946444f72224ae2f56b197cefb93f9b94b5c5b2c91269b3bc30b109cb484cc8908b158e35f5437c50d8e778b8eb0d6037
   languageName: node
   linkType: hard
 
@@ -5092,9 +5085,9 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"mongoose@npm:5.10.0, mongoose@npm:^5.10.0":
-  version: 5.10.0
-  resolution: "mongoose@npm:5.10.0"
+"mongoose@npm:5.10.1, mongoose@npm:^5.10.0":
+  version: 5.10.1
+  resolution: "mongoose@npm:5.10.1"
   dependencies:
     bson: ^1.1.4
     kareem: 2.3.1
@@ -5107,7 +5100,7 @@ fsevents@~2.1.2:
     safe-buffer: 5.2.1
     sift: 7.0.1
     sliced: 1.0.1
-  checksum: e2b2b7e53744c62df12db1770e2948ba8394eaeb18b2790707ad212574dae53c9954bf40d6563b158fe28e8e7076e89c1b75551858c17db31102121ba0a49d8c
+  checksum: ad8337b19ff7abe16c3b7e8023a235b9d47798d9ae98cd4c1ae0228e75d7740558f9def0dbac77248e012a2aa339f0869a38792dfc8dc20b8c230be68ff8ce70
   languageName: node
   linkType: hard
 
@@ -6135,8 +6128,8 @@ fsevents@~2.1.2:
     dotenv: ^8.2.0
     express: ^4.17.1
     express-ws: ^4.0.0
-    graphql: ^14.6.0
-    graphql-compose: ^7.19.4
+    graphql: ^14.0.0
+    graphql-compose: ^7.20.1
     graphql-compose-connection: ^7.0.1
     graphql-compose-mongoose: ^8.0.2
     jsonwebtoken: ^8.5.1
@@ -6199,14 +6192,14 @@ fsevents@~2.1.2:
   linkType: hard
 
 "sanitize-html@npm:^1.27.3":
-  version: 1.27.3
-  resolution: "sanitize-html@npm:1.27.3"
+  version: 1.27.4
+  resolution: "sanitize-html@npm:1.27.4"
   dependencies:
     htmlparser2: ^4.1.0
     lodash: ^4.17.15
     parse-srcset: ^1.0.2
     postcss: ^7.0.27
-  checksum: b1cffe8abb8f63cfecbdc680deea10940d79f2682247ed403fa69867885ff03675c46425bfad1c5279156123b595fc81e60ba274a04dd4fb6706856dedc1d730
+  checksum: 9e2309f68302e2ccd34a649714742af6c6f67c6f7c0e296be017d1597e4bb9e0585aea92943664d5e9871724aafc8c25bcf6e550e0c5581afd84c35a7edae238
   languageName: node
   linkType: hard
 
@@ -7087,21 +7080,12 @@ typescript@^3.9.7:
   languageName: node
   linkType: hard
 
-"uuid@npm:3.3.2":
+"uuid@npm:3.3.2, uuid@npm:^3.1.0, uuid@npm:^3.3.2":
   version: 3.3.2
   resolution: "uuid@npm:3.3.2"
   bin:
     uuid: ./bin/uuid
   checksum: f407d974ca30b20bfbd32ae9cc05d20e18df5fd9e5fa088d91db04a6597125dcc8d09eeeb7237782724daba36418e24f557e0245e6ce7b8e4ad25d6436f1cde1
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^3.1.0, uuid@npm:^3.3.2":
-  version: 3.4.0
-  resolution: "uuid@npm:3.4.0"
-  bin:
-    uuid: ./bin/uuid
-  checksum: 1ce3f37e214d6d0dc94a6a9663a0365013ace66bc3fd5b203e6f5d2eeb978aaee1192367222386345d30b4c6a447928c501121aa84c637724bf105ef57284949
   languageName: node
   linkType: hard
 
