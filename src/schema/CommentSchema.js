@@ -269,7 +269,7 @@ const CommentQuery = {
       return payload
     }),
 
-  commentByPost: CommentTC.getResolver('findManyByPostID')
+  commentByPost: CommentTC.getResolver('findTopLevelByPostID')
     .withMiddlewares([checkLoggedIn])
     .wrapResolve(next => async rp => {
       const payload = await next({
