@@ -35,7 +35,7 @@ const CommentSchema = new Schema({
 
   depth: {
     type: Number,
-    required: true,
+    required: false,
     default: 0
   },
 
@@ -123,7 +123,12 @@ CommentTC.addResolver({
     type: [CommentTC],
 
     resolve: ({ args }) =>
-      Comment.find({ post: args.postID, parent: { $exists: false } })
+      Comment.find({
+        $and: [
+          { post: args.postID },
+          { $or: [{ parent: { $exists: false } }, { parent: { $eq: null } }] }
+        ]
+      })
         .then(res => res)
         .catch(err => {
           log.error(err)
