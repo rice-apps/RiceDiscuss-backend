@@ -270,7 +270,6 @@ PostDTC.addFields({
     type: PostDTC.getDInterface().getTypePlural(),
     args: {
       filterStyle: 'String!',
-
       beginDate: "Date",
       endDate: "Date",
       tags: "[String]",
@@ -279,6 +278,7 @@ PostDTC.addFields({
     },
     resolve: async ({ args }) => {
       let all_posts = await Post.find({})
+
         .exec()
         .then(post => post)
         .catch(err => {
@@ -316,7 +316,6 @@ PostDTC.addFields({
           return false
         })
       }
-
       return all_posts
     }
   })
@@ -367,6 +366,7 @@ const PostQuery = {
   postCount: PostDTC.getResolver('count').withMiddlewares([checkLoggedIn]),
 
   postConnection: PostDTC.getResolver('connection').addArgs()
+
     .withMiddlewares([checkLoggedIn])
     .wrapResolve(next => async rp => {
       const payload = await next({
@@ -385,7 +385,6 @@ const PostQuery = {
           }
         }
       }
-
       //maybe do sorting here?
       return payload
     }),
