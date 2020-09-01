@@ -294,7 +294,7 @@ PostDTC.addFields({
       if (args.filterStyle.includes("date")){
         all_posts = all_posts.filter(post => {
           const creation_date = post.date_created
-          return beginDate < creation_date && creation_date < endDate
+          return args.beginDate < creation_date && creation_date < args.endDate
         })
       }
       if (args.filterStyle.includes("popularity")){
@@ -386,7 +386,7 @@ const PostQuery = {
         }
       }
 
-      //maybe do filtering here?
+      //maybe do sorting here?
       return payload
     }),
 
