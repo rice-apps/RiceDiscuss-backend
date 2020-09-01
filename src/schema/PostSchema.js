@@ -270,15 +270,15 @@ PostDTC.addFields({
     type: PostDTC.getDInterface().getTypePlural(),
     args: {
       filterStyle: 'String!',
-
-      beginDate: 'Date',
-      endDate: 'Date',
-      tags: '[String]',
-      upvoteType: 'String',
-      kind: 'EnumDKeyPostKind'
+      beginDate: "Date",
+      endDate: "Date",
+      tags: "[String]",
+      upvoteType: "String",
+      kind: "EnumDKeyPostKind"
     },
     resolve: async ({ args }) => {
-      let allPosts = await Post.find({})
+      let all_posts = await Post.find({})
+
         .exec()
         .then(post => post)
         .catch(err => {
@@ -286,40 +286,37 @@ PostDTC.addFields({
           return true
         })
 
-      const compareUpvoteLengths = (a, b) => {
-        return a.upvotes.length - a.downvotes.length <=
-          b.upvotes.length - b.downvotes.length
-          ? -1
-          : 1
+      const compare_upvote_lengths = (a, b) => {
+        return a.upvotes.length - a.downvotes.length 
+              <= b.upvotes.length - b.downvotes.length ? -1 : 1
       }
 
-      if (args.filterStyle.includes('date')) {
-        allPosts = allPosts.filter(post => {
-          const creationDate = post.date_created
-          return args.beginDate < creationDate && creationDate < args.endDate
+      if (args.filterStyle.includes("date")){
+        all_posts = all_posts.filter(post => {
+          const creation_date = post.date_created
+          return args.beginDate < creation_date && creation_date < args.endDate
         })
       }
-      if (args.filterStyle.includes('popularity')) {
+      if (args.filterStyle.includes("popularity")){
         if (args.upvoteType.includes('hot')) {
-          allPosts = allPosts.sort(compareUpvoteLengths).reverse()
+          all_posts = all_posts.sort(compare_upvote_lengths).reverse()
         } else if (args.upvoteType.includes('cold')) {
-          allPosts = allPosts.sort(compareUpvoteLengths)
+          all_posts = all_posts.sort(compare_upvote_lengths)
         }
       }
-      if (args.filterStyle.includes('kind')) {
-        allPosts = allPosts.filter(post => args.kind === post.kind)
+      if (args.filterStyle.includes("kind")){
+        all_posts = all_posts.filter(post => args.kind === post.kind)
       }
-      if (args.filterStyle.includes('tags')) {
-        allPosts = allPosts.filter(post => {
-          const postTags = post.tags
+      if (args.filterStyle.includes("tags")){
+        all_posts = all_posts.filter(post => {
+          const post_tags = post.tags
           for (let i = 0; i < args.tags.length; i++) {
-            if (postTags.includes(args.tags[i])) return true
+            if (post_tags.includes(args.tags[i])) return true
           }
           return false
         })
       }
-
-      return allPosts
+      return all_posts
     }
   })
 
@@ -368,8 +365,8 @@ const PostQuery = {
 
   postCount: PostDTC.getResolver('count').withMiddlewares([checkLoggedIn]),
 
-  postConnection: PostDTC.getResolver('connection')
-    .addArgs()
+  postConnection: PostDTC.getResolver('connection').addArgs()
+
     .withMiddlewares([checkLoggedIn])
     .wrapResolve(next => async rp => {
       const payload = await next({
@@ -388,17 +385,12 @@ const PostQuery = {
           }
         }
       }
-
-      // maybe do filtering here?
+      //maybe do sorting here?
       return payload
     }),
 
-  getAllTags: PostDTC.getResolver('getAllTags').withMiddlewares([
-    checkLoggedIn
-  ]),
-  getFilteredData: PostDTC.getResolver('getFilteredData').withMiddlewares([
-    checkLoggedIn
-  ])
+  getAllTags: PostDTC.getResolver('getAllTags').withMiddlewares([checkLoggedIn]),
+  getFilteredData: PostDTC.getResolver('getFilteredData').withMiddlewares([checkLoggedIn])
 }
 
 const PostMutation = {

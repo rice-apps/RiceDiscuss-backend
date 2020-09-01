@@ -12,7 +12,7 @@ const enumPostType = {
   Discussion: 'Discussion',
   Event: 'Event',
   Notice: 'Notice',
-  Job: 'Job'
+  Job: 'Job',
 }
 
 const PostSchema = new Schema({
