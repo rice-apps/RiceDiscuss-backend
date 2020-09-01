@@ -13,7 +13,6 @@ const enumPostType = {
   Event: 'Event',
   Notice: 'Notice',
   Job: 'Job',
-  Default: 'Default'
 }
 
 const PostSchema = new Schema({
