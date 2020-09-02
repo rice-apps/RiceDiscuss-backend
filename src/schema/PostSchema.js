@@ -265,6 +265,61 @@ PostDTC.addFields({
       return Array.from(new Set(allTags))
     }
   })
+  .addResolver({
+    name: 'getFilteredData',
+    type: PostDTC.getDInterface().getTypePlural(),
+    args: {
+      filterStyle: 'String!',
+      beginDate: 'Date',
+      endDate: 'Date',
+      tags: '[String]',
+      upvoteType: 'String',
+      kind: 'EnumDKeyPostKind'
+    },
+    resolve: async ({ args }) => {
+      let allPosts = await Post.find({})
+        .exec()
+        .then(post => post)
+        .catch(err => {
+          log.error(err)
+          return true
+        })
+
+      const compareUpvoteLengths = (a, b) => {
+        return a.upvotes.length - a.downvotes.length <=
+          b.upvotes.length - b.downvotes.length
+          ? -1
+          : 1
+      }
+
+      if (args.filterStyle.includes('date')) {
+        allPosts = allPosts.filter(post => {
+          const creationDate = post.date_created
+          return args.beginDate < creationDate && creationDate < args.endDate
+        })
+      }
+      if (args.filterStyle.includes('popularity')) {
+        if (args.upvoteType.includes('hot')) {
+          allPosts = allPosts.sort(compareUpvoteLengths).reverse()
+        } else if (args.upvoteType.includes('cold')) {
+          allPosts = allPosts.sort(compareUpvoteLengths)
+        }
+      }
+      if (args.filterStyle.includes('kind')) {
+        allPosts = allPosts.filter(post => args.kind === post.kind)
+      }
+      if (args.filterStyle.includes('tags')) {
+        allPosts = allPosts.filter(post => {
+          const postTags = post.tags
+          for (let i = 0; i < args.tags.length; i++) {
+            if (postTags.includes(args.tags[i])) return true
+          }
+          return false
+        })
+      }
+      return allPosts
+    }
+  })
 
 const PostQuery = {
   postById: PostDTC.getResolver('findById')
@@ -312,6 +367,8 @@ const PostQuery = {
   postCount: PostDTC.getResolver('count').withMiddlewares([checkLoggedIn]),
 
   postConnection: PostDTC.getResolver('connection')
+    .addArgs()
+
     .withMiddlewares([checkLoggedIn])
     .wrapResolve(next => async rp => {
       const payload = await next({
@@ -330,11 +387,16 @@ const PostQuery = {
           }
         }
       }
-
+      // maybe do sorting here?
       return payload
     }),
 
-  getAllTags: PostDTC.getResolver('getAllTags').withMiddlewares([checkLoggedIn])
+  getAllTags: PostDTC.getResolver('getAllTags').withMiddlewares([
+    checkLoggedIn
+  ]),
+  getFilteredData: PostDTC.getResolver('getFilteredData').withMiddlewares([
+    checkLoggedIn
+  ])
 }
 
 const PostMutation = {
