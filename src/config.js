@@ -37,7 +37,8 @@ const CHECK_HTML_CONFIG = {
 const MONGOOSE_CONFIG = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useCreateIndex: true
+  useCreateIndex: true,
+  useFindAndModify: false
 }
 
 export {

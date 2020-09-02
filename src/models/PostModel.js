@@ -15,80 +15,80 @@ const enumPostType = {
   Job: 'Job'
 }
 
-const PostSchema = new Schema({
-  kind: {
-    type: String,
-    require: true,
-    enum: Object.keys(enumPostType),
-    description: 'The type of the post (whether event, discussion, or notice)'
-  },
-
-  title: {
-    type: String,
-    required: true
-  },
-
-  body: {
-    type: String,
-    required: true
-  },
-
-  text_align: {
-    type: String,
-    required: false,
-    default: 'left'
-  },
-
-  date_created: {
-    type: Date,
-    required: false,
-    default: new Date().getTime(),
-    index: true
-  },
-
-  tags: {
-    type: [String],
-    required: false,
-    default: []
-  },
-
-  creator: {
-    type: String,
-    required: true
-  },
-
-  upvotes: [
-    {
-      type: String
-    }
-  ],
-
-  downvotes: [
-    {
-      type: String
-    }
-  ],
-
-  reports: [
-    {
-      type: String
-    }
-  ],
-
-  imageUrl: {
-    type: String,
-    validate: {
-      validator: testUrl =>
-        testUrl
-          ? /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(
-              testUrl
-            )
-          : true,
-      message: props => `${props.value} is not a valid URL!`
+const PostSchema = new Schema(
+  {
+    kind: {
+      type: String,
+      require: true,
+      enum: Object.keys(enumPostType),
+      description:
+        'The type of the post (whether discussion, event, job, or notice)'
     },
-    required: false
+
+    title: {
+      type: String,
+      required: true
+    },
+
+    body: {
+      type: String,
+      required: true
+    },
+
+    text_align: {
+      type: String,
+      default: 'left'
+    },
+
+    date_created: {
+      type: Date,
+      default: new Date().getTime(),
+      index: true
+    },
+
+    tags: {
+      type: [String],
+      default: []
+    },
+
+    creator: {
+      type: String,
+      required: true
+    },
+
+    upvotes: {
+      type: [String],
+      default: []
+    },
+
+    downvotes: {
+      type: [String],
+      default: []
+    },
+
+    reports: {
+      type: [String],
+      default: []
+    },
+
+    imageUrl: {
+      type: String,
+      validate: {
+        validator: testUrl =>
+          testUrl
+            ? /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(
+                testUrl
+              )
+            : true,
+        message: props => `${props.value} is not a valid URL!`
+      },
+      required: false
+    }
+  },
+  {
+    discriminatorKey: DKey,
   }
-})
+)
 
 const DiscussionSchema = new Schema()
 
@@ -143,7 +143,10 @@ const NoticeSchema = new Schema({
   }
 })
 
-PostSchema.set('discriminatorKey', DKey)
+PostSchema.virtual('relevance').get(async function () {
+  console.log(this.downvotes)
+  return this.upvotes.length //- this.downvotes.length
+})
 
 const Post = model('Post', PostSchema)
 
@@ -152,9 +155,15 @@ const Notice = Post.discriminator(enumPostType.Notice, NoticeSchema)
 const Event = Post.discriminator(enumPostType.Event, EventSchema)
 const Job = Post.discriminator(enumPostType.Job, JobSchema)
 
-const PostDTC = composeWithMongooseDiscriminators(Post).setField('imageUrl', {
-  type: UrlTC
-})
+const PostDTC = composeWithMongooseDiscriminators(Post)
+  .setField('imageUrl', {
+    type: UrlTC
+  })
+  .addFields({
+    relevance: {
+      type: 'Int'
+    }
+  })
 
 const DiscussionTC = PostDTC.discriminator(Discussion)
 const NoticeTC = PostDTC.discriminator(Notice)
@@ -169,6 +178,16 @@ PostDTC.getDInterface()
   .addTypeResolver(EventTC, value => value.kind === enumPostType.Event)
   .addTypeResolver(JobTC, value => value.kind === enumPostType.Job)
   .addTypeResolver(NoticeTC, value => value.kind === enumPostType.Notice)
+
+PostDTC.getResolver('connection').addSortArg({
+  name: 'RELEVANCE_ASC',
+  description: 'Sort by increasing upvotes',
+  value: (resolveParams) => {
+    return {
+      relevance: -1
+    }
+  }
+})
 
 PostDTC.getResolver('createOne')
   .getArgITC('record')
