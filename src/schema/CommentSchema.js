@@ -1,4 +1,8 @@
-import { ForbiddenError, UserInputError } from 'apollo-server-express'
+import {
+  ForbiddenError,
+  UserInputError,
+  withFilter
+} from 'apollo-server-express'
 import log from 'loglevel'
 import { Comment, CommentTC, PostDTC, UserTC } from '../models'
 import {
@@ -394,31 +398,76 @@ const CommentSubscription = {
   commentCreated: {
     type: CommentTC,
 
-    subscribe: () => pubsub.asyncIterator('commentCreated')
+    args: {
+      postID: 'ID!'
+    },
+
+    subscribe: withFilter(
+      (rootValue, args, context, info) =>
+        pubsub.asyncIterator('commentCreated'),
+      (payload, variables) =>
+        String(payload.commentCreated.post) === String(variables.postID)
+    )
   },
 
   commentUpdated: {
     type: CommentTC,
 
-    subscribe: () => pubsub.asyncIterator('commentUpdated')
+    args: {
+      postID: 'ID!'
+    },
+
+    subscribe: withFilter(
+      (rootValue, args, context, info) =>
+        pubsub.asyncIterator('commentUpdated'),
+      (payload, variables) =>
+        String(payload.commentUpdated.post) === String(variables.postID)
+    )
   },
 
   commentVoteChanged: {
     type: CommentTC,
 
-    subscribe: () => pubsub.asyncIterator('commentVotedChanged')
+    args: {
+      postID: 'ID!'
+    },
+
+    subscribe: withFilter(
+      (rootValue, args, context, info) =>
+        pubsub.asyncIterator('commentVoteChanged'),
+      (payload, variables) =>
+        String(payload.commentVoteChanged.post) === String(variables.postID)
+    )
   },
 
   commentReported: {
     type: CommentTC,
 
-    subscribe: () => pubsub.asyncIterator('commentReported')
+    args: {
+      postID: 'ID!'
+    },
+
+    subscribe: withFilter(
+      (rootValue, args, context, info) =>
+        pubsub.asyncIterator('commentReported'),
+      (payload, variables) =>
+        String(payload.commentReported.post) === String(variables.postID)
+    )
   },
 
   commentRemoved: {
     type: CommentTC,
 
-    subscribe: () => pubsub.asyncIterator('commentRemoved')
+    args: {
+      postID: 'ID!'
+    },
+
+    subscribe: withFilter(
+      (rootValue, args, context, info) =>
+        pubsub.asyncIterator('commentRemoved'),
+      (payload, variables) =>
+        String(payload.commentRemoved.post) === String(variables.postID)
+    )
   }
 }
 
