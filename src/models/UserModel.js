@@ -68,7 +68,17 @@ const UserSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'PostInterface'
     }
-  ]
+  ],
+
+  email: {
+    type: String,
+    required: false
+  },
+
+  phone: {
+    type: String,
+    required: false
+  }
 })
 
 const User = model('User', UserSchema)
