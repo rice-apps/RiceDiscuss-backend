@@ -4,7 +4,7 @@ steps:
     args: ['install']
   - name: node
     entrypoint: yarn
-    args: ['run', 'env']
+    args: ['run', 'create-env']
     env:
       - 'CLIENT_TOKEN_SECRET=${_CLIENT_TOKEN_SECRET}'
       - 'MONGODB_CONNECTION_URL=${_MONGODB_CONNECTION_URL}'

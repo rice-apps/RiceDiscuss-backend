@@ -6,9 +6,10 @@
   "scripts": {
     "lint": "prettier-standard --lint",
     "build": "rm -rf build && babel src -d build",
-    "start": "nodemon",
-    "serve": "node --trace-warnings build/index.js",
-    "pkg": "pkg build/index.js -o build/$npm_package_name"
+    "dev": "nodemon",
+    "start": "node --trace-warnings build/index.js",
+    "pkg": "pkg build/index.js -o build/$npm_package_name",
+    "create-env": "printenv > .env"
   },
   "repository": {
     "type": "git",
