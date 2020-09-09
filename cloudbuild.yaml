@@ -22,5 +22,8 @@ steps:
       - 'AWS_SECRET=${_AWS_SECRET}'
       - 'BUCKET=${_BUCKET}'
       - 'REGION=${_REGION}'
+  - name: node
+    entrypoint: yarn
+    args: ['run', 'build']
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy', '--version=1']
