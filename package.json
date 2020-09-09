@@ -5,7 +5,6 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "prettier-standard --lint",
-    // "build": "babel src -d build",
     "build": "react-scripts build",
     "dev": "nodemon",
     "start": "node --trace-warnings build/index.js",
