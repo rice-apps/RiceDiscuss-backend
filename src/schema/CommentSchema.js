@@ -386,8 +386,6 @@ const CommentMutation = {
     .wrapResolve(next => async rp => {
       const payload = await next(rp)
 
-      console.log(rp);
-
       pubsub.publish('commentRemoved', {
         commentRemoved: payload.record
       })
