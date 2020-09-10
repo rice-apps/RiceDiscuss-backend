@@ -24,6 +24,7 @@
   "homepage": "https://github.com/rice-apps/RiceDiscuss-backend#readme",
   "dependencies": {
     "@babel/runtime": "^7.11.2",
+    "@babel/node": "^7.8.7",
     "apollo-server-express": "^2.16.1",
     "aws-sdk": "^2.747.0",
     "bent": "^7.3.9",
