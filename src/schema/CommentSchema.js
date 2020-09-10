@@ -366,9 +366,9 @@ const CommentMutation = {
   toggleCommentReport: CommentTC.getResolver('toggleReport')
     .withMiddlewares([checkLoggedIn])
     .wrapResolve(next => async rp => {
-      if (rp.args.record.reports) {
-        if (rp.args.record.reports.length > MAX_REPORTS) {
-          rp.args.record.body = '[This comment has been removed]'
+      if (rp.args.reports) {
+        if (rp.args.reports.length > MAX_REPORTS) {
+          rp.args.body = '[This comment has been removed.]'
         }
       }
 
