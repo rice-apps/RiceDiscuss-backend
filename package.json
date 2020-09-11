@@ -7,7 +7,7 @@
     "lint": "prettier-standard --lint",
     "build": "babel src --out-dir dist",
     "dev": "nodemon",
-    "start": "nodemon src/index.js",
+    "start": "node build/index.js",
     "serve": "node build/index.js",
     "pkg": "pkg build/index.js -o build/$npm_package_name",
     "create-env": "printenv > .env"
