@@ -27,4 +27,4 @@ steps:
     entrypoint: yarn
     args: ['run', 'build']
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['app', 'deploy', '--version=1']
+    args: ['app', 'deploy', '--version=2']
