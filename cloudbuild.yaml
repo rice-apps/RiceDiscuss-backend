@@ -22,6 +22,7 @@ steps:
       - 'AWS_SECRET=${_AWS_SECRET}'
       - 'BUCKET=${_BUCKET}'
       - 'REGION=${_REGION}'
+      - 'NODE_ENV=${_NODE_ENV}'
   - name: node
     entrypoint: yarn
     args: ['run', 'build']
