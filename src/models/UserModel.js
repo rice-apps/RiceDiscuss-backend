@@ -32,7 +32,6 @@ const UserSchema = new Schema({
 
   college: {
     type: String,
-    enum: COLLEGES,
     required: false
   },
 
@@ -76,6 +75,11 @@ const UserSchema = new Schema({
   },
 
   phone: {
+    type: String,
+    required: false
+  },
+
+  imageUrl: {
     type: String,
     required: false
   }
