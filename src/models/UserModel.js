@@ -32,6 +32,7 @@ const UserSchema = new Schema({
 
   college: {
     type: String,
+    enum: COLLEGES,
     required: false
   },
 
