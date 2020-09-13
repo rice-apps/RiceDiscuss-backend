@@ -28,3 +28,4 @@ steps:
     args: ['run', 'build']
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy', 'src/app.yaml', '--version=2']
+    timetout: '1600s'
