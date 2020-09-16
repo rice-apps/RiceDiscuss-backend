@@ -1,0 +1,5 @@
+runtime: nodejs
+env: flex
+service: api
+network:
+  session_affinity: true
