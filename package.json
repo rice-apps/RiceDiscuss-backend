@@ -46,7 +46,7 @@
     "loglevel": "^1.6.8",
     "mongoose": "^5.10.4",
     "nodemon": "^2.0.4",
-    "sanitize-html": "^1.27.2",
+    "sanitize-html": "^2.3.2",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
