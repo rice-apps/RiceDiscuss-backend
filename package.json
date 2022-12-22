@@ -42,7 +42,7 @@
     "graphql-compose": "^7.20.1",
     "graphql-compose-connection": "^7.0.1",
     "graphql-compose-mongoose": "^8.0.3",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "loglevel": "^1.6.8",
     "mongoose": "^5.10.4",
     "nodemon": "^2.0.4",
